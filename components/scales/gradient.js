@@ -5,7 +5,7 @@ import Basic from './basic.js';
 
 const SELECTED_COLOR = "red";
 
-export default class Palette extends Basic { 
+export default class Scale extends Basic { 
 	
 	constructor() {
 		super();
@@ -34,5 +34,8 @@ export default class Palette extends Basic {
 				
 		this.gradient = d3.scaleQuantile().domain([vMin, n, vMax]).range(colors);
 	}
+	
+	static FromJson(json) {
+		
+	}
 }
-				

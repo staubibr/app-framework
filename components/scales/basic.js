@@ -5,14 +5,20 @@ import Evented from '../../components/evented.js';
 
 const SELECTED_COLOR = "red";
 
-export default class Palette extends Evented { 
+export default class Scale extends Evented { 
 	
 	get SelectedColor() { return SELECTED_COLOR; }
 
-	constructor() {
+	constructor(classes) {
 		super();
 		
 		this.classes = [];
+		
+		if (classes) this.AddClasses(classes);
+	}
+	
+	AddClasses(classes) {
+		classes.forEach(p => this.AddClass(p.start, p.end, p.color));
 	}
 	
 	AddClass(start, end, color) {
@@ -28,7 +34,7 @@ export default class Palette extends Evented {
 		
 		this.classes.splice(i, 1);
 		
-		this.Emit("Change", { palette:this });
+		this.Emit("Change", { scale:this });
 	}
 	
 	GetColor(value) {
@@ -36,27 +42,27 @@ export default class Palette extends Evented {
 			return (value >= c.start && value < c.end);
 		});
 		
-		var color = clss ? clss.color : [248, 24, 148];
+		if (!clss) return null;
 		
-		return `rgb(${color.join(",")})`;
+		return `rgb(${clss.color.join(",")})`;
 	}
 	
 	SetColor(clss, color) {
 		clss.color = color;
 		
-		this.Emit("Change", { palette:this });
+		this.Emit("Change", { scale:this });
 	}
 	
 	SetStart(clss, value) {
 		clss.start = value;
 		
-		this.Emit("Change", { palette:this });
+		this.Emit("Change", { scale:this });
 	}
 	
 	SetEnd(clss, value) {
 		clss.end = value;
 		
-		this.Emit("Change", { palette:this });
+		this.Emit("Change", { scale:this });
 	}
 	
 	Save() {
@@ -70,7 +76,7 @@ export default class Palette extends Evented {
 		this.fileName = config.fileName;
 		this.classes = config.classes;
 		
-		this.Emit("Session", { palette:this });
+		this.Emit("Session", { scale:this });
 	}
 	
 	Buckets(n, cMin, cMax, vMin, vMax) {
@@ -96,6 +102,16 @@ export default class Palette extends Evented {
 			this.classes.push({ i:classes.length, start:v1, end:v2, color:[r,g,b] });
 		}
 	
-		this.Emit("Change", { palette:this });
+		this.Emit("Change", { scale:this });
+	}
+	
+	ToJson() {
+		return this.classes.map(c => {
+			return {
+				start : c.start,
+				end : c.end,
+				color : c.color
+			}
+		});
 	}
 }
