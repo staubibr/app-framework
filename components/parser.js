@@ -1,14 +1,26 @@
 'use strict';
 
 import Core from '../tools/core.js';
-import Parser from "./parser.js";
-import Settings from "../components/settings.js";
+import Evented from "../components/evented.js";
+import ChunkReader from "../components/chunkReader.js";
 import SimulationDEVS from "../simulation/simulationDEVS.js";
 import SimulationCA from "../simulation/simulationCA.js";
 import SimulationIRR from "../simulation/simulationIRR.js";
 import Model from "../simulation/model.js";
 
-export default class Standardized extends Parser { 
+export default class Parser extends Evented { 
+	
+	ReadByChunk(file, delegate) {		
+		return ChunkReader.ReadByChunk(file, "\n", (parsed, chunk, progress) => {
+			if (!parsed) parsed = [];
+		
+			parsed = delegate(parsed, chunk);
+			
+			this.Emit("Progress", { progress: progress });
+			
+			return parsed;
+		});
+	}
 	
 	Parse(files) {
 		var d = Core.Defer();
@@ -24,16 +36,16 @@ export default class Standardized extends Parser {
 			return d.promise;
 		}
 
-		this.Read(structure, this.ParseStructure.bind(this)).then(response => {
+		ChunkReader.Read(structure, this.ParseStructure.bind(this)).then(response => {
 			this.structure = response;
 			
 			var type = this.structure.info.type;
 			
-			// if (type == "DEVS" && !diagram) return d.Reject(new Error("Unable to parse the diagram (.svg) file."));
-			
-			var p1 = this.ReadByChunk(messages, this.ParseLogChunk.bind(this));
-			var p2 = this.Read(diagram, (content) => content);
-			var p3 = this.Read(style, (content) => JSON.parse(content));
+			this.t = null;
+						
+			var p1 = this.ReadLog(messages);
+			var p2 = ChunkReader.Read(diagram, (content) => content);
+			var p3 = ChunkReader.Read(style, (content) => JSON.parse(content));
 			
 			Promise.all([p1, p2, p3]).then((data) => {			
 				if (!data[0]) return d.Reject(new Error("Unable to parse the messages (.log) file."));
@@ -44,12 +56,7 @@ export default class Standardized extends Parser {
 				if (type == "Cell-DEVS") simulation = SimulationCA.FromJson(this.structure, data[0]);
 				if (type == "Irregular Cell-DEVS") simulation = SimulationIRR.FromJson(this.structure, data[0]);
 				
-				var oFiles = { structure:structure, messages:messages }
-				
-				if (diagram) oFiles.diagram = diagram;
-				if (style) oFiles.style = style;
-				
-				d.Resolve({ simulation:simulation, style:data[2], files:oFiles });
+				d.Resolve({ simulation:simulation, style:data[2] || null });
 			}, (error) => d.Reject(error));
 		});
 		
@@ -99,8 +106,19 @@ export default class Standardized extends Parser {
 		};
 	}
 	
+	ReadLog(file) {
+		return ChunkReader.ReadByChunk(file, "\n", (parsed, chunk, progress) => {
+			if (parsed == null) parsed = [];
+			
+			parsed = this.ParseLogChunk(parsed, chunk);
+			
+			this.Emit("Progress", { progress: progress });
+			
+			return parsed;
+		});
+	}
+	
 	ParseLogChunk(parsed, chunk) {
-		var t = null;
 		// If line has only one item, then it's a timestep. Otherwise, it's a simulation message, 
 		// the format then depends on the whether it's a DEVS, Cell-DEVS or Irregular model
 		var lines = chunk.split("\n");
@@ -109,33 +127,29 @@ export default class Standardized extends Parser {
 			var l = lines[i];
 			var v = l.trim().split(",");
 			
-			if (v.length == 1) t = v[0];
+			if (v.length == 1) this.t = v[0];
 			
 			else if (this.structure.info.type == "Cell-DEVS") {
 				var c = [+v[0],+v[1],+v[2]];
-				// var p = this.structure.ports[0];
 				var m = this.structure.models[0];
 				var d = this.TemplateData(m.template, v.slice(3));
 				
 				// StateChangeMessages
-				parsed.push({ time:t, cell:c, value:d });
-				// parsed.push({ time:t, coord:c, value:d });
+				parsed.push({ time:this.t, cell:c, value:d });
 			}
 			else if (this.structure.info.type == "Irregular Cell-DEVS") {
 				var m = this.structure.models[v[0]];
 				var d = this.TemplateData(m.template, v.slice(1));
 				
 				// StateChangeMessages
-				// parsed.push({ time:t, model:m.name, port:null, value:d });
-				parsed.push({ time:t, model:m.name, value:d });
+				parsed.push({ time:this.t, model:m.name, value:d });
 			}
 			else if (this.structure.info.type != "Cell-DEVS") {
 				var p = this.structure.ports[v[0]];
 				var d = this.TemplateData(p.template, v.slice(1));
 				
 				// OutputMessages
-				// parsed.push({ time:t, model:p.model, port:p.name, value:d });
-				parsed.push({ time:t, model:p.model, port:p.name, value:d });
+				parsed.push({ time:this.t, model:p.model, port:p.name, value:d });
 			}
 		}
 		
