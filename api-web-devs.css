@@ -43,7 +43,7 @@ button.inactive {
 .playback label {
 	font-weight: bold;
     color: #0051A3;
-    min-width: 90px;
+    min-width: 120px;
 }
 
 .playback > * {

@@ -15,10 +15,10 @@ export default class Info {
 	set type(value) { this._json.type = value; }
 	
 	constructor(name, simulator, type) {
-		this._json = {
-			name : name ?? null,
-			simulator : simulator ?? null,
-			type : type ?? null
-		}
+		this._json = {};
+		
+		this.name = name ?? null;
+		this.simulator = simulator ?? null;
+		this.type = type ?? null;
 	}
 }

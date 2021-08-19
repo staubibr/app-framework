@@ -17,16 +17,12 @@ export class Link {
 	get portB() {  return this._json.portB; }
 	set portB(value) { this._json.portB = value; }
 	
-	get svg() {  return this._json.svg; }
-	set svg(value) { this._json.svg = value; }
-	
-	constructor(modelA, portA, modelB, portB, svg) {
-		this._json = {
-			modelA : modelA ?? null,
-			portA : portA ?? null,
-			modelB : modelB ?? null,
-			portB : portB ?? null,
-			svg : svg ?? null
-		}
+	constructor(modelA, portA, modelB, portB) {
+		this._json = {};
+		
+		this.modelA = modelA ?? null;
+		this.portA = portA ?? null;
+		this.modelB = modelB ?? null;
+		this.portB = portB ?? null;
 	}
 }

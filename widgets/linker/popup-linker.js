@@ -20,13 +20,16 @@ export default Core.Templatable("Popup.Linker", class PopupLinker extends Popup 
 		
 		this.simulation = simulation;
 		
-		var ports = [];
-		
 		var diagram = await ChunkReader.ReadAsText(diagram);
+		
+		var ports = [];
+		var links = [];
 		
 		simulation.models.forEach(m => {
 			m.ports.forEach(p => ports.push({ model:m, port:p }));
 		});
+		
+		simulation.models.forEach(m => links = links.concat(m.links));
 		
 		var options = {
 			diagram: diagram,
@@ -52,7 +55,7 @@ export default Core.Templatable("Popup.Linker", class PopupLinker extends Popup 
 				caption: 'Links',
 				empty: 'No links found in the structure file.',
 				label: d => `<div><b>${d.portA.name}</b> @ <b>${d.modelA.id}</b> to</div><div><b>${d.portB.name}</b> @ <b>${d.modelB.id}</b></div>`,
-				items: simulation.links,
+				items: links,
 				attrs: {
 					"devs-link-mA" : d => d.modelA.id,
 					"devs-link-pA" : d => d.portA.name

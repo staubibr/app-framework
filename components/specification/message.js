@@ -3,13 +3,14 @@
 export class Message { 
 	
 	get value() { return this._value; }
+	set value(value) { this._value = value; }
 	
 	get diff() { return this._diff; }
 	set diff(value) { this._diff = value; }
 	
-	constructor(value) {
-		this._value = value;
-		this._diff = null;
+	constructor(value, diff) {
+		this.value = value ?? null;
+		this.diff = diff ?? null;
 	}
 	
 	GetDiff() {

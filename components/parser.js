@@ -71,15 +71,15 @@ export default class Parser extends Evented {
 	}
 	
 	ParseLine(frame, structure, emitter, values) {
-		var model = structure.nodes[emitter[0]];
+		var model = structure.models[emitter[0]];
 		var port = emitter.length == 2 ? model.ports[emitter[1]]: null ; 
 
-		if (port) frame.AddOutputMessage(new OutputMessage(model, port, values));
+		if (port) frame.AddOutputMessage(new OutputMessage(model, port, port.Template(values)));
 
-		else frame.AddStateMessage(new StateMessage(model, values));		
+		else frame.AddStateMessage(new StateMessage(model, model.Template(values)));	
 	}
 	
-	ParseLineCA(frame, structure, coord, values) {
+	ParseLineCA(frame, structure, coord, values) {		
 		var values = structure.model_types[1].Template(values);
 
 		frame.AddStateMessage(new StateMessageCA(coord, values));

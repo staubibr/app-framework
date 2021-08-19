@@ -19,7 +19,7 @@ export default class SimulationDEVS extends Simulation {
 		
 		if (!vb) throw new Error("The viewBox attribute must be specified on the svg element.");
 
-		var split = vb[1].split(" ");
+		var split = vb.split(" ");
 		
 		return split[2] / split[3];
 	}

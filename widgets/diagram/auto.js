@@ -90,7 +90,7 @@ export default Core.Templatable("Auto.Diagram", class AutoDiagram extends Automa
 		if (tY.length == 0) return;
 		
 		tY.forEach(t => {
-			var value = JSON.stringify(t.value);
+			var value = t.value.join(", "); //JSON.stringify(t.value);
 			var subs = [t.model.id, value, t.port.name];
 			var html = this.nls.Ressource("Diagram_Tooltip_Y", subs);
 			
