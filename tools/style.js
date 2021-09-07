@@ -53,6 +53,8 @@ export default class Style {
 		
 		var zValues = zero ?  values.filter(v => v != 0) : values;
 		
+		if (zValues.length == 0) return [0];
+		
 		var interval = Math.floor(zValues.length / n);
 		
 		for (var i = 1; i < n; i++) buckets.push(zValues[i * interval]);

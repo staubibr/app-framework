@@ -2,14 +2,20 @@ import Core from './core.js';
 
 export default class Net {
 	
+	static Url(base, query) {
+		var keys = Object.keys(query);
+		
+		var params = keys.length > 0 ? keys.map(k => `${k}=${query[k]}`).join("&") : null;
+		
+		return params ? `${base}?${params}` : base;
+	}
+	
 	/**
 	* Execute a web request
 	*
 	* Parameters :
 	*	url : String, the request URL
 	* Return : none
-	*
-	* TODO : This should return a promise object but (ie11)
 	*
 	*/
 	static Fetch(url, options, optional){
@@ -25,6 +31,10 @@ export default class Net {
 		}, (error) => d.Reject(error));
 
 		return d.promise;
+	}
+	
+	static Post(url, options, payload, optional) {
+		
 	}
 	
 	static FetchBlob(url, options, optional) {
@@ -49,14 +59,16 @@ export default class Net {
 		}, error => d.Reject(error));
 		
 		return d.promise;
-	}
+	}		
 	
 	static JSON(url, options, optional) {
 		var d = Core.Defer();
 		
-		Net.FetchText(url, options, optional).then(text => {
-			d.Resolve(text ? JSON.parse(text) : null);
-		}, error => d.Reject(error));
+		this.Fetch(url, options, optional).then(response => { 
+			if (response == null) d.Resolve(null);
+			
+			else response.json().then(json => d.Resolve(json), error => d.Reject(error));
+		});
 		
 		return d.promise;
 	}

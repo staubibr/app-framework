@@ -8,11 +8,15 @@ import Templated from '../components/templated.js';
 export default Core.Templatable("Basic.UI.Select", class Select extends Templated {
 	
 	get value() {
-		return this.Elem("root").value;
+		return parseInt(this.Elem("root").value);
 	}
 	
 	set value(value) {
+		if (value == null) value = -1;
+		
 		this.Elem("root").value = value;
+		
+		if (value == -1) Dom.SetCss(this.Elem("root"), "is-placeholder");
 	}
 	
 	set disabled(value) {
@@ -76,10 +80,10 @@ export default Core.Templatable("Basic.UI.Select", class Select extends Template
 		var item = this.items[ev.target.value];
 		
 		this.Emit("Change", { index:ev.target.value, item:item, label:ev.target.innerHTML });
-	}
-	
-	Template() {
-		return '<select handle="root"></select>';
+		
+		if (ev.target.value == -1) return;
+		
+		Dom.SetCss(this.Elem("root"), null);
 	}
 	
 	Empty() {
@@ -92,5 +96,19 @@ export default Core.Templatable("Basic.UI.Select", class Select extends Template
 		Dom.Place(this.ph, this.Elem("root"));
 	
 		this.ph.selected = true;
+	}
+	
+	Reload(data, delegate) {
+		var i = this.value;
+		
+		this.Empty();
+		
+		data.forEach(d => this.Add(...delegate(d)));
+		
+		this.value = i;
+	}
+	
+	Template() {
+		return '<select handle="root"></select>';
 	}
 });
