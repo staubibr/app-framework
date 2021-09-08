@@ -33,10 +33,6 @@ export default class Net {
 		return d.promise;
 	}
 	
-	static Post(url, options, payload, optional) {
-		
-	}
-	
 	static FetchBlob(url, options, optional) {
 		var d = Core.Defer();
 		

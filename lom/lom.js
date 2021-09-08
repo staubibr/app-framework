@@ -21,6 +21,7 @@ const MODEL_TYPES = `${BASE}/modeltypes`;
 const NN_FILES_V_ALL = `${BASE}/nn_files_v_all`;
 const NN_MODEL_TYPES_V_TAGS = `${BASE}/nn_model_types_v_tags`;
 const TAGS = `${BASE}/tags`;
+const DOWNLOAD = `${BASE}/download/files`;
 
 class LoM extends Evented {
 	
@@ -57,7 +58,8 @@ class LoM extends Evented {
 			model_types: this.tableApi(MODEL_TYPES, ModelType),
 			nn_files_v_all: this.tableApi(NN_FILES_V_ALL, NNFileVAll),
 			nn_model_types_v_tags: this.tableApi(NN_MODEL_TYPES_V_TAGS, NNModelTypeVTag),
-			tags: this.tableApi(TAGS, Tag)
+			tags: this.tableApi(TAGS, Tag),
+			download: this.downloadApi(DOWNLOAD)
 		}
 		
 		this.data = {
@@ -105,6 +107,22 @@ class LoM extends Evented {
 				var headers = { 'Content-Type': 'application/json' };
 				
 				return Net.JSON(`${api}`, { method:"delete", body:body, headers:headers });
+			}
+		}
+	}
+	
+	downloadApi(api) {
+		return {
+			"get": async (id, hierarchy) => {
+				var url = Net.Url(`${api}/${id}`, { hierarchy:!!hierarchy });
+				
+				return Net.File(url, { method:"get" });
+			},
+				
+			"getAll": async (ids, hierarchy) => {
+				var url = Net.Url(`${api}`, { ids:ids, hierarchy:!!hierarchy });
+				
+				return Net.File(url, { method:"get" });
 			}
 		}
 	}

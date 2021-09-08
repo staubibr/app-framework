@@ -4,10 +4,15 @@ import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 import Templated from '../../components/templated.js';
 import eModelType from '../entities/e_model_type.js';
+import TagsInput from '../../ui/tags-input.js';
+import FilesTable from './files-table.js';
 
 import Select from '../../ui/select.js';
 
 export default Core.Templatable("Widget.Forms.ModelType", class ModelType extends Templated { 
+
+	set files(value) { this._files = value; }
+	get files() { return this._files; }
 
 	set authors(value) {
 		this.Widget("u_author").Reload(value, d => [d.full_name, null, d]);
@@ -25,6 +30,8 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 			description: this.Elem("u_description").value,
 			date_created: date.getTime(),
 			author_id: this.Widget("u_author").selected.id,
+			tags: this.Widget("u_tags").value,
+			files: this.Widget("u_files").value
 		});
 	}
 
@@ -47,6 +54,8 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 		this.Widget("u_formalism").placeholder = this.nls.Ressource("ph_formalism");
 		this.Widget("u_simulator").placeholder = this.nls.Ressource("ph_simulator");
 		this.Widget("u_author").placeholder = this.nls.Ressource("ph_author");
+		
+		this.files = this.Widget("u_files");
 	}
 	
 	Clear() {
@@ -58,6 +67,8 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 		this.Elem("u_description").value = null;
 		this.Elem("u_date_created").value = null;
 		this.Widget("u_author").value = null;
+		this.Widget("u_tags").value = null;
+		this.Widget("u_files").value = null;
 	}
 	
 	Show(data) {
@@ -69,10 +80,12 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 		this.Elem("u_description").value = data.description;
 		this.Elem("u_date_created").value = data.date_created.toISOString().split("T")[0];
 		this.Widget("u_author").Select(i => i.id == data.author_id);
+		this.Widget("u_tags").value = data.tags;
+		this.Widget("u_files").value = data.files;
 	}
 		
 	Template() {
-		return `<form class='form-contributor'>
+		return `<div class='form form-contributor'>
 					<div class=''>
 						<label handle='id'>nls(label_id)</label>
 						<label handle='u_id'></label>
@@ -105,7 +118,13 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 						<label handle='author'>nls(label_author)</label>
 						<div handle='u_author' class='select' widget='Basic.UI.Select'></div>
 					</div>
-		       </form>`;
+					<div class=''>
+						<label handle='tags'>nls(label_tags)</label>
+						<div handle='u_tags' widget='Basic.LoM.Forms.TagsInput'></div>
+					</div>
+					<hr>
+					<div handle='u_files' widget='Basic.LoM.Forms.FilesTable'></div>
+		       </div>`;
 	}
 	
 	static Nls() {
@@ -118,6 +137,7 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 			"label_description": { "en": "Description" },
 			"label_date_created": { "en": "Date created" },
 			"label_author": { "en": "Author" },
+			"label_tags": { "en": "Tags (split by ;)" },
 			"type_atomic": { "en": "Atomic" },
 			"type_coupled": { "en": "Coupled" },
 			"type_top": { "en": "Top" },
@@ -128,7 +148,10 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 			"ph_type": { "en": "Select a type of model..." },
 			"ph_formalism": { "en": "Select a formalism..." },
 			"ph_simulator": { "en": "Select a simulator..." },
-			"ph_author": { "en": "Select an author..." }
+			"ph_author": { "en": "Select an author..." },
+			"table_col_name" : { "en": "File name" },
+			"table_col_date" : { "en": "Modified" },
+			"table_col_description" : { "en": "Description" }
 		}
 	}
 });

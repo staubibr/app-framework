@@ -50,7 +50,7 @@ export default Core.Templatable("Widget.Forms.Contributor", class Contributor ex
 	}
 	
 	Template() {
-		return `<form class='form-contributor'>
+		return `<div class='form form-contributor'>
 					<div class=''>
 						<label handle='id'>nls(label_id)</label>
 						<label handle='u_id'></label>
@@ -79,7 +79,7 @@ export default Core.Templatable("Widget.Forms.Contributor", class Contributor ex
 						<label handle='creation_date'>nls(label_creation_date)</label>
 						<input handle='u_creation_date' type="date" />
 					</div>
-		       </form>`;
+		       </div>`;
 	}
 	
 	static Nls() {

@@ -61,7 +61,7 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 	}
 	
 	Template() {
-		return `<form class='form-contributor'>
+		return `<div class='form form-contributor'>
 					<div class=''>
 						<label handle='id'>nls(label_id)</label>
 						<label handle='u_id'></label>
@@ -90,7 +90,7 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 						<label handle='top_model_type'>nls(label_top_model_type)</label>
 						<div handle='u_top_model_type' widget='Basic.UI.Select'></div>
 					</div>
-		       </form>`;
+		       </div>`;
 	}
 	
 	static Nls() {
