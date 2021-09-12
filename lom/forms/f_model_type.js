@@ -31,7 +31,7 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 			date_created: date.getTime(),
 			author_id: this.Widget("u_author").selected.id,
 			tags: this.Widget("u_tags").value,
-			files: this.Widget("u_files").value
+			files: this.Widget("u_files").value.files
 		});
 	}
 
@@ -81,7 +81,7 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 		this.Elem("u_date_created").value = data.date_created.toISOString().split("T")[0];
 		this.Widget("u_author").Select(i => i.id == data.author_id);
 		this.Widget("u_tags").value = data.tags;
-		this.Widget("u_files").value = data.files;
+		this.Widget("u_files").value = { "files":data.files }
 	}
 		
 	Template() {

@@ -229,7 +229,7 @@ export default class Linker extends Templated {
 
 	static get SVG_FORMAT() {
 		return {
-			DRAW_IO: 'foreignObject div > div > div, rect:not([fill="none"][stroke="none"]), circle, ellipse, path, polygon'
+			DRAW_IO: 'foreignObject div > div > div, rect:not([fill="none"][stroke="none"]), circle, ellipse, path, polygon, text'
 		}
 	}
 }

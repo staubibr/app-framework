@@ -64,7 +64,7 @@ export default class Net {
 			if (response == null) d.Resolve(null);
 			
 			else response.json().then(json => d.Resolve(json), error => d.Reject(error));
-		});
+		}, error => d.Reject(error));
 		
 		return d.promise;
 	}

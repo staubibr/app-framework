@@ -7,11 +7,15 @@ export default class Contributor {
 	
     get json() { return this._json; }
     set json(value) { this._json = value; }
-
+	
 	get label() { throw new Error("label getter must be implemented.") }
 	
-	constructor(json) {		
+	constructor(json, complex) {		
 		this.json = json;
  	}
+	
+	toJSON() {
+		return this.json;
+	}
 }
 

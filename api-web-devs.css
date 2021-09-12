@@ -359,7 +359,7 @@ button.inactive {
 .diagram-container path {
 	pointer-events:none;
 }
-
+/*
 text.highlighted,
 marker.highlighted path,
 .highlighted:not(text):not(path) {
@@ -393,7 +393,7 @@ div.highlighted.origin {
 .highlighted.origin.selected:not(text):not(path) {
     stroke: red  !important;
 }
-
+*/
 /* grid widget styling */
 .grid, .grid .grid-canvas-container {
 	width: 100%;

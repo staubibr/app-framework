@@ -19,22 +19,25 @@ export default Core.Templatable("Basic.LoM.Forms.FilesTable", class FilesTable e
 		
 		if (!value) return;
 		
-		value.forEach(f => {
-			var date = new Date(f.last_modification);
-			
-			var tr = Dom.Create("tr", {}, this.Elem("files"));
-			var td = Dom.Create("td", { }, tr);
-			var btn = Dom.Create("button", { className:"icon download" }, td);
-			
-			btn.title = this.nls.Ressource("btn_one_download", [f.name]);
-			
-			Dom.Create("i", { className:"fas fa-file-download" }, btn);
-			Dom.Create("td", { innerHTML:f.name }, tr);
-			Dom.Create("td", { innerHTML:date.toISOString().split("T")[0] }, tr);
-			Dom.Create("td", { innerHTML:f.file_type.description }, tr);
-			
-			btn.addEventListener("click", this.OnBtnOne_Click.bind(this, f));
-		});
+		for (var id in value) {			
+			value[id].forEach(f => {
+				var date = new Date(f.last_modification);
+				
+				var tr = Dom.Create("tr", {}, this.Elem("files"));
+				var td = Dom.Create("td", { }, tr);
+				var btn = Dom.Create("button", { className:"icon download" }, td);
+				
+				btn.title = this.nls.Ressource("btn_one_download", [f.name]);
+				
+				Dom.Create("i", { className:"fas fa-file-download" }, btn);
+				Dom.Create("td", { innerHTML:f.name }, tr);
+				Dom.Create("td", { innerHTML:date.toISOString().split("T")[0] }, tr);
+				Dom.Create("td", { innerHTML:f.file_type.description }, tr);
+				
+				btn.addEventListener("click", this.OnBtnOne_Click.bind(this, f));
+			});
+		}
+		
 	}
 
 	constructor(node) {
@@ -47,8 +50,12 @@ export default Core.Templatable("Basic.LoM.Forms.FilesTable", class FilesTable e
 		this.Emit("download", { files:[file.id], hierarchy:false });
 	}
 	
-	OnBtnAll_Click(ev) {		
-		this.Emit("download", { files:this.value.map(v => v.id), hierarchy:true });
+	OnBtnAll_Click(ev) {
+		var files = [];
+
+		for (var id in this.value) files = files.concat(this.value[id]);
+		
+		this.Emit("download", { files:files.map(v => v.id), hierarchy:true });
 	}
 	
 	Template() {

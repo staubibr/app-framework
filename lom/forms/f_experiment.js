@@ -4,6 +4,7 @@ import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 import Templated from '../../components/templated.js';
 import eExperiment from '../entities/e_experiment.js';
+import FilesTable from './files-table.js';
 
 export default Core.Templatable("Widget.Forms.Experiment", class Experiment extends Templated { 
 
@@ -24,11 +25,16 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 			name: this.Elem("u_name").value,
 			description: this.Elem("u_description").value,
 			date_created: date.getTime(),
-			author: this.Widget("u_author").selected.id,
-			top_model_type: this.Widget("u_top_model_type").selected.id
+			author_id: this.Widget("u_author").selected.id,
+			top_model_type_id: this.Widget("u_top_model_type").selected.id,
+			exp_files: this.Widget("u_files").value.exp_files,
+			doc_files: this.Widget("u_files").value.doc_files,
+			raw_res_files: this.Widget("u_files").value.raw_res_files,
+			conv_res_files: this.Widget("u_files").value.conv_res_files,
+			viz_files: this.Widget("u_files").value.viz_files
 		});
 	}
-
+	
 	get id() {
 		return parseInt(this.Elem("u_id").innerHTML) || null;
 	}
@@ -38,6 +44,8 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 		
 		this.Widget("u_author").placeholder = this.nls.Ressource("ph_author");
 		this.Widget("u_top_model_type").placeholder = this.nls.Ressource("ph_top_model_type");
+		
+		this.files = this.Widget("u_files");
 	}
 	
 	Clear() {
@@ -48,6 +56,7 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 		this.Elem("u_date_created").value = null;
 		this.Widget("u_author").placeholder = null;
 		this.Widget("u_top_model_type").placeholder = null;
+		this.Widget("u_files").value = null;
 	}
 	
 	Show(data) {
@@ -56,8 +65,16 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 		this.Elem("u_name").value = data.name;
 		this.Elem("u_description").value = data.description;
 		this.Elem("u_date_created").value = data.date_created.toISOString().split("T")[0];
-		this.Widget("u_author").Select(a => a.id == data.author);
-		this.Widget("u_top_model_type").Select(mt => mt.id == data.top_model_type);
+		this.Widget("u_author").Select(a => a.id == data.author_id);
+		this.Widget("u_top_model_type").Select(mt => mt.id == data.top_model_type_id);
+				
+		this.Widget("u_files").value = {
+			"exp_files": data.exp_files, 
+			"doc_files": data.doc_files, 
+			"raw_res_files": data.raw_res_files, 
+			"conv_res_files": data.conv_res_files, 
+			"viz_files": data.viz_files
+		};
 	}
 	
 	Template() {
@@ -90,6 +107,9 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 						<label handle='top_model_type'>nls(label_top_model_type)</label>
 						<div handle='u_top_model_type' widget='Basic.UI.Select'></div>
 					</div>
+					<hr>
+					<label>nls(label_files)</label>
+					<div handle='u_files' widget='Basic.LoM.Forms.FilesTable'></div>
 		       </div>`;
 	}
 	
@@ -103,7 +123,8 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 			"label_author": { "en": "author" },
 			"label_top_model_type": { "en": "top model type" },
 			"ph_author": { "en": "Select an author..." },
-			"ph_top_model_type": { "en": "Select a top model type..." }
+			"ph_top_model_type": { "en": "Select a top model type..." },
+			"label_files": { "en": "Experiment files" }
 		}
 	}
 });

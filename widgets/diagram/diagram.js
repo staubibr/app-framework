@@ -26,8 +26,12 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 		
 		this.Elem('diagram').appendChild(this.svg);
 		
+		var style = "marker.highlighted path {fill: #1e94c3 !important;stroke: #1e94c3 !important;}marker.highlighted.origin path {fill: #b36402 !important;stroke: #b36402 !important;}text.highlighted {fill: #1e94c3 !important;}text.highlighted.origin {fill: #b36402 !important;}path.highlighted {stroke: #1e94c3 !important;}path.highlighted.origin {stroke: #b36402 !important;}.highlighted:not(text):not(path) {stroke: #1e94c3 !important;fill: #d6f2fd !important;}.highlighted.origin:not(text):not(path) {stroke: #b36402 !important;fill: #f9e5c1 !important;}";
+		
+		Dom.Create("style", { innerHTML:style }, this.Node("diagram").Elem("svg"));
+				
 		this.svg.setAttribute("preserveAspectRatio", "none");
-
+		
 		this.SetPointerEvents();
 	}
 	
@@ -111,10 +115,13 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 	
 	onSvgMouseMove_Handler(node, ev) {
 		var id = node.getAttribute("devs-model-id");
+		var model = this.simulation.Model(id);
 		
-		this.Emit("MouseMove", { x:ev.pageX, y:ev.pageY, model:this.simulation.Model(id), svg:ev.target });
+		if (!model) return;
+		
+		this.Emit("MouseMove", { x:ev.pageX, y:ev.pageY, model:model, svg:ev.target });
 	}
-		
+	
 	onSvgMouseOut_Handler(node, ev) {
 		var id = node.getAttribute("devs-model-id");
 		
@@ -140,20 +147,19 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 	DrawToCanvas(node) {
 		var serializer = new XMLSerializer();
 		var source = serializer.serializeToString(node);
-		var canvas = this.Elem("canvas");
+		var cv = this.Elem("canvas");
 		
 		// create a file blob of our SVG.
 		var blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
 		var url = window.URL.createObjectURL(blob);
 		
+		var ctx = cv.getContext('2d');
 		var img = new Image();
 
 		img.onload = function() {
-			var ctx = canvas.getContext('2d');
-			
 			ctx.fillStyle = "#f9f9f9";
-			ctx.fillRect(0, 0, canvas.getAttribute("width"), canvas.getAttribute("height"));
-			ctx.drawImage(img, 0, 0, canvas.getAttribute("width"), canvas.getAttribute("height"));
+			ctx.fillRect(0, 0, cv.getAttribute("width"), cv.getAttribute("height"));
+			ctx.drawImage(img, 0, 0, cv.getAttribute("width"), cv.getAttribute("height"));
 			
 			window.URL.revokeObjectURL(url);
 		}

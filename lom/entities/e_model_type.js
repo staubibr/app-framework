@@ -37,5 +37,11 @@ export default class ModelType extends Entity {
 		super(json);
 		
 		json.date_created = new Date(json.date_created);
+		
+		if (complex) {
+			json.author = new Contributor(json.author, false);
+			json.files = json.files.map(f => new File(f, true));
+			json.tags = json.tags.map(t => new Tag(t, false))
+		}
 	}
 }

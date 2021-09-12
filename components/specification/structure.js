@@ -65,7 +65,9 @@ export default class Structure {
 		// build all node types from json
 		var model_types = json.model_types.map(t => {
 			// build model type metadata from json
-			var metadata = new Metadata(t.metadata.author, t.metadata.created, t.metadata.description, t.metadata.tags);
+			var metadata = null;
+			
+			if (t.metadata) metadata = new Metadata(t.metadata.author, t.metadata.created, t.metadata.description, t.metadata.tags);
 			
 			// build model type ports from json
 			var ports = t.ports.map(p => {
