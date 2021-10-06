@@ -17,7 +17,8 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 			messages: value.find(f => f.name == 'messages.log'),
 			diagram: value.find(f => f.name == 'diagram.svg'),
 			visualization: value.find(f => f.name == 'visualization.json'),
-			style: value.find(f => f.name == 'style.json')
+			style: value.find(f => f.name == 'style.json'),
+			geojson: value.filter(f => f.name.endsWith('.geojson'))
 		}
 	}
 	

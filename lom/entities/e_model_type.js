@@ -16,7 +16,8 @@ export default class ModelType extends Entity {
     get date_created() { return this._json.date_created; };
     get author_id() { return this._json.author_id; };
     get author() { return this._json.author; };
-    get files() { return this._json.files; };
+    get src_files() { return this._json.src_files; };
+    get meta() { return this._json.meta; };
     get tags() { return this._json.tags; };
 	
     set id(value) { this._json.id = value; };
@@ -28,7 +29,8 @@ export default class ModelType extends Entity {
     set date_created(value) { this._json.date_created = value; };
     set author_id(value) { this._json.author_id = value; };
     set author(value) { this._json.author = value; };
-    set files(value) { this._json.files = value; };
+    set src_files(value) { this._json.src_files = value; };
+    set meta(value) { this._json.meta = value; };
     set tags(value) { this._json.tags = value; };
 	
 	get label() { return `${this.name} (${this.type.toLowerCase()})`; }
@@ -40,7 +42,8 @@ export default class ModelType extends Entity {
 		
 		if (complex) {
 			json.author = new Contributor(json.author, false);
-			json.files = json.files.map(f => new File(f, true));
+			json.src_files = json.src_files.map(f => new File(f, true));
+			json.meta = json.meta;
 			json.tags = json.tags.map(t => new Tag(t, false))
 		}
 	}

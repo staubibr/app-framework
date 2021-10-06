@@ -67,7 +67,7 @@ export default Core.Templatable("Widget.Forms.Experiment", class Experiment exte
 		this.Elem("u_date_created").value = data.date_created.toISOString().split("T")[0];
 		this.Widget("u_author").Select(a => a.id == data.author_id);
 		this.Widget("u_top_model_type").Select(mt => mt.id == data.top_model_type_id);
-				
+		
 		this.Widget("u_files").value = {
 			"exp_files": data.exp_files, 
 			"doc_files": data.doc_files, 

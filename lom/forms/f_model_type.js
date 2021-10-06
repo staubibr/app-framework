@@ -5,6 +5,8 @@ import Dom from '../../tools/dom.js';
 import Templated from '../../components/templated.js';
 import eModelType from '../entities/e_model_type.js';
 import TagsInput from '../../ui/tags-input.js';
+import MetadataAtomic from './metadata-atomic.js';
+import MetadataCoupled from './metadata-coupled.js';
 import FilesTable from './files-table.js';
 
 import Select from '../../ui/select.js';
@@ -31,7 +33,7 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 			date_created: date.getTime(),
 			author_id: this.Widget("u_author").selected.id,
 			tags: this.Widget("u_tags").value,
-			files: this.Widget("u_files").value.files
+			src_files: this.Widget("u_files").value.src_files
 		});
 	}
 
@@ -81,7 +83,20 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 		this.Elem("u_date_created").value = data.date_created.toISOString().split("T")[0];
 		this.Widget("u_author").Select(i => i.id == data.author_id);
 		this.Widget("u_tags").value = data.tags;
-		this.Widget("u_files").value = { "files":data.files }
+		
+		this.Widget("u_files").value = { "src_files": data.src_files }
+		
+		Dom.AddCss(this.Elem("u_atomic"), "hidden");
+		Dom.AddCss(this.Elem("u_coupled"), "hidden");
+		
+		if (data.type == "Atomic") this.ShowMetadata("u_atomic", data);
+		
+		if (data.type == "Coupled" || data.type == "Top") this.ShowMetadata("u_coupled", data);
+	}
+	
+	ShowMetadata(meta_id, data) {
+		Dom.RemoveCss(this.Elem(meta_id), "hidden");
+		this.Widget(meta_id).value = data.meta;
 	}
 		
 	Template() {
@@ -122,6 +137,9 @@ export default Core.Templatable("Widget.Forms.ModelType", class ModelType extend
 						<label handle='tags'>nls(label_tags)</label>
 						<div handle='u_tags' widget='Basic.LoM.Forms.TagsInput'></div>
 					</div>
+					<hr>
+					<div handle='u_atomic' widget='Basic.LoM.Forms.MetadataAtomic' class='hidden'></div>
+					<div handle='u_coupled' widget='Basic.LoM.Forms.MetadataCoupled' class='hidden'></div>
 					<hr>
 					<div handle='u_files' widget='Basic.LoM.Forms.FilesTable'></div>
 		       </div>`;

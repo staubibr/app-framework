@@ -21,7 +21,7 @@ const MODEL_TYPES = `${BASE}/modeltypes`;
 const NN_FILES_V_ALL = `${BASE}/nn_files_v_all`;
 const NN_MODEL_TYPES_V_TAGS = `${BASE}/nn_model_types_v_tags`;
 const TAGS = `${BASE}/tags`;
-const DOWNLOAD = `${BASE}/download/files`;
+const DOWNLOAD = `${BASE}/files/download`;
 
 class LoM extends Evented {
 	
@@ -113,8 +113,8 @@ class LoM extends Evented {
 	
 	downloadApi(api) {
 		return {
-			"get": async (id, hierarchy) => {
-				var url = Net.Url(`${api}/${id}`, { hierarchy:!!hierarchy });
+			"get": async (id, hierarchy, name) => {
+				var url = Net.Url(`${api}/${id}`, { hierarchy:!!hierarchy, name:name });
 				
 				return Net.File(url, { method:"get" });
 			},

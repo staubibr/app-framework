@@ -46,8 +46,8 @@ export default Core.Templatable("Basic.LoM.Forms.FilesTable", class FilesTable e
 		this.Elem("btn_all").addEventListener('click', this.OnBtnAll_Click.bind(this));
 	}
 	
-	OnBtnOne_Click(file, ev) {
-		this.Emit("download", { files:[file.id], hierarchy:false });
+	OnBtnOne_Click(file, ev) {		
+		this.Emit("download:one", { file:file.id, name:file.label, hierarchy:false });
 	}
 	
 	OnBtnAll_Click(ev) {
@@ -55,7 +55,7 @@ export default Core.Templatable("Basic.LoM.Forms.FilesTable", class FilesTable e
 
 		for (var id in this.value) files = files.concat(this.value[id]);
 		
-		this.Emit("download", { files:files.map(v => v.id), hierarchy:true });
+		this.Emit("download:all", { files:files.map(v => v.id), hierarchy:true });
 	}
 	
 	Template() {
