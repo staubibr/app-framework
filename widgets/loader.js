@@ -5,6 +5,7 @@ import Dom from '../tools/dom.js';
 import Templated from '../components/templated.js';
 import BoxInputFiles from '../ui/box-input-files.js';
 import Parser from '../components/parser.js';
+import ParserCDpp from '../components/parserCDpp.js';
 import ChunkReader from '../components/chunkReader.js';
 import SimulationDEVS from '../simulation/simulationDEVS.js';
 import SimulationCA from '../simulation/simulationCA.js';
@@ -13,6 +14,10 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 
 	set files(value) {
 		this._files = { 
+			cd_ma: value.find(f => f.name.toLowerCase().endsWith('.ma')),
+			cd_log: value.find(f => f.name.toLowerCase().includes('.log')),
+			cd_pal: value.find(f => f.name.toLowerCase().endsWith('.pal')),
+			cd_val: value.find(f => f.name.toLowerCase().endsWith('.val')),
 			structure: value.find(f => f.name == 'structure.json'),
 			messages: value.find(f => f.name == 'messages.log'),
 			diagram: value.find(f => f.name == 'diagram.svg'),
@@ -29,9 +34,9 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 		
         if (!Core.URLs.conversion) throw new Error("Config Error: conversion url not defined in application configuration.");
 		
-		this.parser = new Parser();
+		// this.parser = new Parser();
 		
-		this.parser.On("Progress", this.OnParser_Progress.bind(this));
+		// this.parser.On("Progress", this.OnParser_Progress.bind(this));
 		
 		this.Node("parse").On("click", this.onParseButton_Click.bind(this));
 		this.Node("clear").On("click", this.onClearButton_Click.bind(this));
@@ -48,15 +53,36 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 		this.Elem("parse").style.backgroundImage = null;	
 	}
 	
-	Load(files) {		
-		if (!files.structure) this.onWidget_Error(new Error("Missing structure.json file, cannot parse."));
+	Load(files) {
+		if (files.cd_ma && files.cd_log && files.cd_pal) this.ParseCDpp(files);
+		
+		else if (!files.structure) this.onWidget_Error(new Error("Missing structure.json file, cannot parse."));
 		
 		else if (!files.messages) this.onWidget_Error(new Error("Missing messages.log file, cannot parse."));
 		
 		else this.Parse(files);
 	}
 	
+	async ParseCDpp(files) {
+		this.parser = new ParserCDpp();
+		
+		this.parser.On("Progress", this.OnParser_Progress.bind(this));
+		
+		var structure = await this.parser.ParseStructure(files.cd_ma);
+		var simulation = await this.parser.ParseSimulation(structure, files.cd_log, files.cd_val);
+		
+		var configuration = await this.parser.ParseConfiguration(simulation, files.cd_pal);
+
+		this.RestoreUI();
+		
+		this.Emit("ready", { files: files, simulation: simulation, configuration: configuration });			
+	}
+	
 	async Parse(files) {
+		this.parser = new Parser();
+		
+		this.parser.On("Progress", this.OnParser_Progress.bind(this));
+		
 		var structure = await this.parser.ParseStructure(files.structure);
 		var messages = await this.parser.ParseMessages(structure, files.messages);
 		var diagram = await this.parser.ParseDiagram(files.diagram);

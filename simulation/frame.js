@@ -21,6 +21,8 @@ export default class Frame {
 	
 	AddMessage(m, type) {
 		this.messages[type].push(m);
+		
+		return m;
 	}
 	
 	AddOutputMessage(m) {

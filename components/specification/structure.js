@@ -31,7 +31,7 @@ export default class Structure {
 	set message_types(value) { this._json.message_types = value; }
 	
 	// NOTE: Standard for loops are faster than forEach. Maybe replace the forEach loops by for loops.
-	constructor(info, models, model_types, message_types) {
+	constructor(info, models, model_types, message_types) {		
 		this._json = {};
 		
 		this.info = info ?? null;
