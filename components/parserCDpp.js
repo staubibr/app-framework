@@ -118,7 +118,22 @@ export default class ParserCDpp extends Evented {
 		return s;
 	}
 	
-	async ParseConfiguration(simulation, pal) {
+	async ParseStyle(simulation, fStyle) {
+		var config = Configuration.FromSimulation(simulation);
+		var style = await ChunkReader.ReadAsJson(fStyle);
+		
+		config.grid.styles = style;
+		
+		return config;
+	}
+	
+	async ParseVisualization(simulation, fViz) {
+		var visualization = await ChunkReader.ReadAsJson(fViz);
+		
+		return Configuration.FromJson(visualization);
+	}
+	
+	async ParsePalette(simulation, pal) {
 		var config = Configuration.FromSimulation(simulation);
 		var content = await ChunkReader.ReadAsText(pal);		
 		var lines = content.trim().split("\n").map(l => l.trim());

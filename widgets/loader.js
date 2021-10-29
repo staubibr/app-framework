@@ -54,7 +54,7 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 	}
 	
 	Load(files) {
-		if (files.cd_ma && files.cd_log && files.cd_pal) this.ParseCDpp(files);
+		if (files.cd_ma && files.cd_log) this.ParseCDpp(files);
 		
 		else if (!files.structure) this.onWidget_Error(new Error("Missing structure.json file, cannot parse."));
 		
@@ -71,7 +71,11 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 		var structure = await this.parser.ParseStructure(files.cd_ma);
 		var simulation = await this.parser.ParseSimulation(structure, files.cd_log, files.cd_val);
 		
-		var configuration = await this.parser.ParseConfiguration(simulation, files.cd_pal);
+		if (files.visualization) var configuration = await this.parser.ParseVisualization(simulation, files.visualization);
+		
+		else if (files.style) var configuration = await this.parser.ParseStyle(simulation, files.style);
+		
+		else var configuration = await this.parser.ParsePalette(simulation, files.cd_pal);
 
 		this.RestoreUI();
 		
