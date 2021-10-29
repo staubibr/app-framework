@@ -32,12 +32,6 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 	constructor(node) {		
 		super(node);
 		
-        if (!Core.URLs.conversion) throw new Error("Config Error: conversion url not defined in application configuration.");
-		
-		// this.parser = new Parser();
-		
-		// this.parser.On("Progress", this.OnParser_Progress.bind(this));
-		
 		this.Node("parse").On("click", this.onParseButton_Click.bind(this));
 		this.Node("clear").On("click", this.onClearButton_Click.bind(this));
 		this.Widget("dropzone").On("change", this.onDropzone_Change.bind(this));

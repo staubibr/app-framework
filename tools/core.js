@@ -5,10 +5,7 @@ let _locale = document.documentElement.lang || "en";
 let _templatables = {}
 
 let _urls = {
-	// conversion : "http://206.12.94.204:8080/sim.services.1.4/parser/auto",
-	conversion : "http://localhost:8080/parser/auto",
-	models : "http://localhost/Dev/arslab-logs/devs-logs/",
-	files : "http://arslab-services.herokuapp.com/get/model/simulation"
+	models : "http://localhost/Dev/arslab-logs/devs-logs/"
 }
 
 export default class Core {
