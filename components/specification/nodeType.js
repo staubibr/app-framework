@@ -25,8 +25,9 @@ export class NodeType {
 	Template(values) {
 		if (!this.message_type || !this.template) return values;
 		
-		if (this.template.length != values.length) throw new Error("length mismatch between fields and message content. This is a required temporary measure until Cadmium outputs message information.");			
-		
+		if (this.template.length != values.length) {
+			throw new Error("length mismatch between message type fields and message content. Check that your output function returns a comma delimited string the same length as your message_type fields property. ");			
+		}
 		var out = {};
 		
 		for (var i = 0; i < this.template.length; i++) {

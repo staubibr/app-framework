@@ -99,16 +99,14 @@ export default class ChunkReader extends Evented {
 					read = delegate(read, content, 100 * position / file.size);
 				}
 				catch (error) {
-					console.error(error);
-					
-					d.Reject(`Error while reading file chunk at position ${position}.`);
+					d.Reject(error);
 				}
 				
 				if (position < file.size) ReadChunk(size);
 				
 				else if (position == file.size) d.Resolve(read);
 				
-				else throw new Error("Reader position exceeded the file size.");
+				else d.Reject(new Error("Reader position exceeded the file size."));
 			});
 		}
 		

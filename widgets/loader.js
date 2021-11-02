@@ -47,14 +47,19 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 		this.Elem("parse").style.backgroundImage = null;	
 	}
 	
-	Load(files) {
-		if (files.cd_ma && files.cd_log) this.ParseCDpp(files);
-		
-		else if (!files.structure) this.onWidget_Error(new Error("Missing structure.json file, cannot parse."));
-		
-		else if (!files.messages) this.onWidget_Error(new Error("Missing messages.log file, cannot parse."));
-		
-		else this.Parse(files);
+	async Load(files) {
+		try {
+			if (files.cd_ma && files.cd_log) await this.ParseCDpp(files);
+			
+			else if (!files.structure) throw new Error("Missing structure.json file, cannot parse.");
+			
+			else if (!files.messages) throw new Error("Missing messages.log file, cannot parse.");
+			
+			else await this.Parse(files);
+		}
+		catch (error) {
+			this.onWidget_Error(error);
+		}
 	}
 	
 	async ParseCDpp(files) {

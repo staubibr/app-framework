@@ -84,16 +84,4 @@ export default class Parser extends Evented {
 
 		frame.AddStateMessage(new StateMessageCA(coord, values));
 	}
-	
-	ReadByChunk(file, delegate) {		
-		return ChunkReader.ReadByChunk(file, "\n", (parsed, chunk, progress) => {
-			if (!parsed) parsed = [];
-		
-			parsed = delegate(parsed, chunk);
-			
-			this.Emit("Progress", { progress: progress });
-			
-			return parsed;
-		});
-	}
 }
