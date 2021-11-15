@@ -186,9 +186,9 @@ export default class ParserCDpp extends Evented {
 		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
 		
 		this.initialRowValues.forEach(irv => {
-			irv.values.forEach(y => {
-				var coord = [irv.row, y, 0]
-				var value = sim.models[1].template.map(t => irv.values[y]);
+			irv.values.forEach((v, y) => {
+				var coord = [irv.row, +y, 0]
+				var value = sim.models[1].template.map(t => v);
 				
 				frame.AddStateMessage(new StateMessageCA(coord, value));
 			});
@@ -243,8 +243,8 @@ export default class ParserCDpp extends Evented {
 		
 		var sim = new SimulationCA(structure, []);
 		
-		if (!is_lopez) this.ReadInitialRowValues(sim, t0);
 		if (!is_lopez) this.ReadInitialValue(sim, t0);
+		if (!is_lopez) this.ReadInitialRowValues(sim, t0);
 		
 		this.ReadVal(sim, val, t0);
 		
