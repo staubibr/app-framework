@@ -104,11 +104,11 @@ export default class ParserCDpp extends Evented {
 				else if (kv[0] == "initialrowvalue") {
 					if (this.initialRowValues == null) this.initialRowValues = [];
 					
-					var lr = kv[1].replaceAll(" ","").split('')
+					var lr = kv[1].replace(/\s\s+/g, ',').split(',');
 					
 					this.initialRowValues.push({
 						row: +lr[0],
-						values: lr.slice(1, lr.length).map(v => v)
+						values: lr[1].split('')
 					});
 				}
 
