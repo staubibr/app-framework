@@ -18,6 +18,7 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 			cd_log: value.find(f => f.name.toLowerCase().includes('.log')),
 			cd_pal: value.find(f => f.name.toLowerCase().endsWith('.pal')),
 			cd_val: value.find(f => f.name.toLowerCase().endsWith('.val')),
+			cd_map: value.find(f => f.name.toLowerCase().endsWith('.map')),
 			structure: value.find(f => f.name == 'structure.json'),
 			messages: value.find(f => f.name == 'messages.log'),
 			diagram: value.find(f => f.name == 'diagram.svg'),
@@ -68,7 +69,7 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 		this.parser.On("Progress", this.OnParser_Progress.bind(this));
 		
 		var structure = await this.parser.ParseStructure(files.cd_ma);
-		var simulation = await this.parser.ParseSimulation(structure, files.cd_log, files.cd_val);
+		var simulation = await this.parser.ParseSimulation(structure, files.cd_log, files.cd_val, files.cd_map);
 		
 		if (files.visualization) var configuration = await this.parser.ParseVisualization(simulation, files.visualization);
 		

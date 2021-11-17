@@ -235,8 +235,27 @@ export default class ParserCDpp extends Evented {
 			frame.AddStateMessage(new StateMessageCA(coord, value));
 		}
 	}
+	
+	async ReadMap(sim, map, time) {
+		if (!map) return;
 		
-	async ParseSimulation(structure, log, val) {
+		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
+		var content = await ChunkReader.ReadAsText(map);
+		var lines = content.trim().split("\n").map(l => l.trim());		
+		var i = 0;
+		
+		for (var x = 0; x < sim.maxX; x++) {
+			for (var y = 0; y < sim.maxY; y++) {
+				for (var z = 0; z < sim.maxZ; z++) {
+					if (i == lines.length) throw new Error("missing initial values in map file."); 
+											
+					frame.AddStateMessage(new StateMessageCA([x, y, z], lines[i++].trim()));
+				}
+			}
+		}
+	}
+		
+	async ParseSimulation(structure, log, val, map) {
 		var lopez_test = await log.slice(0, 5).text();
 		var is_lopez = lopez_test == "0 / L";
 		var t0 = is_lopez ? "00:00:00:000:0" : "00:00:00:000";
@@ -246,7 +265,8 @@ export default class ParserCDpp extends Evented {
 		if (!is_lopez) this.ReadInitialValue(sim, t0);
 		if (!is_lopez) this.ReadInitialRowValues(sim, t0);
 		
-		this.ReadVal(sim, val, t0);
+		await this.ReadVal(sim, val, t0);
+		await this.ReadMap(sim, map, t0);
 		
 		await ChunkReader.ReadByChunk(log, "\n", (parsed, chunk, progress) => {			
 			var lines = chunk.split("\n");
