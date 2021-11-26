@@ -4,7 +4,7 @@ if (!window.streamSaver || !window.ZIP || !window.zip) {
 	console.warn("Unable to zip or unzip, some required scripts were not added.");
 }
 
-else zip.workerScriptsPath = "../api-web-devs/references/zip/";
+else zip.workerScriptsPath = "../app-framework/references/zip/";
 		
 export default class Zip {
 	
