@@ -3,33 +3,33 @@
 import Core from '../tools/core.js';
 import Evented from "../components/evented.js";
 import ChunkReader from "../components/chunkReader.js";
-import Configuration from '../components/configuration/configuration.js';
-import Structure from "../components/specification/structure.js";
-import SimulationDEVS from "../simulation/simulationDEVS.js";
-import SimulationCA from "../simulation/simulationCA.js";
-import Frame from "../simulation/frame.js";
-
-import { StateMessage, OutputMessage, StateMessageCA } from "./specification/message.js"
+import Configuration from '../data_structures/configuration/configuration.js';
+import Structure from "../data_structures/metadata/structure.js";
+import MessageState from "../data_structures/simulation/message_state.js"
+import MessageOutput from "../data_structures/simulation/message_output.js"
+import MessageStateCA from "../data_structures/simulation/message_state_ca.js"
+import Frame from "../data_structures/simulation/frame.js";
 
 export default class Parser extends Evented { 
+		
+	async ParseStyle(fStyle) {
+		var style = await ChunkReader.ReadAsJson(fStyle);		
+				
+		return style;
+	}
 	
-	async ParseConfiguration(simulation, fViz, fStyle) {
+	async ParseVisualization(type, fViz) {
 		var visualization = await ChunkReader.ReadAsJson(fViz);
-		var style = await ChunkReader.ReadAsJson(fStyle);
 		
-		if (visualization) var config = Configuration.FromJson(visualization);
+		if (visualization) return Configuration.FromJson(visualization);
 		
-		else var config = Configuration.FromSimulation(simulation);
-		
-		if (simulation.type == "Cell-DEVS" && style) config.grid.styles = style;
-		
-		return config;
+		else return Configuration.FromType(type);
 	}
 	
 	async ParseStructure(fStruct) {
 		var json = await ChunkReader.ReadAsJson(fStruct);
 		
-		return Structure.FromJson(json);
+		return Structure.from_json(json);
 	}
 	
 	async ParseDiagram(fDiag) {
@@ -74,14 +74,18 @@ export default class Parser extends Evented {
 		var model = structure.models[emitter[0]];
 		var port = emitter.length == 2 ? model.ports[emitter[1]]: null ; 
 
-		if (port) frame.AddOutputMessage(new OutputMessage(model, port, port.Template(values)));
-
-		else frame.AddStateMessage(new StateMessage(model, model.Template(values)));	
+		if (port) {
+			var values = port.apply_template(values);
+		
+			frame.add_output_message(new MessageOutput(model, port, values));
+		}
+		
+		else frame.add_state_message(new MessageState(model, model.apply_template(values)));	
 	}
 	
 	ParseLineCA(frame, structure, coord, values) {		
-		var values = structure.model_types[1].Template(values);
+		var values = structure.model_types[1].apply_template(values);
 
-		frame.AddStateMessage(new StateMessageCA(coord, values));
+		frame.add_state_message(new MessageStateCA(coord, values));
 	}
 }

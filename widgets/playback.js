@@ -116,19 +116,19 @@ export default Core.Templatable("Widget.Playback", class Playback extends Templa
 	GoToPrevious() {
 		this.SetCurrent(--this.current);
 		
-		this.simulation.GoToPreviousFrame();
+		this.simulation.go_to_previous_frame();
 	}
 	
 	GoToNext() {
 		this.SetCurrent(++this.current);
 		
-		this.simulation.GoToNextFrame();
+		this.simulation.go_to_next_frame();
 	}
 	
 	GoTo(i) {
 		this.SetCurrent(i);
 		
-		this.simulation.GoToFrame(i);
+		this.simulation.go_to_frame(i);
 	}
 	
 	onFirstClick_Handler(ev) {
@@ -197,7 +197,7 @@ export default Core.Templatable("Widget.Playback", class Playback extends Templa
 	}
 	
 	onSimulationSession_Handler(ev) {
-		this.SetCurrent(this.simulation.state.i);
+		this.SetCurrent(this.simulation.state.index);
 	}
 	
 	Template() {

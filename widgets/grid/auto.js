@@ -109,7 +109,7 @@ export default Core.Templatable("Auto.Grid", class AutoGrid extends Automator {
 		var labels = [];
 		
 		ev.data.layer.ports.forEach(port => {
-			var state = this.simulation.state.GetValue([ev.data.x, ev.data.y, ev.data.layer.z]);
+			var state = this.simulation.state.get_value([ev.data.x, ev.data.y, ev.data.layer.z]);
 			var subs = [ev.data.x, ev.data.y, ev.data.layer.z, state[port], port];
 			
 			labels.push(this.nls.Ressource("Grid_Tooltip_Title", subs));
@@ -127,12 +127,12 @@ export default Core.Templatable("Auto.Grid", class AutoGrid extends Automator {
 	onClick_Handler(ev) {
 		var id = [ev.data.x, ev.data.y, ev.data.z];
 		
-		if (this.simulation.IsSelected(id)) {
-			this.simulation.Deselect(id);
+		if (this.simulation.is_selected(id)) {
+			this.simulation.deselect(id);
 			
 			// TODO: This is nasty. Maybe just store the original color along with the id.
 			var port = ev.data.layer.ports[ev.data.layer.ports.length - 1];
-			var value = this.simulation.state.GetValue(id);
+			var value = this.simulation.state.get_value(id);
 			var scale = this.widget.styler.GetScale(ev.data.layer.style);
 			var color = this.widget.styler.GetColor(scale, value[port]);
 			
@@ -140,7 +140,7 @@ export default Core.Templatable("Auto.Grid", class AutoGrid extends Automator {
 		} 
 		
 		else {
-			this.simulation.Select(id);
+			this.simulation.select(id);
 			
 			this.widget.DrawCellBorder(ev.data.x, ev.data.y, ev.data.k, 'rgb(255,0,0)');
 		}

@@ -47,7 +47,7 @@ export default Core.Templatable("Widget.Settings.Layers", class Layers extends T
 		
 		item.data = l;
 		item.row = Dom.Create("tr", { className:"table-row" }, this.Elem("body"));		
-		item.z = this.AddZ(item, this.simulation.maxZ);
+		item.z = this.AddZ(item, this.simulation.max_z);
 		item.ports = this.AddPorts(item, this.simulation.ports);
 		item.style = this.AddStyle(item, this.settings.styles);
 		item.btnDelete = this.AddDeleteButton(item);

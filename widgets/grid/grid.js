@@ -154,7 +154,7 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 			for (var x = 0; x < this.dimensions.x; x++) {
 				for (var y = 0; y < this.dimensions.y; y++) {
 					for (var p = 0; p < l.ports.length; p++) {
-						var v = state.GetValue([x, y, l.z]); // value of cell to draw
+						var v = state.get_value([x, y, l.z]); // value of cell to draw
 						var f = l.ports[p]; 
 						
 						var color = this.styler.GetColor(scale, v[f]) || 'rgb(200, 200, 200)';
@@ -164,7 +164,7 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 					
 					var id = x + "-" + y + "-" + l.z; // id of cell to draw
 					
-					if (simulation.IsSelected(id)) this.DrawCellBorder(x, y, i, 'rgb(255,0,0)');
+					if (simulation.is_selected(id)) this.DrawCellBorder(x, y, i, 'rgb(255,0,0)');
 				}
 			}
 		}
@@ -185,7 +185,7 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 			
 					this.DrawCell(m.x, m.y, l.position, this.styler.GetColor(scale, v));
 					
-					if (simulation.IsSelected(m.coord)) this.DrawCellBorder(m.x, m.y, i, 'rgb(255,0,0)');
+					if (simulation.is_selected(m.coord)) this.DrawCellBorder(m.x, m.y, l.position, 'rgb(255,0,0)');
 				}
 			}
 		}

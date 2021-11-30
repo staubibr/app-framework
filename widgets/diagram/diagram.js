@@ -52,7 +52,7 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 	}
 	
 	GetLinkSVGNodes(l) {
-		var selector = `[devs-link-mA=${l.modelA.id}][devs-link-pA=${l.portA.name}]`;
+		var selector = `[devs-link-mA=${l.model_a.id}][devs-link-pA=${l.port_a.name}]`;
 		
 		return Array.from(this.svg.querySelectorAll(selector));
 	}
@@ -70,7 +70,7 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 
 				var nodes = this.GetPortSVGNodes(m, p);
 				
-				m.PortLinks(p).forEach(l => nodes = nodes.concat(this.GetLinkSVGNodes(l)));
+				m.get_port_links(p).forEach(l => nodes = nodes.concat(this.GetLinkSVGNodes(l)));
 				
 				this._svg.origins[m.id][p.name] = nodes;
 			});
@@ -82,22 +82,22 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 			m.ports.forEach(p => {
 				if (!this._svg.dests[m.id]) this._svg.dests[m.id] = {};
 				
-				var links = m.PortLinks(p);
+				var links = m.get_port_links(p);
 				
-				for (var i = 0; i < m.PortLinks(p).length; i++) {
-					var mB = links[i].modelB;
-					var pB = links[i].portB;
+				for (var i = 0; i < m.get_port_links(p).length; i++) {
+					var mB = links[i].model_b;
+					var pB = links[i].port_b;
 					
 					if (mB.type == "atomic") continue;
 					
-					links = links.concat(mB.PortLinks(pB));
+					links = links.concat(mB.get_port_links(pB));
 				}
 				
 				var svg = [];
 				
 				links.forEach(l => {
 					svg = svg.concat(this.GetLinkSVGNodes(l));
-					svg = svg.concat(this.GetPortSVGNodes(l.modelB, l.portB));
+					svg = svg.concat(this.GetPortSVGNodes(l.model_b, l.port_b));
 				});
 				
 				this._svg.dests[m.id][p.name] = Array.from(svg);
@@ -115,7 +115,7 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 	
 	onSvgMouseMove_Handler(node, ev) {
 		var id = node.getAttribute("devs-model-id");
-		var model = this.simulation.Model(id);
+		var model = this.simulation.get_model(id);
 		
 		if (!model) return;
 		
@@ -125,13 +125,13 @@ export default Core.Templatable("Widgets.Diagram", class Diagram extends Templat
 	onSvgMouseOut_Handler(node, ev) {
 		var id = node.getAttribute("devs-model-id");
 		
-		this.Emit("MouseOut", { x:ev.pageX, y:ev.pageY, model:this.simulation.Model(id), svg:ev.target });
+		this.Emit("MouseOut", { x:ev.pageX, y:ev.pageY, model:this.simulation.get_model(id), svg:ev.target });
 	}
 	
 	onSvgClick_Handler(node, ev) {	
 		var id = node.getAttribute("devs-model-id");
 		
-		this.Emit("Click", { x:ev.pageX, y:ev.pageY, model:this.simulation.Model(id), svg:ev.target });
+		this.Emit("Click", { x:ev.pageX, y:ev.pageY, model:this.simulation.get_model(id), svg:ev.target });
 	}
 
 	Resize() {		

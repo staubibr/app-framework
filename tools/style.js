@@ -16,17 +16,22 @@ export default class Style {
 	static Statistics(simulation) {		
 		var values = {};
 
-		
 		// TODO :Something doesn't work here now that there can be multiple model types. 
 		// Statistics should be computed in the GIS part of the app, by property on the map.
-		simulation.EachMessage((t, f) => {			
-			for (var f in t.value) {
-				if (!values[f]) values[f] = [];
+		for (var i = 0; i < simulation.frames.length; i++) {
+			var fr = simulation.frames[i];
+			
+			for (var j = 0; j < fr.state_messages.length; j++) {
+				var m = fr.state_messages[j];
 				
-				values[f].push(t.value[f]);
+				for (var f in m.value) {
+					if (!values[f]) values[f] = [];
+					
+					values[f].push(m.value[f]);
+				}
 			}
-		});
-		
+		}
+			
 		for (var f in values) {
 			values[f] = values[f].filter(v => !isNaN(v));
 			values[f] = values[f].sort((a, b) => (a < b) ? -1 : 1);

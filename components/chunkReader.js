@@ -41,9 +41,7 @@ export default class ChunkReader extends Evented {
 		resolve(this.fileReader.result);
 	}
 
-	onLoadError_Handler(ev) {
-		debugger;
-		
+	onLoadError_Handler(ev) {		
 		// TODO: This never triggers, example, bad visualization.json file
 		var reject = this.defer.Reject;
 		

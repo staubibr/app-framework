@@ -3,16 +3,17 @@
 import Core from '../tools/core.js';
 import Evented from "../components/evented.js";
 import ChunkReader from "../components/chunkReader.js";
-import Configuration from '../components/configuration/configuration.js';
-import Info from "../components/specification/info.js";
-import { ModelTypeCA, PortType } from '../components/specification/nodeType.js';
-import { ModelNodeCA } from '../components/specification/node.js';
-import { MessageType } from '../components/specification/message_type.js';
-import Structure from "../components/specification/structure.js";
-import SimulationCA from "../simulation/simulationCA.js";
-import Frame from "../simulation/frame.js";
-
-import { StateMessage, OutputMessage, StateMessageCA } from "./specification/message.js"
+import IndexedList from "../components/indexed_list.js";
+import Configuration from '../data_structures/configuration/configuration.js';
+import SimulationCA from "../data_structures/simulation/simulationCA.js";
+import Frame from "../data_structures/simulation/frame.js";
+import MessageStateCA from "../data_structures/simulation/message_state_ca.js"
+import TypeModelCA from '../data_structures/metadata/type_model_ca.js';
+import TypePort from '../data_structures/metadata/type_port.js';
+import ModelCA from '../data_structures/metadata/model_ca.js';
+import MessageType from '../data_structures/metadata/message_type.js';
+import Structure from "../data_structures/metadata/structure.js";
+import Info from "../data_structures/metadata/info.js";
 
 export default class ParserCDpp extends Evented { 
 	
@@ -28,14 +29,14 @@ export default class ParserCDpp extends Evented {
 		var model_type_id = structure.model_types.length;
 		
 		var msg_type = new MessageType(msg_type_id, `s_${name}`, ["out"], "No description available.");
-		var port = new PortType("out", "output", null);
-		var model_type = new ModelTypeCA(model_type_id, name, type, msg_type, [port], null, null, null, null)
-		var model = new ModelNodeCA(name, model_type, null);
+		var port = new TypePort("out", "output", null);
+		var model_type = new TypeModelCA(model_type_id, name, type, msg_type, [port], null, null, null)
+		var model = new ModelCA(name, model_type, null);
 		
 		structure.message_types.push(msg_type);
 		structure.model_types.push(model_type);
 		
-		structure.AddModel(model);
+		structure.add_model(model);
 				
 		return model;
 	}
@@ -69,7 +70,7 @@ export default class ParserCDpp extends Evented {
 				if (kv[0] == "components") {				
 					var model = this.MakeComponent(s, kv[1].split(' ')[0].trim(), "atomic");
 					
-					curr.AddModel(model); 
+					curr.add_submodel(model); 
 				}
 				
 				else if (kv[0] == "dim") {
@@ -94,7 +95,7 @@ export default class ParserCDpp extends Evented {
 					var ports = kv[1].split(" ").map(c => c.trim());
 				
 					ports.forEach(p => {
-						curr.AddPort(new PortType(`out_${p}`, "output", null));
+						curr.add_port(new TypePort(`out_${p}`, "output", null));
 						curr.template.push(`out_${p}`);
 					});
 				}
@@ -117,24 +118,8 @@ export default class ParserCDpp extends Evented {
 		
 		return s;
 	}
-	
-	async ParseStyle(simulation, fStyle) {
-		var config = Configuration.FromSimulation(simulation);
-		var style = await ChunkReader.ReadAsJson(fStyle);
 		
-		config.grid.styles = style;
-		
-		return config;
-	}
-	
-	async ParseVisualization(simulation, fViz) {
-		var visualization = await ChunkReader.ReadAsJson(fViz);
-		
-		return Configuration.FromJson(visualization);
-	}
-	
-	async ParsePalette(simulation, pal) {
-		var config = Configuration.FromSimulation(simulation);
+	async ParsePalette(pal) {
 		var content = await ChunkReader.ReadAsText(pal);		
 		var lines = content.trim().split("\n").map(l => l.trim());
 		var style = { buckets: [] };
@@ -175,47 +160,45 @@ export default class ParserCDpp extends Evented {
 			}
 		}
 		
-		config.grid.styles = [style];
-		
-		return config;
+		return [style];
 	}
 	
-	ReadInitialRowValues(sim, time) {
+	ReadInitialRowValues(frames, t0, model) {
 		if (this.initialRowValues == null) return;
 		
-		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
+		var f0 = frames.get(t0) || frames.add(new Frame(t0));
 		
 		this.initialRowValues.forEach(irv => {
 			irv.values.forEach((v, y) => {
 				var coord = [irv.row, +y, 0]
-				var value = sim.models[1].template.map(t => v);
+				var value = model.template.map(t => v);
 				
-				frame.AddStateMessage(new StateMessageCA(coord, value));
+				f0.add_state_message(new MessageStateCA(coord, value));
 			});
 		});
 	}
 	
-	ReadInitialValue(sim, time) {
+	ReadInitialValue(frames, t0, model, dim) {
 		if (this.initialValue == null) return;
 		
-		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
-
-        for (var x = 0; x < sim.maxX; x++) {
-            for (var y = 0; y < sim.maxY; y++) {
-                for (var z = 0; z < sim.maxZ; z++) {
+		var f0 = frames.get(t0) || frames.add(new Frame(t0));
+		
+        for (var x = 0; x < model.dim[0]; x++) {
+            for (var y = 0; y < model.dim[1]; y++) {
+                for (var z = 0; z < model.dim[2]; z++) {
 					var coord = [x, y, z];
-					var value = sim.models[1].template.map(t => this.initialValue);
+					var value = model.template.map(t => this.initialValue);
 					
-					frame.AddStateMessage(new StateMessageCA(coord, value));
+					f0.add_state_message(new MessageStateCA(coord, value));
 				}
 			}
 		}		
 	}
 	
-	async ReadVal(sim, val, time) {
+	async ReadVal(frames, t0, val) {
 		if (!val) return;
 		
-		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
+		var f0 = frames.get(t0) || frames.add(new Frame(t0));
 		var content = await ChunkReader.ReadAsText(val);		
 		var lines = content.trim().split("\n").map(l => l.trim());
 		
@@ -232,41 +215,42 @@ export default class ParserCDpp extends Evented {
 			
 			if (coord.length  == 2) coord.push("0");
 			
-			frame.AddStateMessage(new StateMessageCA(coord, value));
+			f0.add_state_message(new MessageStateCA(coord, value));
 		}
 	}
 	
-	async ReadMap(sim, map, time) {
+	async ReadMap(frames, t0, model, map) {
 		if (!map) return;
 		
-		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
+		var f0 = frames.get(t0) || frames.add(new Frame(t0));
 		var content = await ChunkReader.ReadAsText(map);
 		var lines = content.trim().split("\n").map(l => l.trim());		
 		var i = 0;
 		
-		for (var x = 0; x < sim.maxX; x++) {
-			for (var y = 0; y < sim.maxY; y++) {
-				for (var z = 0; z < sim.maxZ; z++) {
+		for (var x = 0; x < model.dim[0]; x++) {
+			for (var y = 0; y < model.dim[1]; y++) {
+				for (var z = 0; z < model.dim[2]; z++) {
 					if (i == lines.length) throw new Error("missing initial values in map file."); 
 											
-					frame.AddStateMessage(new StateMessageCA([x, y, z], lines[i++].trim()));
+					f0.add_state_message(new MessageStateCA([x, y, z], lines[i++].trim()));
 				}
 			}
 		}
 	}
-		
-	async ParseSimulation(structure, log, val, map) {
+	
+	async ParseMessages(structure, log, val, map) {
 		var lopez_test = await log.slice(0, 5).text();
 		var is_lopez = lopez_test == "0 / L";
 		var t0 = is_lopez ? "00:00:00:000:0" : "00:00:00:000";
 		
-		var sim = new SimulationCA(structure, []);
+		var model = structure.model_types[1];
+		var frames = new IndexedList(f => f.time);
 		
-		if (!is_lopez) this.ReadInitialValue(sim, t0);
-		if (!is_lopez) this.ReadInitialRowValues(sim, t0);
+		if (!is_lopez) this.ReadInitialValue(frames, t0, model);
+		if (!is_lopez) this.ReadInitialRowValues(frames, t0, model);
 		
-		await this.ReadVal(sim, val, t0);
-		await this.ReadMap(sim, map, t0);
+		await this.ReadVal(frames, t0, val);
+		await this.ReadMap(frames, t0, model, map);
 		
 		await ChunkReader.ReadByChunk(log, "\n", (parsed, chunk, progress) => {			
 			var lines = chunk.split("\n");
@@ -276,26 +260,24 @@ export default class ParserCDpp extends Evented {
 				
 				// Mensaje Y / 00:00:00:100 / flu(18,12)(645) / out /      2.00000 para flu(02)
 				// Mensaje Y / 00:00:20:000 / sender(02) / dataout /     11.00000 para top(01)
-				if (line.startsWith("Mensaje Y")) this.ParseCdppLine(sim, line);
+				if (line.startsWith("Mensaje Y")) this.ParseCdppLine(frames, line);
 				
-				else if (line.startsWith("0 / L / Y")) this.ParseLopezLine(sim, line);
+				else if (line.startsWith("0 / L / Y")) this.ParseLopezLine(frames, model, line);
 			}
 			
 			this.Emit("Progress", { progress: progress });
-			
-			return sim;
 		});
 		
-		sim.frames.forEach(f => {
+		frames.items.forEach(f => {
 			f.state_messages.forEach(m => {
-				m.value = sim.models[1].Template(m.value);
+				m.value = model.apply_template(m.value);
 			});
 		});
 		
-		return sim;
+		return frames.items;
 	}
 	
-	ParseCdppLine(sim, line) {
+	ParseCdppLine(frames, line) {
 		var split = line.split('/').map(l => l.trim());
 		var model = split[2].replaceAll('(', ' ').replaceAll(')', '').split(' ')
 		var coord = model.length == 3 ? model[1].split(',') : null;
@@ -304,16 +286,16 @@ export default class ParserCDpp extends Evented {
 		var port = split[3]
 		var value = split[4].split(' ')[0]
 		
-		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
+		var frame = frames.get(time) || frames.add(new Frame(time));
 
 		if (coord) {
 			if (coord.length == 2) coord.push("0");
 						
-			frame.AddStateMessage(new StateMessageCA(coord, [value]));
+			frame.add_state_message(new MessageStateCA(coord, [value]));
 		}
 	}
 	
-	ParseLopezLine(sim, line) {
+	ParseLopezLine(frames, model_type, line) {
 		var split = line.split('/').map(l => l.trim());
 		var model = split[4].replaceAll('(', ' ').replaceAll(')', '').split(' ')
 		var c = model.length == 3 ? model[1].split(',') : null;
@@ -322,7 +304,7 @@ export default class ParserCDpp extends Evented {
 		var port = split[5]
 		var value = split[6]
 		
-		var frame = sim.Frame(time) || sim.AddFrame(new Frame(time));
+		var frame = frames.get(time) || frames.add(new Frame(time));
 
 		if (c) {
 			if (c.length == 2) c.push("0");
@@ -330,12 +312,12 @@ export default class ParserCDpp extends Evented {
 			var m = frame.state_messages.find(m => m.x == c[0] && m.y == c[1] && m.z == c[2])
 
 			if (!m) {
-				var values = sim.models[1].template.map(t => "");
+				var values = model_type.template.map(t => "");
 				
-				m = frame.AddStateMessage(new StateMessageCA(c, values));
+				m = frame.add_state_message(new MessageStateCA(c, values));
 			}
 			
-			var idx = sim.models[1].ports.findIndex(p => p.name == port);
+			var idx = model_type.ports.findIndex(p => p.name == port);
 			
 			m.value[idx] = value;
 		}

@@ -54,11 +54,11 @@ export default Core.Templatable("Popup.Linker", class PopupLinker extends Popup 
 			}, {
 				caption: 'Links',
 				empty: 'No links found in the structure file.',
-				label: d => `<div><b>${d.portA.name}</b> @ <b>${d.modelA.id}</b> to</div><div><b>${d.portB.name}</b> @ <b>${d.modelB.id}</b></div>`,
+				label: d => `<div><b>${d.port_a.name}</b> @ <b>${d.model_a.id}</b> to</div><div><b>${d.port_b.name}</b> @ <b>${d.model_b.id}</b></div>`,
 				items: links,
 				attrs: {
-					"devs-link-mA" : d => d.modelA.id,
-					"devs-link-pA" : d => d.portA.name
+					"devs-link-mA" : d => d.model_a.id,
+					"devs-link-pA" : d => d.port_a.name
 				}
 			}]
 		}
@@ -73,7 +73,7 @@ export default Core.Templatable("Popup.Linker", class PopupLinker extends Popup 
 	onLinker_Complete(ev) {
 		this.linker.Reset();
 		
-		this.simulation.diagram = this.simulation.LoadSVG(this.linker.svg.innerHTML);
+		this.simulation.diagram = this.simulation.load_svg(this.linker.svg.innerHTML);
 	}
 	
 	Template() {
