@@ -25,6 +25,25 @@ export default class TypeModelCA extends TypeModel {
 	*/
 	set dim(value) { this._json.dim = value; }
 	
+	
+	/** 
+	* Gets the simulation dimensions maximum X coordinate
+	* @type {number}
+	*/
+	get max_x() { return this.dim[0] }
+	
+	/** 
+	* Gets the simulation dimensions maximum Y coordinate
+	* @type {number}
+	*/
+	get max_y() { return this.dim[1] }
+	
+	/** 
+	* Gets the simulation dimensions maximum Z coordinate
+	* @type {number}
+	*/
+	get max_z() { return this.dim[2] }
+	
     /**
      * @param {string} id - unique id for the model type
      * @param {string} name - name of the model type

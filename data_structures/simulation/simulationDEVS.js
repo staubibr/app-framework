@@ -2,7 +2,7 @@
 
 import Dom from '../../tools/dom.js';
 import Simulation from './simulation.js';
-import State from './state.js';
+import StateDEVS from './stateDEVS.js';
 
 /** 
  * A simulation class specifically for DEVS simulations
@@ -52,8 +52,13 @@ export default class SimulationDEVS extends Simulation {
 		if (diagram) this._diagram = this.load_svg(diagram);
 	}
 	
-	initialize(structure) {
-		this.state = new State(this.models);
+    /**
+     * Returns the initial, zero state for this simulation.
+     * @param {Structure} structure - The simulation model structure.
+	 * @return {StateCA} the zero state for this simulation
+     */
+	get_initial_state(structure) {
+		return new StateDEVS(this.models, this.size);
 	}
 	
     /**

@@ -24,6 +24,6 @@ export default class MessageStateCA extends Message {
 	
 	reverse() {		
 		// TODO: Only place where we use GetDiff I think.		
-		return new MessageStateCA(this.coord, this.get_diff());
+		return new MessageStateCA(this.coord, this.diff);
 	}
 }

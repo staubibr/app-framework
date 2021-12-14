@@ -28,6 +28,6 @@ export default class MessageState extends Message {
      */
 	reverse() {		
 		// TODO: Only place where we use GetDiff I think.		
-		return new MessageState(this.model, this.get_diff());
+		return new MessageState(this.model, this.diff);
 	}
 }

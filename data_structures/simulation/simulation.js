@@ -1,6 +1,7 @@
 'use strict';
 
 import Evented from '../../components/evented.js';
+import IndexedList from '../../components/indexed_list.js';
 import Cache from './cache.js';
 
 /** 
@@ -97,6 +98,14 @@ export default class Simulation extends Evented {
 	get ratio() { 
 		throw new Error("get ratio must be defined in child simulation class.");
 	}
+	
+	/** 
+	* Gets the size of the simulation (number of models)
+	* @type {number} 
+	*/
+	get size() {
+		return this.models.length;
+	}
 
     /**
      * @param {Structure} structure - The simulation model structure.
@@ -107,27 +116,21 @@ export default class Simulation extends Evented {
 		super();
 		
 		this._structure = structure
-		
-		// class variables with accessors
-		this._state = null;
+		this._state = this.get_initial_state(structure);
 		this._selected = [];
-		this._frames = [];
-		this._frame_index = {};
 		
-		for (var i = 0; i < frames.length; i++) this.add_frame(frames[i]);
+		this._frames = new IndexedList(f => f.time);
 		
-		this.initialize(structure);
+		for (var i = 0; i < frames.length; i++) this.frames.add(frames[i]);
 		
-		this.state.reset();
 		this._cache = new Cache(nCache, this.frames, this.state);
-		this.state.reset();
 		
 		for (var i = 0; i < this.frames.length; i++) {
 			this.frames[i].difference(this.state);
 			this.state.apply_messages(this.frames[i]);
 		}
 		
-		this.state = this.cache.first();
+		this._state = this.cache.first();
 	}
 	
     /**
@@ -166,28 +169,6 @@ export default class Simulation extends Evented {
 		}
 		
 		return cached;
-	}
-	
-    /**
-     * Returns the frame for the time provided.
-     * @param {string} time - the timestep of the frame to retrieve.
-	 * @return {Frame} the frame corresponding to the timestep provided
-     */
-	get_frame(time) {
-		return this._frame_index[time] || null;
-	}
-	
-    /**
-     * Adds a frame to the simulation.
-     * @param {Frame} frame - the frame to add.
-	 * @return {Frame} the frame added.
-     */
-	add_frame(frame) {		
-		this.frames.push(frame);
-		
-		this._frame_index[frame.time] = frame;
-		
-		return frame;
 	}
 	
     /**

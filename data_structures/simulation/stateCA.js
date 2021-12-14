@@ -14,10 +14,25 @@ export default class StateCA extends State {
 	 * @param {number} size.y - the size of the grid space on the y axis.
 	 * @param {number} size.z - the size of the grid space on the z axis.
      */
-	constructor(model, size) {
-		super([model]);
+	constructor(models, size) {
+		super(models, size);
 		
-		this.size = size;
+		this.data = [];
+		
+		// TODO : Is this always 1?? Is there always only one model in Cell-DEVS?
+		var m = this.models[1];
+		
+		for (var x = 0; x < this.size.x; x++) {
+			this.data[x] = [];
+			
+			for (var y = 0; y < this.size.y; y++) {
+				this.data[x][y] = [];
+				
+				for (var z = 0; z < this.size.z; z++) {
+					this.data[x][y][z] = m.model_type.get_template_0();
+				}
+			}
+		}
 	}
 	
     /**
@@ -48,28 +63,5 @@ export default class StateCA extends State {
 	 */
 	apply_message(m) {		
 		for (var f in m.value) this.data[m.x][m.y][m.z][f] = m.value[f];
-	}
-	
-    /**
-     * Resets the state to a zero template for all models.
-     * @param {Frame} frame - the frame to apply to the state.
-	 */
-	reset() {
-		this.data = [];
-		
-		// TODO : Is this always 0?? Is there always only one model in Cell-DEVS?
-		var m = this.models[0];
-		
-		for (var x = 0; x < this.size.x; x++) {
-			this.data[x] = [];
-			
-			for (var y = 0; y < this.size.y; y++) {
-				this.data[x][y] = [];
-				
-				for (var z = 0; z < this.size.z; z++) {
-					this.data[x][y][z] = m.model_type.get_template_0();
-				}
-			}
-		}
 	}
 }

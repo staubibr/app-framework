@@ -46,7 +46,7 @@ export default class Cache {
 		
 		this.states = [];
 		
-		var state = zero;
+		var state = zero.clone();
 		
 		for (var i = 0; i < frames.length; i++) {
 			state.forward(frames[i]);

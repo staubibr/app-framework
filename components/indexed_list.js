@@ -1,6 +1,6 @@
 'use strict';
 
-export default class Indexed_List { 
+export default class Indexed_List extends Array { 
 
 	set fn_key(value) { this._fn_key = value; }
 	get fn_key() { return this._fn_key; }
@@ -8,13 +8,11 @@ export default class Indexed_List {
 	set index(value) { this._index = value; }
 	get index() { return this._index; }
 
-	set items(value) { this._items = value; }
-	get items() { return this._items; }
-
 	constructor(fn_key) {
+		super();
+		
 		this.fn_key = fn_key;
 		this.index = {};
-		this.items = [];
 	}
 	
 	add(item) {
@@ -23,7 +21,7 @@ export default class Indexed_List {
 		if (this.has_key(key)) throw new Error("Key is already in index of indexed list.");
 		
 		this.index[key] = item;
-		this.items.push(item);
+		this.push(item);
 		
 		return item;
 	}

@@ -268,13 +268,13 @@ export default class ParserCDpp extends Evented {
 			this.Emit("Progress", { progress: progress });
 		});
 		
-		frames.items.forEach(f => {
+		frames.forEach(f => {
 			f.state_messages.forEach(m => {
 				m.value = model.apply_template(m.value);
 			});
 		});
 		
-		return frames.items;
+		return frames;
 	}
 	
 	ParseCdppLine(frames, line) {

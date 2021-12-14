@@ -39,26 +39,16 @@ export default class Message {
 	}
 	
     /**
-     * Returns the message value for the previous state.
-     * @return {object} the message value of containing the previous state.
-     */
-	get_diff() {
-		var d = {};
-		
-		for (var f in this.value) d[f] = this.value[f] - this.diff[f];
-		
-		return d;
-	}
-	
-    /**
-     * Calculates the difference between the message value and the diff value.
+     * Stores the value provided on this message. The provided value is usually the value of the 
+	 * previous state for the model targeted by the message. The diff value is used subsequently 
+	 * to return to the previous state when playing backwards. 
      */
 	difference(v) {
 		if (v === undefined || v === null) return;
 		
 		this.diff = {};
 		
-		for (var f in this.value) this.diff[f] = this.value[f] - v[f];
+		for (var f in this.value) this.diff[f] = v[f];
 	}
 	
     /**

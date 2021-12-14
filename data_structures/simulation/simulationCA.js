@@ -13,31 +13,37 @@ export default class SimulationCA extends Simulation {
 	* Gets the simulation 3D dimensions
 	* @type {object}
 	*/
-	get dimensions() {  return this._dimensions; }
+	get dimensions() {  
+		return {
+			x: this.max_x,
+			y: this.max_y,
+			z: this.max_z
+		}
+	}
 	
 	/** 
 	* Gets the height / width ratio for visual representation
 	* @type {number} 
 	*/
-	get ratio() { return this.dimensions.x / this.dimensions.y; }
-	
+	get ratio() { return this.max_x / this.max_y; }
+		
 	/** 
 	* Gets the simulation dimensions maximum X coordinate
 	* @type {number}
 	*/
-	get max_x() { return this.dimensions.x }
+	get max_x() { return this.structure.model_types[1].max_x }
 	
 	/** 
 	* Gets the simulation dimensions maximum Y coordinate
 	* @type {number}
 	*/
-	get max_y() { return this.dimensions.y }
+	get max_y() { return this.structure.model_types[1].max_y }
 	
 	/** 
 	* Gets the simulation dimensions maximum Z coordinate
 	* @type {number}
 	*/
-	get max_z() { return this.dimensions.z }
+	get max_z() { return this.structure.model_types[1].max_z }
 	
 	/** 
 	* Gets the simulation model ports
@@ -69,13 +75,12 @@ export default class SimulationCA extends Simulation {
 		return this.selected.find(s => s[0] == id[0] && s[1] == id[1] && s[2] == id[2]);
 	}
 		
-	initialize(structure) {		
-		this._dimensions = {
-			x: structure.model_types[1].dim[0],
-			y: structure.model_types[1].dim[1],
-			z: structure.model_types[1].dim[2]
-		}
-		
-		this.state = new StateCA(this.models[1], this.dimensions);
+    /**
+     * Returns the initial, zero state for this simulation.
+     * @param {Structure} structure - The simulation model structure.
+	 * @return {StateCA} the zero state for this simulation
+     */
+	get_initial_state(structure) {		
+		return new StateCA(this.models, this.dimensions);
 	}
 }

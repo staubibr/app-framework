@@ -55,11 +55,11 @@ export default class State {
     /**
      * @param {Model[]} models - An array of all the models in the simulation.
      */
-	constructor(models) {
+	constructor(models, size) {
 		this.index = -1;
-		this.data = null;
 		this.models = models || [];
-		this.size = this.models.length;
+		this.size = size;
+		this.data = null;
 	}
 	
     /**
@@ -67,12 +67,7 @@ export default class State {
      * @return {State} the cloned state.
      */
 	clone() {
-		var clone = new State(this.models);
-		
-		clone.index = this.index;
-		clone.data = JSON.parse(JSON.stringify(this.data));
-
-		return clone;
+		throw new Error("The clone method must be implemented by the state specialization class.");
 	}
 	
     /**
@@ -81,7 +76,7 @@ export default class State {
 	 * @return {object} a state value (usually JSON).
      */
 	get_value(model) {		
-		return this.data[model.id] || null;
+		throw new Error("The get_value method must be implemented by the state specialization class.");
 	}
 	
     /**
@@ -99,7 +94,7 @@ export default class State {
      * @param {Message} m - the message to apply to the state.
 	 */
 	apply_message(m) {		
-		for (var f in m.value) this.data[m.model.id][f] = m.value[f];
+		throw new Error("The apply_messages method must be implemented by the state specialization class.");
 	}
 	
     /**
@@ -126,11 +121,7 @@ export default class State {
      * Resets the state to a zero template for all models.
      * @param {Frame} frame - the frame to apply to the state.
 	 */
-	reset() {
-		this.data = {};
-		
-		this.models.forEach((m) => {
-			this.data[m.id] = m.model_type.get_template_0();
-		});
+	initialize() {
+		throw new Error("The initialize method must be implemented by the state specialization class.");
 	}
 }
