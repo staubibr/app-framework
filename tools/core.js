@@ -5,7 +5,7 @@ let _locale = document.documentElement.lang || "en";
 let _templatables = {}
 
 let _urls = {
-	models : "http://localhost:81/logs-ready/"
+	models : "https://staubibr.github.io/logs-ready/"
 }
 
 export default class Core {
