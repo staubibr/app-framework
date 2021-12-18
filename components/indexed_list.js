@@ -18,12 +18,15 @@ export default class Indexed_List extends Array {
 	add(item) {
 		var key = this.fn_key(item);
 		
-		if (this.has_key(key)) throw new Error("Key is already in index of indexed list.");
+		// if (this.has_key(key)) throw new Error("Key is already in index of indexed list.");
 		
-		this.index[key] = item;
-		this.push(item);
+		if (!this.has_key(key)) {
+			this.index[key] = item;
 		
-		return item;
+			this.push(item);
+		}		
+		
+		return this.index[key];
 	}
 	
 	get(key) {
