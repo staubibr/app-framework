@@ -11,9 +11,9 @@ export default Core.Templatable("Widget.ServerLoader", class ServerLoader extend
     constructor(id) {
         super(id);
 		
-        if (!Core.URLs.models) throw new Error("Config Error: server url not defined in application configuration.");
+        if (!Core.URLs.logs) throw new Error("Config Error: server url not defined in application configuration.");
 
-		var path = Core.URLs.models;
+		var path = Core.URLs.logs;
 		
 		this.models = [{
 				"name": "Alternate Bit Protocol",
