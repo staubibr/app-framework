@@ -97,7 +97,7 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 		var diagram = await parser.ParseDiagram(files.diagram);
 		var config = await parser.ParseVisualization(structure.type, files.visualization);
 				
-		if (structure.type == "Cell-DEVS") {
+		if (config.grid) {
 			var simulation = new SimulationCA(structure, messages, config.playback.cache);
 			
 			if (config.grid.layers.length == 0) config.grid = Grid.FromSimulation(simulation);
@@ -108,8 +108,8 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 		else var simulation = new SimulationDEVS(structure, messages, config.playback.cache, diagram);
 		
 		this.RestoreUI();
-		
-		if (simulation.type == "DEVS" && !simulation.diagram) {
+
+		if (config.diagram && !simulation.diagram) {
 			this.onWidget_Error(new Error("Diagram not found for DEVS simulation. Please provide a diagram.svg file and reload the simulation."));
 		}
 
