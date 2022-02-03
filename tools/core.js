@@ -6,7 +6,7 @@ let _templatables = {}
 
 let _urls = {
 	logs : "http://localhost:81/logs-ready/",
-	viz : "http://localhost:81/lome-files/visualization/"
+	viz : "http://localhost:81/lome-files/visualizations/"
 }
 
 export default class Core {
