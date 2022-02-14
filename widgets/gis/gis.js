@@ -6,6 +6,7 @@ import Style from '../../tools/style.js'
 import Templated from '../../components/templated.js';
 import ChunkReader from '../../components/chunkReader.js';
 import VariableSelect from './variable-select.js';
+import Content from './popup.js';
 
 import Map from '../../components/ol/map.js'
 import Legend from "../../components/ol/legend.js";
@@ -50,6 +51,11 @@ export default Core.Templatable("Widgets.GIS", class GIS extends Templated {
 
 		this.map.On("click", this.OnMap_Click.bind(this));
 		this.map.On("rendercomplete", this.OnMap_RenderComplete.bind(this, d));
+		
+		this.popup_content = new Content(this.map.popup.content, { 
+			get_title: null,
+			get_content: this.GetContent.bind(this)
+		});
 		
 		return d.promise;
 	}
@@ -151,9 +157,11 @@ export default Core.Templatable("Widgets.GIS", class GIS extends Templated {
 		
 		this.HighlightSelected();
 		
-		var content = this.GetContent(this.selected);
+		if (this.selected.length == 0) return;
 		
-		if (content.length > 0) this.map.ShowPopup(ev.coordinates, content);
+		this.popup_content.fill(this.selected);
+				
+		this.map.popup.setPosition(ev.coordinates);
 	}
 	
 	GetSelected(features) {
@@ -164,50 +172,42 @@ export default Core.Templatable("Widgets.GIS", class GIS extends Templated {
 		return selected.length > 0 ? selected : null;
 	}
 	
-	GetContent(selected) {
-		var content = [];
-		var messages = this.simulation.current_frame.output_messages;
+	GetContent(s) {
+		var variable = this.Current[s.layer];
 		
-		selected.forEach(s => {
-			var variable = this.Current[s.layer];
+		if (!variable) return;
+		
+		// state messages
+		var props = s.feature.getProperties();
+		var id = props[variable.layer.join];
+		var model = this.simulation.get_model(id);
+		var data = this.simulation.state.get_value(model);
+		
+		var line = `<div class='title'>${variable.layer.label}</div>`;
+		
+		line += `<ul class='properties'><li>Attributes</li>`;
+		
+		variable.layer.fields.forEach(f => line += `<li>${f}: ${props[f]}</li>`);
+		
+		line += `</ul>`;
+		line += `<ul class='state-message'><li>State</li>`;
+		
+		for (var p in data) line += `<li>${p}: ${data[p]}</li>`
+		
+		line += `</ul>`;
+		
+		// output messages
+		var tY = this.simulation.current_frame.output_messages.filter(t => t.model.id == id);
+		
+		tY.forEach(t => {
+			line += `<ul class='output-message'><li>Output</li>`;
 			
-			if (!variable) return;
-			
-			
-			// state messages
-			var props = s.feature.getProperties();
-			var id = props[variable.layer.join];
-			var model = this.simulation.get_model(id);
-			var data = this.simulation.state.get_value(model);
-			
-			var line = `<div class='title'>${variable.layer.label}</div>`;
-			
-			line += `<ul class='properties'><li>Attributes</li>`;
-			
-			variable.layer.fields.forEach(f => line += `<li>${f}: ${props[f]}</li>`);
+			for (var p in t.value) line += `<li>${p}: ${t.value[p]}</li>`
 			
 			line += `</ul>`;
-			line += `<ul class='state-message'><li>State</li>`;
-			
-			for (var p in data) line += `<li>${p}: ${data[p]}</li>`
-			
-			line += `</ul>`;
-			
-			// output messages
-			var tY = messages.filter(t => t.model.id == id);
-			
-			tY.forEach(t => {
-				line += `<ul class='output-message'><li>Output</li>`;
-				
-				for (var p in t.value) line += `<li>${p}: ${t.value[p]}</li>`
-				
-				line += `</ul>`;
-			});
-			
-			content.push(line);
 		});
 		
-		return content.join(`<hr>`);
+		return line;
 	}
 	
 	ResetSelected() {

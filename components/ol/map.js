@@ -1,5 +1,6 @@
 
 import Evented from '../evented.js';
+import Templated from '../templated.js';
 
 export default class Map extends Evented {
 	get OL() { return this._ol; }
@@ -12,7 +13,6 @@ export default class Map extends Evented {
 		this._layers = {};
 		
 		var sl = new ol.control.ScaleLine();
-		var fs = new ol.control.FullScreen();
 	  	
 		this.basemaps = basemaps;
 		
@@ -22,7 +22,7 @@ export default class Map extends Evented {
 				title: 'Basemaps',
 				layers: basemaps
 			})],
-			controls: ol.control.defaults({ attributionOptions: { collapsible: true } }).extend([fs, sl]),
+			controls: ol.control.defaults({ attributionOptions: { collapsible: true } }).extend([sl]),
 		});
 		
 		this._ol.on("click", (ev) => {
@@ -41,7 +41,7 @@ export default class Map extends Evented {
 		
 		this.projection = basemaps[0].getSource().getProjection();
 		
-		this.popup = new ol.Overlay.Popup();
+		this.popup = new ol.Overlay.Popup({ closeBox:true });
    
 		this.OL.addOverlay(this.popup);
 	}
@@ -100,7 +100,13 @@ export default class Map extends Evented {
 	ShowPopup(coord, content) {
         this.popup.setPosition(coord);
 		
-		this.popup.show(coord, content);
+		if (content instanceof Templated) {
+			this.popup.show(coord, "");
+			
+			content.Place(this.popup.content);
+		}
+		
+		else this.popup.show(coord, content);
 	}
 
 	static BasemapOSM(visible) {
