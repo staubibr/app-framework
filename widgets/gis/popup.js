@@ -31,7 +31,14 @@ export default Core.Templatable("Widgets.GIS.Popup", class Popup extends Templat
 	
 	set_page(i) {
 		this.Elem('page').innerHTML = `${i + 1} of ${this.size}`;
-		this.Elem('props').innerHTML = this.get_content(this.features[i]);
+		
+		Dom.Empty(this.Elem('props'));
+		
+		var content = this.get_content(this.features[i]);
+		
+		if (content instanceof HTMLElement) Dom.Place(content, this.Elem('props'));
+		
+		else this.Elem('props').innerHTML = content;
 		
 		if (!this.get_title) return;
 		
@@ -52,7 +59,7 @@ export default Core.Templatable("Widgets.GIS.Popup", class Popup extends Templat
 		return "<div handle='root' class='popup-content'>" + 
 				  "<div handle='title' class='title'></div>" +
 				  "<div handle='props'></div>" +
-				  "<div handle='button-container' className='.ol-control button'>" + 
+				  "<div handle='button-container' class='button-container'>" + 
 					 "<button handle='prev' class='button previous'><</button>" +
 					 "<button handle='next' class='button next'>></button>" +
 					 "<span handle='page'></span>" + 
