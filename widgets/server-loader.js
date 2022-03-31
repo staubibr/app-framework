@@ -3,18 +3,19 @@
 import Core from '../tools/core.js';
 import Dom from '../tools/dom.js';
 import Net from '../tools/net.js';
-import Templated from '../components/templated.js';
-import Popup from '../ui/popup.js';
 
-export default Core.Templatable("Widget.ServerLoader", class ServerLoader extends Popup {
+import Widget from '../base/widget.js';
+
+import AppConfig from "../components/config.js";
+
+export default Core.templatable("Api.Widget.ServerLoader", class ServerLoader extends Widget {
 
     constructor(id) {
         super(id);
 		
-        if (!Core.URLs.logs) throw new Error("Config Error: server url not defined in application configuration.");
-
-		var path = Core.URLs.logs;
+		var path = AppConfig.URLs.logs;
 		
+		// TODO: Go to config
 		this.models = [{
 				"name": "Alternate Bit Protocol",
 				"type" : "DEVS",
@@ -102,34 +103,35 @@ export default Core.Templatable("Widget.ServerLoader", class ServerLoader extend
 			}
 		]
 		
-		this.models.forEach(m => this.AddModel(m));
+		this.models.forEach(m => this.add_model(m));
     }
 
-	AddModel(model) {
-		var li = Dom.Create("li", { className:'model' }, this.Elem('list'));
+	add_model(model) {
+		var li = Dom.create("li", { className:'model' }, this.elems.list);
 		
 		li.innerHTML = model.name;
 		
-		li.addEventListener("click", this.onLiModelClick_Handler.bind(this, model));
+		li.addEventListener("click", this.on_li_model_click.bind(this, model));
 	}
 	
-    onLiModelClick_Handler(model, ev){
-		this.Emit("ModelSelected", { model : model });
+    on_li_model_click(model, ev){
+		// TODO: Review event names
+		this.emit("model-selected", { model : model });
 		
-        this.getServerResults(model);
+        this.get_server_results(model);
     }
 
-    getServerResults(model){
-		Dom.RemoveCss(this.Elem("wait"), "hidden");
+    get_server_results(model){
+		Dom.remove_css(this.elems.wait, "hidden");
 
-		var p1 = Net.File(`${model.url}structure.json`, 'structure.json');
-		var p2 = Net.File(`${model.url}messages.log`, 'messages.log');
-		var p3 = Net.File(`${model.url}style.json`, 'style.json', true);
-		var p4 = Net.File(`${model.url}diagram.svg`, 'diagram.svg', true);
-		var p5 = Net.File(`${model.url}visualization.json`, 'visualization.json', true);
+		var p1 = Net.file(`${model.url}structure.json`, 'structure.json');
+		var p2 = Net.file(`${model.url}messages.log`, 'messages.log');
+		var p3 = Net.file(`${model.url}style.json`, 'style.json', true);
+		var p4 = Net.file(`${model.url}diagram.svg`, 'diagram.svg', true);
+		var p5 = Net.file(`${model.url}visualization.json`, 'visualization.json', true);
 		
-		var success = function(files) {			
-			Dom.AddCss(this.Elem("wait"), "hidden");	
+		var success = files => {			
+			Dom.add_css(this.elems.wait, "hidden");	
 
 			files = {
 				structure: files.find(f => f && f.name == 'structure.json'),
@@ -139,43 +141,28 @@ export default Core.Templatable("Widget.ServerLoader", class ServerLoader extend
 				style: files.find(f => f && f.name == 'style.json')
 			}
 			
-			this.Emit("filesready", { files : files });
-		}.bind(this);
+			this.emit("files-ready", { files : files });
+		};
 
-		Promise.all([p1, p2, p3, p4, p5]).then(success, this.onError_Handler.bind(this));
+		Promise.all([p1, p2, p3, p4, p5]).then(success, this.on_error.bind(this));
     }
 
-	onError_Handler(error) {
-		Dom.AddCss(this.Elem("wait"), "hidden");
+	on_error(error) {
+		Dom.add_css(this.elems.wait, "hidden");
 		
-		this.Emit("error", { error:error });
+		this.error(error);
 	}
 
-    Template(){
-		return "<div handle='popup' class='popup'>" +
-				  "<div class='popup-header'>" +
-					  "<h2 class='popup-title' handle='title'>nls(Popup_Server_Loader_Title)</h2>" +
-					  "<button class='close' handle='close' title='nls(Popup_Close)'>×</button>" +
-				  "</div>" +
-				  "<div class='popup-body popup-server-loader' handle='body'>"+
-						"<div class='server-loader'>" + 
-							"<div handle='wait' class='wait hidden'><img src='./assets/loading.svg'></div>" + 
-							"<ul handle='list'></ul>" + 
-						"</div>"
-				  "</div>" +
-				  "<div class='popup-footer' handle='footer'></div>" +
+    html() {
+		return "<div class='server-loader-widget'>" + 
+				  "<div handle='wait' class='wait hidden'>" + 
+					 "<img src='./assets/loading.svg'>" + 
+				  "</div>" + 
+				  "<ul handle='list'></ul>" + 
 			   "</div>";
     }
 	
-	static Nls() {
-		return { 
-			"Popup_Close": {
-				"en": "Close"
-			}, 
-			"Popup_Server_Loader_Title" : {
-				"en": "Load from server"
-			}
-		
-		}
+	localize(nls) {
+		super.localize(nls);
 	}
 });

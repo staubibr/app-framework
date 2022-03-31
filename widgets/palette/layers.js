@@ -2,12 +2,11 @@
 
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
-import Templated from '../../components/templated.js';
-import Popup from '../../ui/popup.js';
+import Widget from '../../base/widget.js';
 import Select from '../../ui/select.js';
 import Ports from './ports.js';
 
-export default Core.Templatable("Widget.Settings.Layers", class Layers extends Templated { 
+export default Core.templatable("Api.Widget.Palette.Layers", class Layers extends Widget { 
 	
 	set settings(value) { this._settings = value; }
 	
@@ -18,136 +17,136 @@ export default Core.Templatable("Widget.Settings.Layers", class Layers extends T
 		
 		this.items = null;
 		
-		this.Node('addLayer').On("click", this.OnButtonAddLayer_Click.bind(this));
+		this.elems.addLayer.addEventListener("click", this.on_button_add_layer_click.bind(this));
 	}
 	
-	Refresh() {
+	refresh() {
 		this.items.forEach(item => {
-			item.style.Empty();
+			item.style.empty();
 			
 			this.settings.styles.forEach((style, i) => {
-				item.style.Add(i, null, i);
+				item.style.add(i, null, i);
 		
-				item.style.Select((s, i) => i == item.data.style);
+				item.style.select((s, i) => i == item.data.style);
 			});
 		});
 	}
 	
-	Initialize(simulation, settings) {	
+	initialize(simulation, settings) {	
 		this.items = [];
 		
 		this.simulation = simulation;
 		this.settings = settings;
 		
-		this.settings.layers.forEach((l) => this.AddLayer(l));
+		this.settings.layers.forEach((l) => this.add_layer(l));
 	}
 	
-	AddLayer(l) {
+	add_layer(l) {
 		var item = {}
 		
 		item.data = l;
-		item.row = Dom.Create("tr", { className:"table-row" }, this.Elem("body"));		
-		item.z = this.AddZ(item, this.simulation.max_z);
-		item.ports = this.AddPorts(item, this.simulation.ports);
-		item.style = this.AddStyle(item, this.settings.styles);
-		item.btnDelete = this.AddDeleteButton(item);
+		item.row = Dom.create("tr", { className:"table-row" }, this.elems.body);		
+		item.z = this.add_z(item, this.simulation.max_z);
+		item.ports = this.add_ports(item, this.simulation.ports);
+		item.style = this.add_style(item, this.settings.styles);
+		item.btnDelete = this.add_delete_button(item);
 		
 		this.items.push(item);
 	}
 	
-	RemoveLayer(item) {
+	remove_layer(item) {
 		var i = this.items.indexOf(item);
 		
 		this.items.splice(i, 1);
 	}
 	
-	AddZ(item, max, selected) {
-		var td = Dom.Create("td", { className:"grid-z"}, item.row);
+	add_z(item, max, selected) {
+		var td = Dom.create("td", { className:"grid-z"}, item.row);
 		var select = new Select(td);
 
-		for (var i = 0; i < max; i++) select.Add(i, null, i);
+		for (var i = 0; i < max; i++) select.add(i, null, i);
 		
-		select.Select(s => s == item.data.z);
+		select.select(s => s == item.data.z);
 		
-		select.On("Change", ev => {
+		select.on("change", ev => {
 			item.data.z = ev.item;
 			
-			this.settings.Set("layers", this.settings.layers);
+			this.settings.set("layers", this.settings.layers);
 		})
 		
 		return select;
 	}
 	
-	AddPorts(item, ports, selected) {
-		var td = Dom.Create("td", { className:"grid-ports"}, item.row);
+	add_ports(item, ports, selected) {
+		var td = Dom.create("td", { className:"grid-ports"}, item.row);
 		
 		var select = new Ports(td);
 		
 		select.available = ports;
 		
-		select.Select(item.data.ports);
+		select.select(item.data.ports);
 		
-		select.On("Change", ev => {
+		select.on("change", ev => {
 			item.data.ports = ev.target.value;
 			
-			this.settings.Set("layers", this.settings.layers);
+			this.settings.set("layers", this.settings.layers);
 		})
 		
 		return select;
 	}
 		
-	AddStyle(item, styles, selected) {
-		var td = Dom.Create("td", { className:"grid-styles"}, item.row);
+	add_style(item, styles, selected) {
+		var td = Dom.create("td", { className:"grid-styles"}, item.row);
 		
 		var select = new Select(td);
 
-		styles.forEach((s, i) => select.Add(i, null, s));
+		styles.forEach((s, i) => select.add(i, null, s));
 		
-		select.Select((s, i) => i == item.data.style);
+		select.select((s, i) => i == item.data.style);
 		
-		select.On("Change", ev => {
+		select.on("change", ev => {
 			item.data.style = styles.indexOf(ev.item);
 			
-			this.settings.Set("layers", this.settings.layers);
+			this.settings.set("layers", this.settings.layers);
 		})
 		
 		return select;
 	}
 	
-	AddDeleteButton(item) {
-		var td = Dom.Create("td", { className:"grid-delete"}, item.row);
-		var btn = Dom.Create("button", { className:"table-button button-delete image-button" }, td);
-		var img = Dom.Create("img", { className:"image-icon", src:"./assets/delete.png", title:this.nls.Ressource("Settings_Layers_Delete_Title") }, btn);
+	add_delete_button(item) {
+		var td = Dom.create("td", { className:"grid-delete"}, item.row);
+		var btn = Dom.create("button", { className:"table-button button-delete image-button" }, td);
+		var img = Dom.create("img", { className:"image-icon", src:"./assets/delete.png", title:this.nls("Settings_Layers_Delete_Title") }, btn);
 		
-		btn.addEventListener('click', this.OnButtonDelete_Click.bind(this, item));
+		btn.addEventListener('click', this.on_button_delete_click.bind(this, item));
 		
 		return btn;
 	}
 	
-	OnButtonAddLayer_Click(ev) {
-		var layer = this.settings.AddLayer(0, this.simulation.ports, 0);
+	on_button_add_layer_click(ev) {
+		var layer = this.settings.add_layer(0, this.simulation.ports, 0);
 		
-		this.AddLayer(layer);
+		this.add_layer(layer);
 		
-		this.Elem("layers").scrollTop = this.Elem("layers").scrollHeight;
+		this.elems.layers.scrollTop = this.elems.layers.scrollHeight;
 		
-		this.settings.Set("layers", this.settings.layers);
+		this.settings.set("layers", this.settings.layers);
 	}
 		
-	OnButtonDelete_Click(item, ev) {		
-		this.settings.RemoveLayer(item.data);
+	on_button_delete_click(item, ev) {		
+		this.settings.remove_layer(item.data);
 		
-		this.RemoveLayer(item)
-		
-		Dom.Remove(item.row, this.Elem("body"));
+		this.remove_layer(item);
+				
+		item.row.remove();
 		
 		this.items.forEach((item, i) => item.data.i = i + 1);
 		
-		this.settings.Set("layers", this.settings.layers);
+		this.settings.set("layers", this.settings.layers);
 	}		
 	
-	Template() {
-		return  "<div handle='layers' class='layers'>" + 
+	html() {
+		return  "<div handle='layers' class='layers-widget'>" + 
 				   "<table>" + 
 					  "<thead>" +
 						 "<tr>" + 
@@ -174,23 +173,13 @@ export default Core.Templatable("Widget.Settings.Layers", class Layers extends T
 				"</div>";
 	}
 	
-	static Nls() {
-		return {
-			"Settings_Layers_Z" : {
-				"en" : "Z"
-			},
-			"Settings_Layers_Ports" : {
-				"en" : "Ports"
-			},
-			"Settings_Layers_Styles" : {
-				"en" : "Style"
-			},
-			"Settings_Layers_Add_Title" : {
-				"en" : "Add another grid to the visualization"
-			},
-			"Settings_Layers_Delete_Title" : {
-				"en" : "Remove grid no from visualization"
-			}
-		}
+	localize(nls) {
+		super.localize(nls);
+		
+		nls.add("Settings_Layers_Z", "en", "Z");
+		nls.add("Settings_Layers_Ports", "en", "Ports");
+		nls.add("Settings_Layers_Styles", "en", "Style");
+		nls.add("Settings_Layers_Add_Title", "en", "Add another grid to the visualization");
+		nls.add("Settings_Layers_Delete_Title", "en", "Remove grid no from visualization");
 	}
 });

@@ -2,9 +2,9 @@
 
 import Core from '../tools/core.js';
 import Dom from '../tools/dom.js';
-import Templated from '../components/templated.js';
+import Widget from '../base/widget.js';
 
-export default Core.Templatable("Widget.Playback", class Playback extends Templated { 
+export default Core.templatable("Api.Widget.Playback", class Playback extends Widget { 
 
 	get is_looping() { return this.settings.loop; } 
 	
@@ -15,192 +15,186 @@ export default Core.Templatable("Widget.Playback", class Playback extends Templa
 	set recorder(value) {
 		this._recorder = value;
 		
-		Dom.ToggleCss(this.Elem("record"), "hidden", !value);
+		Dom.toggle_css(this.elems.record, "hidden", !value);
 	}
 	
 	get recording() { return (this.recorder) ? this.recorder.recording : false; }
 
-	constructor(node) {
-		super(node);
+	constructor(container) {
+		super(container);
 		
 		this.current = 0;
 		this._interval = null;
 		this.direction = null;
 		
-		this.Enable(false);
+		this.enable(false);
 		
-		this.Node("first").On("click", this.onFirstClick_Handler.bind(this));
-		this.Node("stepBack").On("click", this.onStepBackClick_Handler.bind(this));
-		this.Node("rewind").On("click", this.onRewindClick_Handler.bind(this));
-		this.Node("play").On("click", this.onPlayClick_Handler.bind(this));
-		this.Node("stepForward").On("click", this.onStepForwardClick_Handler.bind(this));
-		this.Node("last").On("click", this.onLastClick_Handler.bind(this));
-		this.Node("slider").On("input", this.onSliderChange_Handler.bind(this));
-		this.Node("record").On("click", this.onRecordClick_Handler.bind(this));
+		this.elems.first.addEventListener("click", this.on_first_click.bind(this));
+		this.elems.stepBack.addEventListener("click", this.on_step_back_click.bind(this));
+		this.elems.rewind.addEventListener("click", this.on_rewind_click.bind(this));
+		this.elems.play.addEventListener("click", this.on_play_click.bind(this));
+		this.elems.stepForward.addEventListener("click", this.on_step_forward_click.bind(this));
+		this.elems.last.addEventListener("click", this.on_last_click.bind(this));
+		this.elems.slider.addEventListener("input", this.on_slider_change.bind(this));
+		this.elems.record.addEventListener("click", this.on_record_click.bind(this));
 	}
 	
-	Initialize(simulation, settings) {
+	initialize(simulation, settings) {
 		this.simulation = simulation;
 		this.settings = settings;
-		
-		this.simulation.On("Session", this.onSimulationSession_Handler.bind(this));
-		
+				
 		this.values = this.simulation.frames.map((f) => { return f.time; });
 		
 		this.min = 0;
 		this.max = this.values.length - 1;
 		
-		this.Elem("slider").setAttribute("min", this.min);
-		this.Elem("slider").setAttribute("max", this.max);
+		this.elems.slider.setAttribute("min", this.min);
+		this.elems.slider.setAttribute("max", this.max);
 		
-		this.SetCurrent(this.min);
+		this.set_current(this.min);
 		
-		this.Enable(true);
+		this.enable(true);
 	}
 	
-	Enable (isEnabled) {
-		this.Elem("first").disabled = !isEnabled;
-		this.Elem("stepBack").disabled = !isEnabled;
-		this.Elem("rewind").disabled = !isEnabled;
-		this.Elem("play").disabled = !isEnabled;
-		this.Elem("stepForward").disabled = !isEnabled;
-		this.Elem("last").disabled = !isEnabled;
-		this.Elem("slider").disabled = !isEnabled;
-		this.Elem("record").disabled = !isEnabled;
+	enable (isEnabled) {
+		this.elems.first.disabled = !isEnabled;
+		this.elems.stepBack.disabled = !isEnabled;
+		this.elems.rewind.disabled = !isEnabled;
+		this.elems.play.disabled = !isEnabled;
+		this.elems.stepForward.disabled = !isEnabled;
+		this.elems.last.disabled = !isEnabled;
+		this.elems.slider.disabled = !isEnabled;
+		this.elems.record.disabled = !isEnabled;
 	}
 	
-	SetCurrent(i) {
+	set_current(i) {
 		this.current = i;
 		
-		this.Elem("label").innerHTML = this.values[this.current];
-		this.Elem("slider").value = this.current;
+		this.elems.label.innerHTML = this.values[this.current];
+		this.elems.slider.value = this.current;
 	}
 	
-	Stop() {
+	stop() {
 		var d = this.direction;
 		
 		this.direction = null;
 		
 		if (this._interval) clearInterval(this._interval);
 		
-		Dom.SetCss(this.Elem("rewind"), "fas fa-backward");
-		Dom.SetCss(this.Elem("play"), "fas fa-play");
+		Dom.set_css(this.elems.rewind, "fas fa-backward");
+		Dom.set_css(this.elems.play, "fas fa-play");
 		
 		return d;
 	}
 	
-	Play(interval) {		
+	play(interval) {		
 		this.direction = "play";
 		
 		this._interval = setInterval(() => { 
-			if (this.current < this.max) this.GoToNext();
+			if (this.current < this.max) this.go_to_next();
 		
-			else if (this.is_looping) this.GoTo(this.min);
+			else if (this.is_looping) this.go_to(this.min);
 			
-			else this.Stop();
+			else this.stop();
 		}, interval);
 	}
 	
-	Rewind(interval) {
+	rewind(interval) {
 		this.direction = "rewind";
 		
 		this._interval = setInterval(() => { 
-			if (this.current > this.min) this.GoToPrevious();
+			if (this.current > this.min) this.go_to_previous();
 		
-			else if (this.is_looping) this.GoTo(this.max);
+			else if (this.is_looping) this.go_to(this.max);
 			
-			else this.Stop();
+			else this.stop();
 		}, interval);
 	}
 	
-	GoToPrevious() {
-		this.SetCurrent(--this.current);
+	go_to_previous() {
+		this.set_current(--this.current);
 		
 		this.simulation.go_to_previous_frame();
 	}
 	
-	GoToNext() {
-		this.SetCurrent(++this.current);
+	go_to_next() {
+		this.set_current(++this.current);
 		
 		this.simulation.go_to_next_frame();
 	}
 	
-	GoTo(i) {
-		this.SetCurrent(i);
+	go_to(i) {
+		this.set_current(i);
 		
 		this.simulation.go_to_frame(i);
 	}
 	
-	onFirstClick_Handler(ev) {
-		this.Stop();
+	on_first_click(ev) {
+		this.stop();
 		
-		this.GoTo(this.min);
+		this.go_to(this.min);
 	}
 	
-	onStepBackClick_Handler(ev) {
-		this.Stop();
+	on_step_back_click(ev) {
+		this.stop();
 		
-		if (this.current > this.min) this.GoToPrevious();
+		if (this.current > this.min) this.go_to_previous();
 		
-		else if (this.is_looping, this.GoTo(this.max));
+		else if (this.is_looping, this.go_to(this.max));
 	}
 	
-	onRewindClick_Handler(ev) {
-		if (this.Stop() == "rewind") return;
+	on_rewind_click(ev) {
+		if (this.stop() == "rewind") return;
 		
-		Dom.SetCss(this.Elem("rewind"), "fas fa-pause");
+		Dom.set_css(this.elems.rewind, "fas fa-pause");
 		
-		this.Rewind(this.interval);
+		this.rewind(this.interval);
 	}
 	
-	onPlayClick_Handler(ev) {
-		if (this.Stop() == "play") return;
+	on_play_click(ev) {
+		if (this.stop() == "play") return;
 		
-		Dom.SetCss(this.Elem("play"), "fas fa-pause");
+		Dom.set_css(this.elems.play, "fas fa-pause");
 		
-		this.Play(this.interval);
+		this.play(this.interval);
 	}
 	
-	onStepForwardClick_Handler(ev) {
-		this.Stop();
+	on_step_forward_click(ev) {
+		this.stop();
 		
-		if (this.current < this.max) this.GoToNext();
+		if (this.current < this.max) this.go_to_next();
 		
-		else if (this.is_looping) this.GoTo(this.min)
+		else if (this.is_looping) this.go_to(this.min)
 	}
 	
-	onLastClick_Handler(ev) {
-		this.Stop();
+	on_last_click(ev) {
+		this.stop();
 		
-		this.GoTo(this.max);
+		this.go_to(this.max);
 	}
 	
-	onRecordClick_Handler(ev) {
+	on_record_click(ev) {
 		if (this.recorder.recording) {
-			Dom.SetCss(this.Elem("record"), "fas fa-circle record");
+			Dom.set_css(this.elems.record, "fas fa-circle record");
 			
-			this.recorder.Stop().then(e => {
-				this.recorder.Download(this.simulation.name);
+			this.recorder.stop().then(e => {
+				this.recorder.download(this.simulation.name);
 			});
 		}
 		else {
-			Dom.SetCss(this.Elem("record"), "fas fa-square record");
+			Dom.set_css(this.elems.record, "fas fa-square record");
 			
-			this.recorder.Start();
+			this.recorder.start();
 		}
 	}
 	
-	onSliderChange_Handler(ev) {
-		this.Stop();
+	on_slider_change(ev) {
+		this.stop();
 		
-		this.GoTo(+ev.target.value);
+		this.go_to(+ev.target.value);
 	}
-	
-	onSimulationSession_Handler(ev) {
-		this.SetCurrent(this.simulation.state.index);
-	}
-	
-	Template() {
+		
+	html() {
 		return "<div class='playback'>" +
 				  "<div class='controls'>" +
 				     "<button handle='first' title='nls(Playback_FastBackward)' class='fas fa-fast-backward'></button>" +
@@ -216,32 +210,16 @@ export default Core.Templatable("Widget.Playback", class Playback extends Templa
 		       "</div>" ;
 	}
 
-	static Nls() {
-		return {
-			"Playback_FastBackward" : {
-				"en" : "Go to first frame"
-			},
-			"Playback_StepBack" : {
-				"en" : "Step back"
-			},
-			"Playback_Backwards" : {
-				"en" : "Play backwards"
-			},
-			"Playback_Play" : {
-				"en" : "Play forward"
-			},
-			"Playback_StepForward" : {
-				"en" : "Step forward"
-			},
-			"Playback_FastForward" : {
-				"en" : "Go to last frame"
-			},
-			"Playback_Seek" : {
-				"en" : "Slide to seek frame"
-			},
-			"Playback_Record" : {
-				"en" : "Record simulation to .webm"
-			}
-		}
+	localize(nls) {
+		super.localize(nls);
+		
+		nls.add("Playback_FastBackward", "en", "Go to first frame");
+		nls.add("Playback_StepBack", "en", "Step back");
+		nls.add("Playback_Backwards", "en", "Play backwards");		
+		nls.add("Playback_Play", "en", "Play forward");		
+		nls.add("Playback_StepForward", "en", "Step forward");		
+		nls.add("Playback_FastForward", "en", "Go to last frame");		
+		nls.add("Playback_Seek", "en", "Slide to seek frame");		
+		nls.add("Playback_Record", "en", "Record simulation to .web");		
 	}
 });

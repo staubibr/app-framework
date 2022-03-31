@@ -4,10 +4,9 @@ import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 import Tooltip from '../../ui/tooltip.js';
 import Automator from '../../components/automator.js';
-import Styler from '../../components/styler.js';
 import Grid from '../grid/grid.js';
 
-export default Core.Templatable("Auto.Grid", class AutoGrid extends Automator { 
+export default Core.templatable("Api.Widget.Grid.Auto", class AutoGrid extends Automator { 
 
 	get canvas() { return this.widget.canvas; }
 
@@ -24,49 +23,43 @@ export default Core.Templatable("Auto.Grid", class AutoGrid extends Automator {
 		this.widget.layers	= options.layers;
 		this.widget.styles	= options.styles;
 		
-		this.AttachHandlers(options);
+		this.attach_handlers(options);
 		
-		this.BuildTooltip();
+		this.tooltip = new Tooltip();
 	}
 	
-	AttachHandlers(options) {
+	attach_handlers(options) {
 		var h = [];
 		
-		if (options.hoverEnabled != false) h.push(this.widget.On("MouseMove", this.onMouseMove_Handler.bind(this)));
-		if (options.hoverEnabled != false) h.push(this.widget.On("MouseOut", this.onMouseOut_Handler.bind(this)));
-		if (options.clickEnabled != false) h.push(this.widget.On("Click", this.onClick_Handler.bind(this)));
+		if (options.hoverEnabled != false) h.push(this.widget.on("mousemove", this.on_mousemove.bind(this)));
+		if (options.hoverEnabled != false) h.push(this.widget.on("mouseout", this.on_mouseout.bind(this)));
+		if (options.clickEnabled != false) h.push(this.widget.on("click", this.on_click.bind(this)));
 		
-		h.push(this.simulation.On("Move", this.onSimulationMove_Handler.bind(this)));
-		h.push(this.simulation.On("Jump", this.onSimulationJump_Handler.bind(this)));
+		h.push(this.simulation.on("move", this.on_simulation_move.bind(this)));
+		h.push(this.simulation.on("jump", this.on_simulation_jump.bind(this)));
 		
-		options.On("change", this.OnSettings_Change.bind(this));
-		options.On("change:styles", this.OnSettingsStyles_Change.bind(this));
-		options.On("change:layers", this.OnSettingsLayers_Change.bind(this));
+		options.on("change", this.on_settings_change.bind(this));
+		options.on("change:styles", this.on_settings_styles_change.bind(this));
+		options.on("change:layers", this.on_settings_layers_change.bind(this));
 		
-		this.Handle(h);
+		this.handle(h);
 	}
 	
-	BuildTooltip() {
-		this.tooltip = new Tooltip();
-		
-		this.tooltip.nodes.label = Dom.Create("div", { className:"tooltip-label" }, this.tooltip.Elem("content"));
-	}
-	
-	Resize() {
+	resize() {
 		var n = this.widget.layers.length;
-		var size = this.options.CanvasSize(this.simulation, n);
+		var size = this.options.canvas_size(this.simulation, n);
 			
 		this.widget.container.style.width = size.width + "px";
 		this.widget.container.style.height = size.height + "px";	
 	}
 	
-	Redraw() {
-		this.widget.Resize();
+	redraw() {
+		this.widget.resize();
 		
-		this.widget.DrawState(this.simulation.state, this.simulation);
+		this.widget.draw_state(this.simulation.state, this.simulation);
 	}
 	
-	OnSettings_Change(ev) {			
+	on_settings_change(ev) {			
 		var check = ["height", "width", "columns", "spacing", "aspect", "layers"];
 
 		if (check.indexOf(ev.property) == -1) return;
@@ -75,56 +68,56 @@ export default Core.Templatable("Auto.Grid", class AutoGrid extends Automator {
 		this.widget.spacing = this.options.spacing;
 		this.widget.layers = this.options.layers;
 		
-		this.Resize();
-		this.Redraw();
+		this.resize();
+		this.redraw();
 	}
 	
-	OnSettingsStyles_Change(ev) {			
-		this.Redraw();
+	on_settings_styles_change(ev) {			
+		this.redraw();
 	}
 	
-	OnSettingsLayers_Change(ev) {			
-		this.Redraw();
+	on_settings_layers_change(ev) {			
+		this.redraw();
 	}
 	
-	onSimulationMove_Handler(ev) {		
+	on_simulation_move(ev) {		
 		var s = this.simulation;
 		
-		this.widget.DrawChanges(ev.frame, s);
+		this.widget.draw_changes(ev.frame, s);
 	}
 	
-	onSimulationJump_Handler(ev) {
+	on_simulation_jump(ev) {
 		var s = this.simulation;
 		
-		this.widget.DrawState(s.state, s);
+		this.widget.draw_state(s.state, s);
 	}
 	
-	onSimulationPaletteChanged_Handler(ev) {
+	on_simulation_palette_change(ev) {
 		var s = this.simulation;
 		
-		this.widget.DrawState(s.state, s);
+		this.widget.draw_state(s.state, s);
 	}
 	
-	onMouseMove_Handler(ev) {
+	on_mousemove(ev) {
 		var labels = [];
 		
 		ev.data.layer.ports.forEach(port => {
 			var state = this.simulation.state.get_value([ev.data.x, ev.data.y, ev.data.layer.z]);
 			var subs = [ev.data.x, ev.data.y, ev.data.layer.z, state[port], port];
 			
-			labels.push(this.nls.Ressource("Grid_Tooltip_Title", subs));
+			labels.push(this.nls("Grid_Tooltip_Title", subs));
 			
-			this.tooltip.Show(ev.x + 20, ev.y);
+			this.tooltip.show(ev.x + 20, ev.y);
 		});
 		
-		this.tooltip.nodes.label.innerHTML = labels.join("<br>");
+		this.tooltip.content = labels.join("<br>");
 	}
 	
-	onMouseOut_Handler(ev) {
-		this.tooltip.Hide();
+	on_mouseout(ev) {
+		this.tooltip.hide();
 	}
 	
-	onClick_Handler(ev) {
+	on_click(ev) {
 		var id = [ev.data.x, ev.data.y, ev.data.z];
 		
 		if (this.simulation.is_selected(id)) {
@@ -133,24 +126,22 @@ export default Core.Templatable("Auto.Grid", class AutoGrid extends Automator {
 			// TODO: This is nasty. Maybe just store the original color along with the id.
 			var port = ev.data.layer.ports[ev.data.layer.ports.length - 1];
 			var value = this.simulation.state.get_value(id);
-			var scale = this.widget.styler.GetScale(ev.data.layer.style);
-			var color = this.widget.styler.GetColor(scale, value[port]);
+			var scale = this.widget.styler.get_scale(ev.data.layer.style);
+			var color = this.widget.styler.get_color(scale, value[port]);
 			
-			this.widget.DrawCellBorder(ev.data.x, ev.data.y, ev.data.k, color);
+			this.widget.draw_cell_border(ev.data.x, ev.data.y, ev.data.k, color);
 		} 
 		
 		else {
 			this.simulation.select(id);
 			
-			this.widget.DrawCellBorder(ev.data.x, ev.data.y, ev.data.k, 'rgb(255,0,0)');
+			this.widget.draw_cell_border(ev.data.x, ev.data.y, ev.data.k, 'rgb(255,0,0)');
 		}
 	}
 	
-	static Nls() {
-		return {
-			"Grid_Tooltip_Title" : {
-				"en" : "The state of cell <b>({0}, {1}, {2})</b> on port <b>{4}</b> is <b>{3}</b>."		
-			}
-		}
+	localize(nls) {
+		super.localize(nls);
+		
+		nls.add("Grid_Tooltip_Title", "en", "The state of cell <b>({0}, {1}, {2})</b> on port <b>{4}</b> is <b>{3}</b>.");
 	}
 });

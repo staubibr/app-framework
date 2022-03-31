@@ -2,15 +2,15 @@
 
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
-import Templated from '../../components/templated.js';
+import Widget from '../../base/widget.js';
 import Styler from '../../components/styler.js';
 
 const STROKE_WIDTH = 2;
 const DEFAULT_COLOR = "#fff";
 
-export default Core.Templatable("Widgets.Grid", class Grid extends Templated { 
+export default Core.templatable("Api.Widget.Grid", class Grid extends Widget { 
 
-	get canvas() { return this.Elem("canvas"); }
+	get canvas() { return this.elems.canvas; }
 	
 	set dimensions(value) { this._dimensions = value; }
 	get dimensions() { return this._dimensions; }
@@ -46,8 +46,8 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 	get styles() { return this._styles; }
 	get styler() { return this._styler; }
 
-	constructor(node) {
-		super(node);
+	constructor(container) {
+		super(container);
 
 		this._cell = { w:null, h:null };
 		this._dimensions = null;
@@ -58,32 +58,32 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 		this._layers = [];
 		this._grids = [];
 
-		this._ctx = this.Elem("canvas").getContext("2d");
+		this._ctx = this.elems.canvas.getContext("2d");
 		
-		this.Node("canvas").On("mousemove", this.onCanvasMouseMove_Handler.bind(this));
-		this.Node("canvas").On("mouseout", this.onCanvasMouseOut_Handler.bind(this));
-		this.Node("canvas").On("click", this.onCanvasClick_Handler.bind(this));
+		this.elems.canvas.addEventListener("mousemove", this.on_canvas_mousemove.bind(this));
+		this.elems.canvas.addEventListener("mouseout", this.on_canvas_mouseout.bind(this));
+		this.elems.canvas.addEventListener("click", this.on_canvas_click.bind(this));
 	}
 	
-	Template() {
-		return "<div class='grid'>" + 
-				  "<div handle='canvas-container' class='grid-canvas-container'>" +
+	html() {
+		return "<div class='grid-widget'>" + 
+				  "<div handle='canvas_container' class='grid-canvas-container'>" +
 					"<canvas handle='canvas' class='grid-canvas'></canvas>" +
 				  "</div>" + 
 			   "</div>";
 	}
 
-	GetRows(columns, layers) {
+	get_rows(columns, layers) {
 		return Math.ceil(layers.length / columns) ;
 	}
 	
-	Resize() {
-		this._size = Dom.Geometry(this.Elem("canvas-container"));
+	resize() {
+		this._size = Dom.geometry(this.elems.canvas_container);
 		
 		// Number of columns and rows
 		this._layout = {
 			columns : this.columns,
-			rows : this.GetRows(this.columns, this.layers)
+			rows : this.get_rows(this.columns, this.layers)
 		}
 
 		// Size of one layer drawn, only used to determine cell size, shouldn't be used after
@@ -122,34 +122,34 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 			return { x1:x1, y1:y1, x2:x2, y2:y2, z:l.z } 
 		}) 
 		
-		this.Elem("canvas").style.margin = `${this._margin.h}px ${this._margin.w}px`;		
+		this.elems.canvas.style.margin = `${this._margin.h}px ${this._margin.w}px`;		
 		
 		// Redefine with and height to fit with number of cells and cell size
-		this.Elem("canvas").width = this._total.w;	
-		this.Elem("canvas").height = this._total.h;	
+		this.elems.canvas.width = this._total.w;	
+		this.elems.canvas.height = this._total.h;	
 	}
 	
 	// TODO : grid shouldn't use simulation object maybe?
-	Draw(state, simulation) {
-		if (this.dimensions) this.DrawState(state, simulation);
+	draw(state, simulation) {
+		if (this.dimensions) this.draw_state(state, simulation);
 		
-		else this.Default(DEFAULT_COLOR);
+		else this.default(DEFAULT_COLOR);
 	}
 	
-	Clear() {
+	clear() {
 		this._ctx.clearRect(0, 0, this._size.w, this._size.h);
 	}
 	
-	Default(color) {
+	default(color) {
 		this._ctx.fillStyle = color;
 		this._ctx.fillRect(0, 0, this._size.w, this._size.h);
 	}
 	
 	// TODO : grid shouldn't use simulation object maybe?
-	DrawState(state, simulation) {
+	draw_state(state, simulation) {
 		for (var i = 0; i < this.layers.length; i++) {
 			var l = this.layers[i];
-			var scale = this.styler.GetScale(l.style);
+			var scale = this.styler.get_scale(l.style);
 			
 			for (var x = 0; x < this.dimensions.x; x++) {
 				for (var y = 0; y < this.dimensions.y; y++) {
@@ -157,21 +157,21 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 						var v = state.get_value([x, y, l.z]); // value of cell to draw
 						var f = l.ports[p]; 
 						
-						var color = this.styler.GetColor(scale, v[f]) || 'rgb(200, 200, 200)';
+						var color = this.styler.get_color(scale, v[f]) || 'rgb(200, 200, 200)';
 						
-						this.DrawCell(x, y, i, color);
+						this.draw_cell(x, y, i, color);
 					}
 					
 					var id = x + "-" + y + "-" + l.z; // id of cell to draw
 					
-					if (simulation.is_selected(id)) this.DrawCellBorder(x, y, i, 'rgb(255,0,0)');
+					if (simulation.is_selected(id)) this.draw_cell_border(x, y, i, 'rgb(255,0,0)');
 				}
 			}
 		}
 	}
 	
 	// TODO : grid shouldn't use simulation object maybe?
-	DrawChanges(frame, simulation) {
+	draw_changes(frame, simulation) {
 		for (var i = 0; i < frame.state_messages.length; i++) {
 			var m = frame.state_messages[i];
 			
@@ -181,18 +181,18 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 				
 				for (var j = 0; j < layers.length; j++) {
 					var l = layers[j];
-					var scale = this.styler.GetScale(l.style);
+					var scale = this.styler.get_scale(l.style);
 			
-					this.DrawCell(m.x, m.y, l.position, this.styler.GetColor(scale, v));
+					this.draw_cell(m.x, m.y, l.position, this.styler.get_color(scale, v));
 					
-					if (simulation.is_selected(m.coord)) this.DrawCellBorder(m.x, m.y, l.position, 'rgb(255,0,0)');
+					if (simulation.is_selected(m.coord)) this.draw_cell_border(m.x, m.y, l.position, 'rgb(255,0,0)');
 				}
 			}
 		}
 	}
 	
-	GetCell(clientX, clientY) {
-		var rect = this.Elem("canvas").getBoundingClientRect();
+	get_cell(clientX, clientY) {
+		var rect = this.elems.canvas.getBoundingClientRect();
 		
 		var x = clientX - rect.left;
 		var y = clientY - rect.top;
@@ -221,7 +221,7 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 		return { x:pX / this._cell.w, y:pY / this._cell.h, z:zero.z, k:k, layer:this.layers[k] };
 	}
 	
-	DrawCell(x, y, k, color) {			
+	draw_cell(x, y, k, color) {			
 		var zero = this._grids[k];
 			
 		var x = zero.x1 + x * this._cell.w;
@@ -231,7 +231,7 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 		this._ctx.fillRect(x, y, this._cell.w, this._cell.h);
 	}
 	
-	DrawCellBorder(x, y, k, color) {	
+	draw_cell_border(x, y, k, color) {	
 		var zero = this._grids[k];
 		
 		// Find the new X, Y coordinates of the clicked cell
@@ -250,23 +250,23 @@ export default Core.Templatable("Widgets.Grid", class Grid extends Templated {
 		this._ctx.strokeRect(dX, dY, this._cell.w - STROKE_WIDTH, this._cell.h - STROKE_WIDTH);
 	}
 	
-	onCanvasClick_Handler(ev) {		
-		var data = this.GetCell(ev.clientX, ev.clientY);
+	on_canvas_click(ev) {		
+		var data = this.get_cell(ev.clientX, ev.clientY);
 		
 		if (!data) return;
 		
-		this.Emit("Click", { x:ev.pageX, y:ev.pageY, data:data });
+		this.emit("click", { x:ev.pageX, y:ev.pageY, data:data });
 	}
 	
-	onCanvasMouseMove_Handler(ev) {				
-		var data = this.GetCell(ev.clientX, ev.clientY);
+	on_canvas_mousemove(ev) {				
+		var data = this.get_cell(ev.clientX, ev.clientY);
 		
 		if (!data) return;
 		
-		this.Emit("MouseMove", { x:ev.pageX, y:ev.pageY, data:data });
+		this.emit("mousemove", { x:ev.pageX, y:ev.pageY, data:data });
 	}
 		
-	onCanvasMouseOut_Handler(ev) {		
-		this.Emit("MouseOut", { x:ev.pageX, y:ev.pageY });
+	on_canvas_mouseout(ev) {		
+		this.emit("mouseout", { x:ev.pageX, y:ev.pageY });
 	}
 });

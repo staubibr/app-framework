@@ -11,9 +11,17 @@ import Point from "../components/style/point.js";
 import PointIcon from "../components/style/pointIcon.js";
 import Linestring from "../components/style/linestring.js";
 
+/** 
+ * A utility class that contains a series of basic functions for styling maps
+ **/
 export default class Style {
 	
-	static Statistics(simulation) {		
+	/**
+	* calculates a series of statistics useful for map classification (min, max, sorted values, etc.)
+	* @param {Simulation} simulation - the simulation object
+	* @return {object} the statistics calculated from the simulation.
+	*/
+	static statistics(simulation) {		
 		var values = {};
 
 		// TODO :Something doesn't work here now that there can be multiple model types. 
@@ -53,7 +61,14 @@ export default class Style {
 		return stats;
 	}
 	
-	static QuantileBuckets(values, n, zero) {
+	/**
+	* calculates a classification buckets using quantiles
+	* @param {number[]} values - an array of numbers, all the values in the simulation
+	* @param {number} n - the number of buckets
+	* @param {boolean} zero - if true, filter out 0 values.
+	* @return {number[]} an array of numbers representing upper limits of buckets.
+	*/
+	static quantile_buckets(values, n, zero) {
 		var buckets = [];
 		
 		var zValues = zero ?  values.filter(v => v != 0) : values;
@@ -69,7 +84,14 @@ export default class Style {
 		return buckets;
 	}
 	
-	static EquivalentBuckets(min, max, n) {
+	/**
+	* calculates a classification buckets using equivalent ranges
+	* @param {number} min - the minimum value among all simulation values
+	* @param {number} max - the maximum value among all simulation values
+	* @param {number} n - the number of buckets.
+	* @return {number[]} an array of numbers representing upper limits of buckets.
+	*/
+	static equivalent_buckets(min, max, n) {
 		var buckets = [];
 		
 		var interval = (max - min) / n;
@@ -81,26 +103,42 @@ export default class Style {
 		return buckets;
 	}
 	
-	static BucketizeStyle(style, stats) {
+	/**
+	* Apply buckets to a style definition. Adds a buckets property on the style definition.
+	* @param {object} style - the style definition
+	* @param {object} stats - the simulation statistics
+	*/
+	static bucketize_style(style, stats) {
 		if (style.type == "quantile") {	
-			style.buckets = Style.QuantileBuckets(stats[style.property].sorted, style.length, !!style.zero);
+			style.buckets = Style.quantile_buckets(stats[style.property].sorted, style.length, !!style.zero);
 		}
 		else if (style.type == "equivalent") {
-			style.buckets = Style.EquivalentBuckets(stats[style.property].min, stats[style.property].max, style.length);
+			style.buckets = Style.equivalent_buckets(stats[style.property].min, stats[style.property].max, style.length);
 		}
 	}
 	
-	static GetStyle(type, json) {
-		if (type == "point") return this.PointStyle(json);
+	/**
+	* Get an OpenLayers style object from a type and a style definition
+	* @param {string} type - the type of style (point, pointIcon, polygon, linestring)
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object
+	*/
+	static get_style(type, json) {
+		if (type == "point") return this.point_style(json);
 		
-		if (type == "pointIcon") return this.PointIconStyle(json);
+		if (type == "pointIcon") return this.point_icon_style(json);
 		
-		if (type == "polygon") return this.PolygonStyle(json);
+		if (type == "polygon") return this.polygon_style(json);
 		
-		if (type == "linestring") return this.LinestringStyle(json);
+		if (type == "linestring") return this.linestring_style(json);
 	}
 	
-	static PointIconStyle(json) {
+	/**
+	* Get an OpenLayers point icon style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Icon
+	*/
+	static point_icon_style(json) {
 		return new ol.style.Style({
 			image: new ol.style.Icon({
 				anchor: [0.5, 0.5],
@@ -114,7 +152,12 @@ export default class Style {
 		});
 	}
 	
-	static PointStyle(json) {
+	/**
+	* Get an OpenLayers point style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Circle
+	*/
+	static point_style(json) {
 		return new ol.style.Style({
 			image: new ol.style.Circle({
 				radius: json.radius,
@@ -128,8 +171,13 @@ export default class Style {
 			})
 		});
 	}
-
-	static PolygonStyle(json) {
+	
+	/**
+	* Get an OpenLayers polygon style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Stroke and ol.style.Fill
+	*/
+	static polygon_style(json) {
 		return new ol.style.Style({
 			stroke: new ol.style.Stroke({
 				color: json.stroke.color,
@@ -141,7 +189,12 @@ export default class Style {
 		});
 	}
 	
-	static LinestringStyle(json) {
+	/**
+	* Get an OpenLayers linestring style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Stroke
+	*/
+	static linestring_style(json) {
 		return new ol.style.Style({
 			stroke: new ol.style.Stroke({
 				color: json.stroke.color,
@@ -150,47 +203,73 @@ export default class Style {
 		})
 	}
 	
-	static FillStyleFromJson(json) {
+	/**
+	* Get a fill style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticFill, BucketFill} the style object created
+	*/
+	static fill_style_from_json(json) {
 		if (json.type == "equivalent" || json.type == "quantile" || json.type == "user-defined") {
-			return BucketFill.FromJson(json);
+			return BucketFill.from_json(json);
 		}
 
-		if (json.type == "static") return StaticFill.FromJson(json);
+		if (json.type == "static") return StaticFill.from_json(json);
 	}
 	
-	static StrokeStyleFromJson(json) {
+	/**
+	* Get a stroke style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticStroke, BucketStroke} the style object created
+	*/
+	static stroke_style_from_json(json) {
 		if (json.type == "equivalent" || json.type == "quantile" || json.type == "user-defined") {
-			return BucketStroke.FromJson(json);
+			return BucketStroke.from_json(json);
 		}
 		
-		if (json.type == "static") return StaticStroke.FromJson(json);
+		if (json.type == "static") return StaticStroke.from_json(json);
 	}
 	
-	static RadiusStyleFromJson(json) {
+	/**
+	* Get a radius style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticRadius, BucketRadius} the style object created
+	*/
+	static radius_style_from_json(json) {
 		if (json.type == "equivalent" || json.type == "quantile" || json.type == "user-defined") {
-			return BucketRadius.FromJson(json);
+			return BucketRadius.from_json(json);
 		}
 		
-		if (json.type == "static") return StaticRadius.FromJson(json.radius);	
+		if (json.type == "static") return StaticRadius.from_json(json.radius);	
 	}
 	
-	static ScaleStyleFromJson(json) {
+	/**
+	* Get a scale style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticScale, BucketScale} the style object created
+	*/
+	static scale_style_from_json(json) {
 		if (json.type == "equivalent" || json.type == "quantile" || json.type == "user-defined") {
-			return BucketScale.FromJson(json);
+			return BucketScale.from_json(json);
 		}
 		
-		if (json.type == "static") return StaticScale.FromJson(json.scale);	
+		if (json.type == "static") return StaticScale.from_json(json.scale);	
 	}
 	
-	static FromJson(type, json) {
-		if (type == "polygon") return Polygon.FromJson(json);
+	/**
+	* Get a style for a geometry type and visual variable definition
+	* @param {string} type - the gepometry type
+	* @param {object} json - the visual variable definition
+	* @return a style for the geometry initialized from the type and visual variable definition
+	*/
+	static from_json(type, json) {
+		if (type == "polygon") return Polygon.from_json(json);
 		
 		if (type == "point") {
-			if (json.radius) return Point.FromJson(json);
+			if (json.radius) return Point.from_json(json);
 			
-			if (json.src) return PointIcon.FromJson(json);
+			if (json.src) return PointIcon.from_json(json);
 		}
 		
-		if (type == "linestring") return Linestring.FromJson(json);
+		if (type == "linestring") return Linestring.from_json(json);
 	}
 }

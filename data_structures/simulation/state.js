@@ -119,7 +119,6 @@ export default class State {
 	
     /**
      * Resets the state to a zero template for all models.
-     * @param {Frame} frame - the frame to apply to the state.
 	 */
 	initialize() {
 		throw new Error("The initialize method must be implemented by the state specialization class.");

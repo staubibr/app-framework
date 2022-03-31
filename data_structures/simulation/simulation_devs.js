@@ -23,7 +23,7 @@ export default class SimulationDEVS extends Simulation {
 	set diagram (value) {  
 		this._diagram = value;
 	
-		this.Emit("NewDiagram", { diagram:this.diagram });
+		this.emit("new-diagram", { diagram:this.diagram });
 	}
 	
 	/** 
@@ -43,11 +43,10 @@ export default class SimulationDEVS extends Simulation {
     /**
      * @param {Structure} structure - The simulation model structure.
      * @param {Frame[]} frames - An array of all the simulation frames.
-     * @param {number} nCache - The cache interval.
      * @param {string} diagram - The SVG diagram for the simulation model.
      */
-	constructor(structure, frames, nCache, diagram) {
-		super(structure, frames, nCache);
+	constructor(structure, frames, diagram) {
+		super(structure, frames);
 		
 		if (diagram) this._diagram = this.load_svg(diagram);
 	}
@@ -63,11 +62,11 @@ export default class SimulationDEVS extends Simulation {
 	
     /**
      * Loads the SVG diagram string to a dom node.
-     * @param {string} diagram - The SVG diagram for the simulation model.
+     * @param {string} svg - The SVG diagram for the simulation model.
 	 * @return {object} the dom node created
      */
 	load_svg(svg) {		
-		var root = Dom.Create("div", { innerHTML:svg });
+		var root = Dom.create("div", { innerHTML:svg });
 		
 		return root.children[0];
 	}

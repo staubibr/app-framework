@@ -1,10 +1,24 @@
 
 import StaticFill from "./staticFill.js";
 
+/** 
+ * A fill style that varies according to the value of the geometry it is applied to
+ **/
 export default class BucketFill {
 
+	/** 
+	* Gets number of buckets for this style
+	* @type {number} 
+	*/
 	get length() { return this.colors.length; }
 
+    /**
+     * @param {string} property - the property to use to apply classification
+     * @param {string[]} colors - a list of string RGBA colors, same length as width
+     * @param {string} type - the type of buckets (equivalent or quantile)
+     * @param {number[]} buckets - a list of upper limits to use for classification
+     * @param {number} zero - the colors to use for 0 value
+     */
 	constructor(property, colors, type, buckets, zero) {
 		this.type = type;
 		this.attribute = "fill";
@@ -14,7 +28,12 @@ export default class BucketFill {
 		this.zero = zero || null;
 	}
 	
-	Symbol(value) {
+    /**
+     * Build an OpenLayers style from this object
+	 * @param {number} value - the value used to determine the style
+     * @return {ol.style.Fill} an OL style for polygons
+     */
+	symbol(value) {
 		var v = value[this.property];
 		
 		if (v == 0 && this.zero) return new ol.style.Fill({ color: this.zero });
@@ -24,11 +43,19 @@ export default class BucketFill {
 		return new ol.style.Fill({ color: this.colors[i] });
 	}
 	
-	static FromJson(json) {
+    /**
+     * Build from a json object
+     * @return {BucketFill} the object built from json
+     */
+	static from_json(json) {
 		return new BucketFill(json.property, json.colors, json.type, json.buckets, json.zero);
 	}
 	
-	static DefaultFill() {
+    /**
+     * Builds a default style for a fill
+     * @return {StaticFill} a default style
+     */
+	static default_fill() {
 		return new StaticFill('rgba(50,100,200,0.6)');
 	}
 }

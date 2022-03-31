@@ -3,10 +3,9 @@
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 import Net from '../../tools/net.js';
-import Templated from '../../components/templated.js';
-import Select from '../../ui/select.js';
+import Widget from '../../base/widget.js';
 
-export default class SelectPorts extends Templated {
+export default Core.templatable("Api.Widget.Palette.Ports", class Ports extends Widget { 
 	
 	set available(value) { this._available = value; }
 	
@@ -16,24 +15,24 @@ export default class SelectPorts extends Templated {
 	
 	get value() { return this._value; }
 	
-	get Opened() { return this.Elem("dropdown").children.length > 0; }
+	get opened() { return this.elems.dropdown.children.length > 0; }
 	
-	constructor(id) {
-		super(id);
+	constructor(container) {
+		super(container);
 		
-		this.OnInput_Click_Bound = this.onInput_Click.bind(this);
-		this.onBody_KeyUp_Bound = this.onBody_KeyUp.bind(this);
-		this.onBody_Click_Bound = this.onBody_Click.bind(this);
+		this.on_input_click_bound = this.on_input_click.bind(this);
+		this.on_body_keyup_bound = this.on_body_keyup.bind(this);
+		this.on_body_click_bound = this.on_body_click.bind(this);
 		
 		this._available = null;
 		this._value = null;
 		this._previous = null;
 		
-		this.Node("input").On("click", this.OnInput_Click_Bound);
+		this.elems.input.addEventListener("click", this.on_input_click_bound);
 	}
 	
-	Open() {		
-		Dom.RemoveCss(this.Elem('top'), 'collapsed');
+	open() {		
+		Dom.remove_css(this.elems.top, 'collapsed');
 		
 		document.body.addEventListener("keyup", this.onBody_KeyUp_Bound);
 		document.body.addEventListener("click", this.onBody_Click_Bound);
@@ -42,63 +41,63 @@ export default class SelectPorts extends Templated {
 		this.value = [];
 		
 		this.available.forEach(a => {
-			var li = Dom.Create("li", { className:'select-ports-dropdown-item', innerHTML:a }, this.Elem("dropdown"));
+			var li = Dom.create("li", { className:'select-ports-dropdown-item', innerHTML:a }, this.elems.dropdown);
 			
-			li.addEventListener("click", this.onLi_Click.bind(this, a));
+			li.addEventListener("click", this.on_li_click.bind(this, a));
 		});
 	}
 	
-	Close() {		
-		Dom.AddCss(this.Elem('top'), 'collapsed');
+	close() {		
+		Dom.add_css(this.elems.top, 'collapsed');
 		
-		document.body.removeEventListener("keyup", this.onBody_KeyUp_Bound);
-		document.body.removeEventListener("click", this.onBody_Click_Bound);
+		document.body.removeEventListener("keyup", this.on_body_keyup_bound);
+		document.body.removeEventListener("click", this.on_body_click_bound);
 		
-		Dom.Empty(this.Elem("dropdown"));
+		Dom.empty(this.elems.dropdown);
 		
-		if (this.value.length == 0) this.Select(this._previous);
+		if (this.value.length == 0) this.select(this._previous);
 	}
 	
-	Select(ports) {
+	select(ports) {
 		this.value = ports;
 		
-		this.Elem('input').value = this.value.join(", ");
+		this.elems.input.value = this.value.join(", ");
 	}
 	
-	onInput_Click(ev) {
-		if (this.Opened) this.Close();
+	on_input_click(ev) {
+		if (this.opened) this.close();
 		
-		else this.Open();
+		else this.open();
 	}
 	
-	onLi_Click(port, ev) {
+	on_li_click(port, ev) {
 		ev.stopPropagation();
 		
 		this.value.push(port);
 		
-		this.Select(this.value);
+		this.select(this.value);
 		
-		this.Elem('dropdown').removeChild(ev.target);
+		this.elems.dropdown.removeChild(ev.target);
 		
-		if (this.Elem('dropdown').children.length == 0) this.Close();
+		if (this.elems.dropdown.children.length == 0) this.close();
 		
-		this.Emit("Change", { value:this.value });
+		this.emit("change", { value:this.value });
 	}
 	
-	onBody_KeyUp(ev) {
-		if (ev.keyCode == 27) this.Close();
+	on_body_keyup(ev) {
+		if (ev.keyCode == 27) this.close();
 	}
 	
-	onBody_Click(ev) {
-		if (this.Elem("input") == ev.target) return;
+	on_body_click(ev) {
+		if (this.elems.input == ev.target) return;
 			
-		this.Close();
+		this.close();
 	}
 	
-	Template() {
+	html() {
 		return "<div handle='top' class='select-ports collapsed'>" +
 				   "<input handle='input' class='select-ports-input' type='text' readonly/>" +  
 				   "<ul handle='dropdown' class='select-ports-dropdown'></ul>" +
 			   "</div>";
 	}
-}
+});

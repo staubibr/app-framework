@@ -2,11 +2,26 @@
 
 import Core from '../tools/core.js';
 
+/** 
+ * A component used to record a simulation trace (diagram, grid or GIS)
+ **/
 export default class Recorder { 
 	
+	/**
+	 * Gets true if the recorder is recording, false otherwise
+	 * @type {boolean}
+	 */
 	get recording() { return this._recording; }
+	
+	/**
+	 * Sets whether the recorder is recording
+	 * @type {boolean}
+	 */
 	set recording(value) { this._recording = value; }
 	
+	/**
+	 * @param {canvas} canvas - an HTML5 canvas element
+	 */	
 	constructor(canvas) {		
 		this.canvas = canvas;
 		this.chunks = null;
@@ -32,7 +47,10 @@ export default class Recorder {
 		}).bind(this);
 	}	
 	
-	Start() {
+	/**
+	 * Begins the recording process
+	 */	
+	start() {
 		this.recording = true;
 		
 		this.chunks = [];
@@ -40,10 +58,13 @@ export default class Recorder {
 		this.recorder.start();
 	}
 	
-	Stop() {
+	/**
+	 * Stops the recording process
+	 */	
+	stop() {
 		this.recording = false;
 		
-		var d = Core.Defer();
+		var d = Core.defer();
 		
 		this.recorder.onstop = e => d.Resolve();
 		
@@ -52,8 +73,12 @@ export default class Recorder {
 		return d.promise;
 	}
 	
-	Download(name) {
-		// TODO : check if can use net.Download
+	/**
+	 * Downloads the video from the recorder
+	 * @param {string} name - the name of the file to download
+	 */	
+	download(name) {
+		// TODO : check if can use net.download
 		if (this.chunks.length == 0) return;
 		
 		var blob = new Blob(this.chunks, { type: 'video/webm' });

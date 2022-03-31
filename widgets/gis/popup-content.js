@@ -2,9 +2,9 @@
 
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
-import Templated from '../../components/templated.js';
+import Widget from '../../base/widget.js';
 
-export default Core.Templatable("Widgets.GIS.Popup", class Popup extends Templated { 
+export default Core.templatable("Api.Widget.GIS.PopupContent", class PopupContent extends Widget { 
 	
 	get size() { return this.features.length; } 
 	
@@ -16,8 +16,8 @@ export default Core.Templatable("Widgets.GIS.Popup", class Popup extends Templat
 		
 		this.fill(options.features || [])
 		
-		this.Elem("prev").addEventListener("click", this.prev_page.bind(this));
-		this.Elem("next").addEventListener("click", this.next_page.bind(this));
+		this.elems.prev.addEventListener("click", this.prev_page.bind(this));
+		this.elems.next.addEventListener("click", this.next_page.bind(this));
 	}
 	
 	fill(features) {		
@@ -26,23 +26,23 @@ export default Core.Templatable("Widgets.GIS.Popup", class Popup extends Templat
 		
 		if (this.size > 0) this.set_page(this.i);
 		
-		Dom.ToggleCss(this.Elem('button-container'), 'hidden', this.size == 1);
+		Dom.toggle_css(this.elems.button_container, 'hidden', this.size == 1);
 	}
 	
 	set_page(i) {
-		this.Elem('page').innerHTML = `${i + 1} of ${this.size}`;
+		this.elems.page.innerHTML = `${i + 1} of ${this.size}`;
 		
-		Dom.Empty(this.Elem('props'));
+		Dom.empty(this.elems.props);
 		
 		var content = this.get_content(this.features[i]);
 		
-		if (content instanceof HTMLElement) Dom.Place(content, this.Elem('props'));
+		if (content instanceof HTMLElement) Dom.place(content, this.elems.props);
 		
-		else this.Elem('props').innerHTML = content;
+		else this.elems.props.innerHTML = content;
 		
 		if (!this.get_title) return;
 		
-		this.Elem('title').innerHTML = this.get_title(this.features[i]);
+		this.elems.title.innerHTML = this.get_title(this.features[i]);
 	}
 	
 	next_page() {
@@ -55,11 +55,11 @@ export default Core.Templatable("Widgets.GIS.Popup", class Popup extends Templat
 		this.set_page(this.i);
 	}
 	
-	Template() {
+	html() {
 		return "<div handle='root' class='popup-content'>" + 
 				  "<div handle='title' class='title'></div>" +
 				  "<div handle='props'></div>" +
-				  "<div handle='button-container' class='button-container'>" + 
+				  "<div handle='button_container' class='button-container'>" + 
 					 "<button handle='prev' class='button previous'><</button>" +
 					 "<button handle='next' class='button next'>></button>" +
 					 "<span handle='page'></span>" + 

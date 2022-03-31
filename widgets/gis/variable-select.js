@@ -2,18 +2,12 @@
 
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
-import Net from '../../tools/net.js';
-import Style from '../../tools/style.js'
-import Templated from '../../components/templated.js';
-import ChunkReader from '../../components/chunkReader.js';
+import Widget from '../../base/widget.js';
 import Select from '../../ui/select.js';
 
-import Map from '../../components/ol/map.js'
-import Legend from "../../components/ol/legend.js";
-
-export default Core.Templatable("Widgets.GIS.VariableSelect", class GIS extends Templated { 
+export default Core.templatable("Widgets.GIS.VariableSelect", class GIS extends Widget { 
 	
-	get Selected() { return this._selected; }
+	get selected() { return this._selected; }
 	
 	get control() { return this._control; }
 	
@@ -22,57 +16,53 @@ export default Core.Templatable("Widgets.GIS.VariableSelect", class GIS extends 
 		
 		this._selected = {};
 		
-		this._control = new ol.control.Control({ element: this.Elem("variable-select-container") });
+		this._control = new ol.control.Control({ element: this.elems.variable_select_container });
 	}
 	
-	AddSelectors(layers, variables) {
+	add_selectors(layers, variables) {
 		// Add map widgets, some of them require everything to be ready		
 		layers.forEach(l => {
 			var filtered = variables.filter(s => s.layer.id == l.id);
 			
 			if (filtered.length == 0) return; 
 			
-			this.AddSelector(l, filtered);
+			this.add_selector(l, filtered);
 		});
 	}
 	
-	AddSelector(layer, variables) {
-		var title = this.nls.Ressource("title_variable_select")
-		var select = new Select(this.Elem("variable-select-container"));
+	add_selector(layer, variables) {
+		var title = this.nls("title_variable_select")
+		var select = new Select(this.elems.variable_select_container);
 		
 		variables.forEach((v, i) => {			
-			select.Add(v.name, null, { layer:layer, variable:v });
+			select.add(v.name, null, { layer:layer, variable:v });
 		});
 		
 		select.value = 0;
 
-		this.Selected[layer.id] = variables[0];
+		this.selected[layer.id] = variables[0];
 		
-		select.On("Change", this.onVariableSelect_Change.bind(this));
+		select.on("change", this.on_variable_select_change.bind(this));
 	}
 
-	onVariableSelect_Change(ev){
-		this.Selected[ev.item.layer.id] = ev.item.variable;
+	on_variable_select_change(ev){
+		this.selected[ev.item.layer.id] = ev.item.variable;
 		
-		this.Emit("Change", { selected:this.Selected });
+		this.emit("change", { selected:this.selected });
 	}
 	
-	Template() {
-		return "<div handle='variable-select-container' class='variable-select-container custom-control'>" + 
+	html() {
+		return "<div handle='variable_select_container' class='variable-select-container custom-control'>" + 
 				   "<label>nls(label_variable_select)</label>" +
 				"</div>";
 	}
 	
-	static Nls() {
-		return {
-			"label_variable_select" : {
-				"en": "Select layer variables:",
-				"fr": "Choisissez les variables:"
-			},
-			"title_variable_select" : {
-				"en": "Select a simulation variable to display on the map",
-				"fr": "Choisissez une variable de simulation à afficher sur la carte"
-			}
-		}
+	localize(nls) {
+		super.localize(nls);
+		
+		nls.add("label_variable_select", "en", "Select layer variables:");
+		nls.add("label_variable_select", "fr", "Choisissez les variables:");
+		nls.add("title_variable_select", "en", "Select a simulation variable to display on the map");
+		nls.add("title_variable_select", "fr", "Choisissez une variable de simulation à afficher sur la carte");
 	}
 });
