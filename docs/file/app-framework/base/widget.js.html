@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">app-framework/base/widget.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<link rel="stylesheet" href="./inject/css/0-custom.css"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#base">base</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/application.js~Application.html">Application</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/component.js~Component.html">Component</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/evented.js~Evented.html">Evented</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/list.js~List.html">List</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/nls.js~Nls.html">Nls</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/template.js~Template.html">Template</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/widget.js~Widget.html">Widget</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components">components</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/automator.js~Automator.html">Automator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/chunk-reader.js~Reader.html">Reader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/config.js~Config.html">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/parser.js~Parser.html">Parser</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/parserCDpp.js~ParserCDpp.html">ParserCDpp</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/recorder.js~Recorder.html">Recorder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/styler.js~Styler.html">Styler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components-ol">components/ol</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/ol/legend.js~Legend.html">Legend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/ol/map.js~Map.html">Map</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components-style">components/style</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketFill.js~BucketFill.html">BucketFill</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketRadius.js~BucketRadius.html">BucketRadius</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketScale.js~BucketScale.html">BucketScale</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketStroke.js~BucketStroke.html">BucketStroke</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/linestring.js~Linestring.html">Linestring</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/point.js~Point.html">Point</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/pointIcon.js~PointIcon.html">PointIcon</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/polygon.js~Polygon.html">Polygon</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticFill.js~StaticFill.html">StaticFill</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticRadius.js~StaticRadius.html">StaticRadius</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticScale.js~StaticScale.html">StaticScale</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticStroke.js~StaticStroke.html">StaticStroke</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-configuration">data_structures/configuration</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/configuration.js~Configuration.html">Configuration</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/diagram.js~Diagram.html">Diagram</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/gis.js~GIS.html">GIS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/grid.js~Grid.html">Grid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/playback.js~Playback.html">Playback</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/section.js~Section.html">Section</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-metadata">data_structures/metadata</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/info.js~Info.html">Info</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/link.js~Link.html">Link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/message_type.js~MessageType.html">MessageType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/metadata.js~Metadata.html">Metadata</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/model.js~Model.html">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/model_ca.js~ModelCA.html">ModelCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/structure.js~Structure.html">Structure</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type.js~Type.html">Type</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_model.js~TypeModel.html">TypeModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_model_ca.js~TypeModelCA.html">TypeModelCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_port.js~TypePort.html">TypePort</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-simulation">data_structures/simulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/cache.js~Cache.html">Cache</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/frame.js~Frame.html">Frame</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message.js~Message.html">Message</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_output.js~MessageOutput.html">MessageOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_state.js~MessageState.html">MessageState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_state_ca.js~MessageStateCA.html">MessageStateCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation.js~Simulation.html">Simulation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation_ca.js~SimulationCA.html">SimulationCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation_devs.js~SimulationDEVS.html">SimulationDEVS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/state.js~State.html">State</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/stateCA.js~StateCA.html">StateCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/stateDEVS.js~StateDEVS.html">StateDEVS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tools">tools</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/core.js~Core.html">Core</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/dom.js~Dom.html">Dom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/net.js~Net.html">Net</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/style.js~Style.html">Style</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/zip.js~Zip.html">Zip</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#ui">ui</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/box-input-files.js~BoxInputFiles.html">BoxInputFiles</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/list.js~List.html">List</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/picker.js~Picker.html">Picker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/popup.js~Popup.html">Popup</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/select.js~Select.html">Select</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/tooltip.js~Tooltip.html">Tooltip</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/yes-no.js~YesNo.html">YesNo</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">app-framework/base/widget.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;;
+
+import Component from &apos;./component.js&apos;;
+import Template from &apos;./template.js&apos;;
+import Dom from &apos;../tools/dom.js&apos;;
+
+/**
+ * Widget module, a base class for complex UI components
+ * @module base/Widget
+ * @extends Component
+ */
+export default class Widget extends Component { 
+	
+	/**
+	 * Get/set the template object
+	 */
+	get template() { return this._template; }
+	set template(value) { this._template = value; }
+
+	/**
+	 * Get/set the container DOM Element
+	 */
+	get container() { return this._container; }
+	set container(value) { 
+		this._container = value;
+		
+		if (this.container) this.template.place(this.container); 
+	}
+
+	/**
+	 * Set the content of this widget
+	 */
+	set content(value) {
+		throw new Error(&quot;content setter not defined.&quot;);
+	}
+	
+	/**
+	 * Get the root element of the widget
+	 */
+	get root() { return this.template.root; }
+	
+	/**
+	 * Get the DOM elements of the widget
+	 */
+	get elems() { return this.template.elems; }
+
+	/**
+	 * Constructor for widget object
+	 * @param {object} container - A DOM element that will contain the widget
+	 */
+	constructor(container) {
+		super();
+		
+		var html = this.html();
+	
+		if (html) {
+			this.template = new Template(html);
+			
+			this.template.build(html, this._nls);
+		};
+		
+		this.container = container;
+	}
+	
+	/**
+	 * Return an HTML fragment to build the widget&apos;s UI
+	 * @returns {string} the HTML fragment for the widget&apos;s UI
+	 */
+	html() {
+		return null;		
+	}
+	
+	/**
+	 * Handles error by emitting an event containing the error. This error should
+	 * be caught at the application level.
+	 * @returns {string} the HTML fragment for the widget&apos;s UI
+	 */
+	error(error) {
+		this.emit(&quot;error&quot;, { error:error });
+	}
+}</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,571 @@
+{
+  "coverage": "80.66%",
+  "expectCount": 812,
+  "actualCount": 655,
+  "files": {
+    "app-framework/base/application.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
+    },
+    "app-framework/base/component.js": {
+      "expectCount": 7,
+      "actualCount": 5,
+      "undocumentLines": [
+        19,
+        19
+      ]
+    },
+    "app-framework/base/evented.js": {
+      "expectCount": 10,
+      "actualCount": 9,
+      "undocumentLines": [
+        15
+      ]
+    },
+    "app-framework/base/list.js": {
+      "expectCount": 20,
+      "actualCount": 16,
+      "undocumentLines": [
+        11,
+        12,
+        17,
+        18
+      ]
+    },
+    "app-framework/base/nls.js": {
+      "expectCount": 6,
+      "actualCount": 5,
+      "undocumentLines": [
+        17
+      ]
+    },
+    "app-framework/base/template.js": {
+      "expectCount": 17,
+      "actualCount": 11,
+      "undocumentLines": [
+        31,
+        31,
+        39,
+        53,
+        79,
+        136
+      ]
+    },
+    "app-framework/base/widget.js": {
+      "expectCount": 13,
+      "actualCount": 9,
+      "undocumentLines": [
+        18,
+        18,
+        24,
+        25
+      ]
+    },
+    "app-framework/components/automator.js": {
+      "expectCount": 10,
+      "actualCount": 7,
+      "undocumentLines": [
+        28,
+        29,
+        30
+      ]
+    },
+    "app-framework/components/chunk-reader.js": {
+      "expectCount": 16,
+      "actualCount": 12,
+      "undocumentLines": [
+        6,
+        13,
+        16,
+        17
+      ]
+    },
+    "app-framework/components/config.js": {
+      "expectCount": 7,
+      "actualCount": 5,
+      "undocumentLines": [
+        22,
+        39
+      ]
+    },
+    "app-framework/components/ol/legend.js": {
+      "expectCount": 11,
+      "actualCount": 9,
+      "undocumentLines": [
+        18,
+        21
+      ]
+    },
+    "app-framework/components/ol/map.js": {
+      "expectCount": 20,
+      "actualCount": 15,
+      "undocumentLines": [
+        28,
+        32,
+        34,
+        57,
+        59
+      ]
+    },
+    "app-framework/components/parser.js": {
+      "expectCount": 9,
+      "actualCount": 8,
+      "undocumentLines": [
+        62
+      ]
+    },
+    "app-framework/components/parserCDpp.js": {
+      "expectCount": 14,
+      "actualCount": 11,
+      "undocumentLines": [
+        23,
+        26,
+        27
+      ]
+    },
+    "app-framework/components/recorder.js": {
+      "expectCount": 11,
+      "actualCount": 7,
+      "undocumentLines": [
+        20,
+        26,
+        27,
+        40
+      ]
+    },
+    "app-framework/components/style/bucketFill.js": {
+      "expectCount": 12,
+      "actualCount": 6,
+      "undocumentLines": [
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    "app-framework/components/style/bucketRadius.js": {
+      "expectCount": 13,
+      "actualCount": 6,
+      "undocumentLines": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ]
+    },
+    "app-framework/components/style/bucketScale.js": {
+      "expectCount": 13,
+      "actualCount": 6,
+      "undocumentLines": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ]
+    },
+    "app-framework/components/style/bucketStroke.js": {
+      "expectCount": 13,
+      "actualCount": 6,
+      "undocumentLines": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ]
+    },
+    "app-framework/components/style/linestring.js": {
+      "expectCount": 9,
+      "actualCount": 7,
+      "undocumentLines": [
+        27,
+        28
+      ]
+    },
+    "app-framework/components/style/point.js": {
+      "expectCount": 13,
+      "actualCount": 9,
+      "undocumentLines": [
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    "app-framework/components/style/pointIcon.js": {
+      "expectCount": 11,
+      "actualCount": 8,
+      "undocumentLines": [
+        34,
+        35,
+        36
+      ]
+    },
+    "app-framework/components/style/polygon.js": {
+      "expectCount": 11,
+      "actualCount": 8,
+      "undocumentLines": [
+        34,
+        35,
+        36
+      ]
+    },
+    "app-framework/components/style/staticFill.js": {
+      "expectCount": 7,
+      "actualCount": 4,
+      "undocumentLines": [
+        11,
+        12,
+        13
+      ]
+    },
+    "app-framework/components/style/staticRadius.js": {
+      "expectCount": 7,
+      "actualCount": 4,
+      "undocumentLines": [
+        11,
+        12,
+        13
+      ]
+    },
+    "app-framework/components/style/staticScale.js": {
+      "expectCount": 7,
+      "actualCount": 4,
+      "undocumentLines": [
+        11,
+        12,
+        13
+      ]
+    },
+    "app-framework/components/style/staticStroke.js": {
+      "expectCount": 8,
+      "actualCount": 4,
+      "undocumentLines": [
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "app-framework/components/styler.js": {
+      "expectCount": 6,
+      "actualCount": 5,
+      "undocumentLines": [
+        23
+      ]
+    },
+    "app-framework/data_structures/configuration/configuration.js": {
+      "expectCount": 20,
+      "actualCount": 15,
+      "undocumentLines": [
+        24,
+        36,
+        48,
+        60,
+        70
+      ]
+    },
+    "app-framework/data_structures/configuration/diagram.js": {
+      "expectCount": 10,
+      "actualCount": 10,
+      "undocumentLines": []
+    },
+    "app-framework/data_structures/configuration/gis.js": {
+      "expectCount": 10,
+      "actualCount": 9,
+      "undocumentLines": [
+        15
+      ]
+    },
+    "app-framework/data_structures/configuration/grid.js": {
+      "expectCount": 27,
+      "actualCount": 26,
+      "undocumentLines": [
+        108
+      ]
+    },
+    "app-framework/data_structures/configuration/playback.js": {
+      "expectCount": 9,
+      "actualCount": 9,
+      "undocumentLines": []
+    },
+    "app-framework/data_structures/configuration/section.js": {
+      "expectCount": 12,
+      "actualCount": 10,
+      "undocumentLines": [
+        21,
+        68
+      ]
+    },
+    "app-framework/data_structures/metadata/info.js": {
+      "expectCount": 11,
+      "actualCount": 10,
+      "undocumentLines": [
+        18
+      ]
+    },
+    "app-framework/data_structures/metadata/link.js": {
+      "expectCount": 13,
+      "actualCount": 12,
+      "undocumentLines": [
+        18
+      ]
+    },
+    "app-framework/data_structures/metadata/message_type.js": {
+      "expectCount": 11,
+      "actualCount": 10,
+      "undocumentLines": [
+        67
+      ]
+    },
+    "app-framework/data_structures/metadata/metadata.js": {
+      "expectCount": 11,
+      "actualCount": 10,
+      "undocumentLines": [
+        63
+      ]
+    },
+    "app-framework/data_structures/metadata/model.js": {
+      "expectCount": 21,
+      "actualCount": 20,
+      "undocumentLines": [
+        97
+      ]
+    },
+    "app-framework/data_structures/metadata/model_ca.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "app-framework/data_structures/metadata/structure.js": {
+      "expectCount": 19,
+      "actualCount": 17,
+      "undocumentLines": [
+        58,
+        94
+      ]
+    },
+    "app-framework/data_structures/metadata/type.js": {
+      "expectCount": 13,
+      "actualCount": 12,
+      "undocumentLines": [
+        67
+      ]
+    },
+    "app-framework/data_structures/metadata/type_model.js": {
+      "expectCount": 16,
+      "actualCount": 14,
+      "undocumentLines": [
+        36,
+        53
+      ]
+    },
+    "app-framework/data_structures/metadata/type_model_ca.js": {
+      "expectCount": 7,
+      "actualCount": 7,
+      "undocumentLines": []
+    },
+    "app-framework/data_structures/metadata/type_port.js": {
+      "expectCount": 2,
+      "actualCount": 2,
+      "undocumentLines": []
+    },
+    "app-framework/data_structures/simulation/cache.js": {
+      "expectCount": 14,
+      "actualCount": 12,
+      "undocumentLines": [
+        25,
+        37
+      ]
+    },
+    "app-framework/data_structures/simulation/frame.js": {
+      "expectCount": 13,
+      "actualCount": 11,
+      "undocumentLines": [
+        38,
+        40
+      ]
+    },
+    "app-framework/data_structures/simulation/message.js": {
+      "expectCount": 10,
+      "actualCount": 8,
+      "undocumentLines": [
+        18,
+        30
+      ]
+    },
+    "app-framework/data_structures/simulation/message_output.js": {
+      "expectCount": 5,
+      "actualCount": 4,
+      "undocumentLines": [
+        24
+      ]
+    },
+    "app-framework/data_structures/simulation/message_state.js": {
+      "expectCount": 5,
+      "actualCount": 4,
+      "undocumentLines": [
+        23
+      ]
+    },
+    "app-framework/data_structures/simulation/message_state_ca.js": {
+      "expectCount": 10,
+      "actualCount": 9,
+      "undocumentLines": [
+        53
+      ]
+    },
+    "app-framework/data_structures/simulation/simulation.js": {
+      "expectCount": 34,
+      "actualCount": 28,
+      "undocumentLines": [
+        56,
+        118,
+        120,
+        122,
+        127,
+        128
+      ]
+    },
+    "app-framework/data_structures/simulation/simulation_ca.js": {
+      "expectCount": 10,
+      "actualCount": 10,
+      "undocumentLines": []
+    },
+    "app-framework/data_structures/simulation/simulation_devs.js": {
+      "expectCount": 8,
+      "actualCount": 7,
+      "undocumentLines": [
+        24
+      ]
+    },
+    "app-framework/data_structures/simulation/state.js": {
+      "expectCount": 21,
+      "actualCount": 17,
+      "undocumentLines": [
+        17,
+        29,
+        41,
+        53
+      ]
+    },
+    "app-framework/data_structures/simulation/stateCA.js": {
+      "expectCount": 6,
+      "actualCount": 5,
+      "undocumentLines": [
+        20
+      ]
+    },
+    "app-framework/data_structures/simulation/stateDEVS.js": {
+      "expectCount": 6,
+      "actualCount": 5,
+      "undocumentLines": [
+        16
+      ]
+    },
+    "app-framework/tools/core.js": {
+      "expectCount": 10,
+      "actualCount": 7,
+      "undocumentLines": [
+        3,
+        4,
+        5
+      ]
+    },
+    "app-framework/tools/dom.js": {
+      "expectCount": 10,
+      "actualCount": 10,
+      "undocumentLines": []
+    },
+    "app-framework/tools/net.js": {
+      "expectCount": 11,
+      "actualCount": 11,
+      "undocumentLines": []
+    },
+    "app-framework/tools/style.js": {
+      "expectCount": 15,
+      "actualCount": 15,
+      "undocumentLines": []
+    },
+    "app-framework/tools/zip.js": {
+      "expectCount": 5,
+      "actualCount": 5,
+      "undocumentLines": []
+    },
+    "app-framework/ui/box-input-files.js": {
+      "expectCount": 12,
+      "actualCount": 11,
+      "undocumentLines": [
+        31
+      ]
+    },
+    "app-framework/ui/list.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "app-framework/ui/picker.js": {
+      "expectCount": 18,
+      "actualCount": 13,
+      "undocumentLines": [
+        56,
+        57,
+        62,
+        73,
+        74
+      ]
+    },
+    "app-framework/ui/popup.js": {
+      "expectCount": 26,
+      "actualCount": 20,
+      "undocumentLines": [
+        23,
+        52,
+        53,
+        54,
+        55,
+        57
+      ]
+    },
+    "app-framework/ui/select.js": {
+      "expectCount": 18,
+      "actualCount": 16,
+      "undocumentLines": [
+        67,
+        82
+      ]
+    },
+    "app-framework/ui/tooltip.js": {
+      "expectCount": 10,
+      "actualCount": 10,
+      "undocumentLines": []
+    },
+    "app-framework/ui/yes-no.js": {
+      "expectCount": 10,
+      "actualCount": 8,
+      "undocumentLines": [
+        22,
+        37
+      ]
+    },
+    "app-framework/widgets/grid/grid.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        8,
+        9
+      ]
+    }
+  }
+}
