@@ -33,7 +33,7 @@ export default Core.templatable("Api.Widget.GIS.Auto", class AutoGIS extends Aut
 			if (l.file) {
 				var f = files.find((f) => f.name == l.file);
 				
-				if (f) return Reader.read(f, (json) => JSON.parse(json));
+				if (f) return Reader.read_as_json(f);
 				
 				if (!AppConfig.URLs.models) { 
 					throw new Error(`Required file for layer ${l.id} was not provided by the user. Unable to fall back on server-side load, Core root is not configured.`);
