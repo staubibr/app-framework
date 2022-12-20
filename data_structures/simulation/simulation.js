@@ -121,7 +121,22 @@ export default class Simulation extends Evented {
 		
 		this._frames = new IndexedList(f => f.time);
 		
-		for (var i = 0; i < frames.length; i++) this.frames.add(frames[i]);
+		// for (var i = 0; i < frames.length; i++) this.frames.add(frames[i]);
+		for (var i = 0; i < frames.length; i++) this.add_frame(frames[i]);
+	}
+	
+	// TODO: This is a workaround due to Cadmium log files being weird.
+	// Cadmium can have multiple time frames with the same time. We merge
+	// them together when it happens.
+	add_frame(add) {
+		var f = this.frames.get(add.time);
+		
+		if (f) {
+			add.output_messages.forEach(m => f.add_output_message(m));
+			add.state_messages.forEach(m => f.add_state_message(m));
+		}
+			
+		else this.frames.add(add);
 	}
 	
 	initialize(nCache) {

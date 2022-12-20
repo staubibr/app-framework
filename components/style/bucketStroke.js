@@ -40,11 +40,11 @@ export default class BucketStroke {
 	symbol(value) {
 		var v = value[this.property];
 		
-		if (v == 0 && this.zero) return new ol.style.Fill({ color: this.zero });
+		if (v == 0 && this.zero) return new ol.style.Stroke({ color: this.zero,	width: this.width[0] });
 		
 		for (var i = 0; v > this.buckets[i] && i <= this.buckets.length; i++);
 		
-		return new ol.style.Stroke({ color: this.colors[i],	width: this.width });
+		return new ol.style.Stroke({ color: this.colors[i],	width: this.width[i] });
 	}
 	
     /**

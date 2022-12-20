@@ -1,9 +1,7 @@
 'use strict';
 
-import Core from '../tools/core.js';
 import Evented from "../base/evented.js";
 import Reader from "../components/chunk-reader.js";
-import Configuration from '../data_structures/configuration/configuration.js';
 import Structure from "../data_structures/metadata/structure.js";
 import MessageState from "../data_structures/simulation/message_state.js"
 import MessageOutput from "../data_structures/simulation/message_output.js"

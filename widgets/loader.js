@@ -94,7 +94,7 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 		var diagram = await parser.parse_diagram(files.diagram);
 		var visualization = await parser.parse_visualization(files.visualization);
 		var style = await parser.parse_style(files.style);
-		
+
 		if (structure.type != "Cell-DEVS") var simulation = new SimulationDEVS(structure, messages, diagram);
 		
 		else var simulation = new SimulationCA(structure, messages); 

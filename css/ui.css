@@ -235,6 +235,7 @@
 
 .box-input-files .box-inner label.top {
     top: 60px;
+    text-align: center;
 }
 
 .box-input-files .files-container > * {
