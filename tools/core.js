@@ -5,7 +5,7 @@ let _locale = document.documentElement.lang || "en";
 let _templatables = {}
 
 let _urls = {
-	logs : "http://localhost:81/logs-ready/",
+	logs : "https://staubibr.github.io/logs-ready/",
 	viz : "http://localhost:81/lome-files/visualizations/"
 }
 
