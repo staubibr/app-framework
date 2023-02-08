@@ -103,6 +103,8 @@ export default class TypeModel extends Type {
 		this._json.ports.push(port);
 		
 		this._port_index[port.name] = port;
+		
+		return port;
 	}
 	
     /**

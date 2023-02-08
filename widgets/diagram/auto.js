@@ -91,7 +91,7 @@ export default Core.templatable("Api.Widget.Diagram.Auto", class AutoDiagram ext
 		
 		tY.forEach(t => {
 			var value = JSON.stringify(t.value);
-			var subs = [t.model.id, value, t.port.name];
+			var subs = [t.model.id, value];
 			var html = this.nls("Diagram_Tooltip_Y", subs);
 			
 			Dom.create("div", { className:"tooltip-label", innerHTML:html }, this.tooltip.elems.content);
@@ -123,6 +123,6 @@ export default Core.templatable("Api.Widget.Diagram.Auto", class AutoDiagram ext
 	localize(nls) {
 		super.localize(nls);
 		
-		nls.add("Diagram_Tooltip_Y", "en", "<b>{0}</b> emitted <b>{1}</b> through port <b>{2}</b>");
+		nls.add("Diagram_Tooltip_Y", "en", "<b>{0}</b> emitted <b>{1}</b>");
 	}
 });

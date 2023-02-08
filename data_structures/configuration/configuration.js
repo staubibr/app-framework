@@ -133,9 +133,13 @@ export default class Configuration extends Evented {
 	 * @return {string} the type of configuration
      */
 	get_type(json, simulation) {
-		if (json && json.grid || simulation.type == "Cell-DEVS") return "Cell-DEVS";
-		if (json && json.gis || simulation.type == "DEVS") return "GIS-DEVS";
-		if (json && json.diagram || simulation.type == "DEVS") return "DEVS";
+		if (json && json.grid) return "Cell-DEVS";
+		if (json && json.gis) return "GIS-DEVS";
+		if (json && json.diagram) return "DEVS";
+		
+		if (simulation.type == "Cell-DEVS") return "Cell-DEVS";
+		if (simulation.type == "GIS-DEVS") return "GIS-DEVS";
+		if (simulation.type == "DEVS") return "DEVS";
 		
 		throw new Error("Unable to determine simulation type.");
 	}
