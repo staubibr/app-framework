@@ -266,7 +266,7 @@ export default Core.templatable("Api.Widget.Linker", class Linker extends Widget
 	}
 	
 	html() {
-		return `<div class="linker-widget d-flex flex-row h-100 w-100">` + 
+		return `<div class="linker-widget d-flex flex-row h-100">` + 
 			      `<div id="json-container" class="d-flex flex-column card me-1 h-100 w-100">` + 
 					 `<div handle="buttons" class="p-3"></div>` + 
 					 `<div handle="cards" id="cards" class="h-100 d-flex flex-row flex-wrap align-content-start justify-content-center overflow-auto">` + 
@@ -280,7 +280,7 @@ export default Core.templatable("Api.Widget.Linker", class Linker extends Widget
 						   `<input handle="chk_thick" id="dwl-thick-chk" class="m-1 dwl-pointer align-middle" type="checkbox" title="Thicken line strokes for easier interaction."/>` +
 						   `<label class="m-1 dwl-pointer align-middle" title="Thicken line strokes for easier interaction." for="dwl-thick-chk">Thicker line strokes</label>` + 
 						`</div>` +
-						`<button handle="btn_clear" type="button" class="m-1 float-end" data-button-type="clear" title="Remove all associations.">Clear</button>` +
+						`<button handle="btn_clear" type="button" class="m-1 float-end hidden" data-button-type="clear" title="Remove all associations.">Clear</button>` +
 					 `</div>` +
 					 `<div handle="svg_content" id="svg-content"></div>` +
 				  `</div>` + 

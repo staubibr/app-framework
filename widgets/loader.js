@@ -6,6 +6,7 @@ import Widget from '../base/widget.js';
 import BoxInputFiles from '../ui/box-input-files.js';
 import Parser from '../components/parser.js';
 import ParserCDpp from '../components/parserCDpp.js';
+import ParserCadmium from '../components/parserCadmium.js';
 import Configuration from '../data_structures/configuration/configuration.js';
 import SimulationDEVS from '../data_structures/simulation/simulation_devs.js';
 import SimulationCA from '../data_structures/simulation/simulation_ca.js';
@@ -13,7 +14,9 @@ import SimulationCA from '../data_structures/simulation/simulation_ca.js';
 export default Core.templatable("Api.Widget.Loader", class Loader extends Widget { 
 
 	set files(value) {
-		this._files = { 
+		this._files = {
+			cadmium_state: value.find(f => f.name.toLowerCase().endsWith('_output_state.txt')),
+			cadmium_output: value.find(f => f.name.toLowerCase().endsWith('_output_messages.txt')),
 			cd_ma: value.find(f => f.name.toLowerCase().endsWith('.ma')),
 			cd_log: value.find(f => f.name.toLowerCase().includes('.log')),
 			cd_pal: value.find(f => f.name.toLowerCase().endsWith('.pal')),
@@ -52,6 +55,8 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 		try {
 			if (files.cd_ma && files.cd_log) await this.parse_cdpp(files);
 			
+			else if (files.cd_ma && (files.cadmium_output || files.cadmium_state)) await this.parse_cadmium(files);
+			
 			else if (!files.structure) throw new Error("Missing structure.json file, cannot parse.");
 			
 			else if (!files.messages) throw new Error("Missing messages.log file, cannot parse.");
@@ -75,6 +80,31 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 		var style = await parserCDpp.parse_palette(files.cd_pal);
 		
 		var simulation = new SimulationCA(structure, messages);
+		var config = new Configuration(simulation, visualization, style);
+		
+		simulation.initialize(config.playback.cache);
+
+		this.restore_ui();
+		
+		this.emit("ready", { files: files, simulation: simulation, configuration: config });
+	}
+	
+	async parse_cadmium(files) {
+		var parser = new Parser();
+		var parserCDpp = new ParserCDpp();
+		var parserCadmium = new ParserCadmium();
+		
+		parserCadmium.on("progress", this.on_parser_progress.bind(this));
+		
+		var structure = await parserCadmium.parse_structure(files.cd_ma);
+		var messages = await parserCadmium.parse_messages(structure, files.cadmium_state, files.cadmium_output);
+		var diagram = await parser.parse_diagram(files.diagram);
+		var visualization = await parserCadmium.parse_visualization(files.visualization);
+		var style = await parser.parse_style(files.style);
+		
+		structure.info.type = "DEVS";
+		
+		var simulation = new SimulationDEVS(structure, messages, diagram);
 		var config = new Configuration(simulation, visualization, style);
 		
 		simulation.initialize(config.playback.cache);
