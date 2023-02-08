@@ -4,47 +4,48 @@ let _nls = {};
 let _locale = document.documentElement.lang || "en";
 let _templatables = {}
 
-let _urls = {
-	logs : "https://staubibr.github.io/logs-ready/",
-	viz : "http://localhost:81/lome-files/visualizations/"
-}
-
+/** 
+ * A utility class that contains a series of basic static functions
+ **/
 export default class Core {
 	
 	/**
-	* Gets the urls to different services used by API-WEB-DEVS
-	*
-	* Return : Object, an Object containing URLs
-	*/
-    static get URLs() { return _urls; }
-	
-	/**
-	* Gets the locale String
-	*
-	* Return : String, a String containing the locale
+	* Gets the current locale
+	* @type {string} 
 	*/
     static get locale() { return _locale; }
 	
 	/**
-	* Sets the locale String
+	* Sets the current locale
+	* @type {string} 
 	*/
     static set locale(value) { _locale = value; }
+
+	/**
+	* Get or set a templated class definition, this is required to nest Templated UI 
+	* components within other Templated UI components.
+	* @param {string} id - the id of the templated class definition to get or set
+	* @param {class} definition - when specified, the class definition to set 
+	* @return {class} if definition was not provided, the class definition corresponding to the id.
+	*/
+	static templatable(id, definition) {
+		if (definition) {
+			if (_templatables[id]) throw new Error(`Templatable ${id} is defined multiple times.`);
+			
+			else _templatables[id] = definition;
+		}
+		
+		else if (!_templatables[id]) throw new Error(`Templatable ${id} is not defined.`);
+		
+		return _templatables[id];
+	}
 	
 	/**
 	* A convenience function to get a deffered object for asynchronous processing. 
 	* Removes one level of nesting when working with promises
-	*
-	* Parameters :
-	*	none
-	* Return : Object, an object with a Resolve and Reject function
-	*
-	* { 
-	*	promise: the promise object associated to the asynchronous process, 
-	*	Resolve: a function to resolve the promise, 
-	*	Reject: a function to reject the promise 
-	* }
+	* @return {object} an object that contains a promise object, a resolve and reject function
 	*/
-	static Defer() {
+	static defer() {
 		var defer = {};
 		
 		defer.promise = new Promise((resolve, reject) => {
@@ -66,100 +67,14 @@ export default class Core {
 		
 		return defer;
 	}
-	/**
-	* A convenience function to get a rejected deffered object for asynchronous 
-	* processing. Removes one level of nesting when working with promises
-	*
-	* Parameters :
-	*	message: String, contains the error message
-	* Return : Object, an object with a Resolve and Reject function
-	*
-	* { 
-	*	promise: the promise object associated to the asynchronous process, 
-	*	Resolve: a function to resolve the promise, 
-	*	Reject: a function to reject the promise 
-	* }
-	*/
-	static Rejected(message) {
-		var d = Core.Defer();
-		
-		d.Reject(new Error(message));
-		
-		return d.promise;
-	}
-	
-	/**
-	* A convenience function to get a resolved deffered object for asynchronous 
-	* processing. Removes one level of nesting when working with promises
-	*
-	* Parameters :
-	*	result: Object, contains the result data
-	* Return : Object, an object with a Resolve and Reject function
-	*
-	* { 
-	*	promise: the promise object associated to the asynchronous process, 
-	*	Resolve: a function to resolve the promise, 
-	*	Reject: a function to reject the promise 
-	* }
-	*/
-	static Resolved(result) {
-		var d = Core.Defer();
-		
-		d.Resolve(result);
-		
-		return d.promise;
-	}
-	
-	/**
-	* Get or set a templated class definition, this is required to nest Templated UI 
-	* components within other Templated UI components.
-	*
-	* Parameters :
-	*	id : String, the id of the templated class definition to get or set
-	*	definition : Class, when specified, the class definition to set 
-	* Return : Class, the class definition created  
-	*/
-	static Templatable(id, definition) {
-		if (definition) {
-			if (_templatables[id]) throw new Error(`Templatable ${id} is defined multiple times.`);
-			
-			else {				
-				_templatables[id] = definition;
-			}
-		}
-		else if (!_templatables[id]) throw new Error(`Templatable ${id} is not defined.`);
-		
-		return _templatables[id];
-	}
-	
-	/**
-	* Get an Array of class definitions by matching its
-	*
-	* Parameters :
-	*	id : String, the id of the nls ressource to retrieve
-	*	subs : Array(String), an array of Strings to substitute in the localized nls string ressource
-	*	locale : String, the locale for the nls ressource
-	* Return : String, the localized nls string ressource
-	*/
-	static Templated(namespace) {
-		var templated = [];
-		
-		for (var id in _templatables) {
-			if (id.match(namespace)) templated.push(_templatables[id]);
-		}
-		
-		return templated;
-	}
 	
 	/**
 	* Merges an object into another object. 
-	*
-	* Parameters :
-	*	a : Object, the object that will receive the properties 
-	*	b : Object, the object to merge into object A
-	* Return : the modified Object
+	* @param {object} a - the object that will receive the properties 
+	* @param {object} b - the object to merge into object A
+	* @return {object} the modified Object
 	*/
-	static Mixin(a, b) {				
+	static mixin(a, b) {				
 		for (var key in b) {
 			if (b.hasOwnProperty(key)) a[key] = b[key];
 		}
@@ -169,74 +84,11 @@ export default class Core {
 	}
 	
 	/**
-	* Debounces a function. The function will be executed after a timeout 
-	* unless the function is called again in which case, the timeout will
-	* reset
-	*
-	* Parameters :
-	*	delegate : Function, the Function to debounce
-	*	threshold : Integer, the timeout length, in milliseconds
-	* Return : Function, the debounced function
+	* Returns a promise that waits until the HTML document is loaded. 
+	* @return {promise} a promise, resolved when the HTML document is loaded.
 	*/
-	static Debounce(delegate, threshold) {
-		var timeout;
-	
-		return function debounced () {
-			
-			function delayed () {
-				delegate.apply(this, arguments);
-				
-				timeout = null; 
-			}
-	 
-			if (timeout) clearTimeout(timeout);
-	 
-			timeout = setTimeout(delayed.bind(this), threshold || 100); 
-		};
-	}
-	
-	/**
-	* Disables or enables all focusable elements in an array of nodes
-	*
-	* Parameters :
-	*	nodes : Array of DOM elements, the DOM elements where focusable elements will be disabled or enabled
-	*	disabled : Boolean, True to disable, False to enable
-	*/
-	static DisableFocusable(nodes, disabled) {
-		var focusable = ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"];
-		
-		nodes.forEach(n => {
-			var selection = n.querySelectorAll(focusable);
-			
-			if (selection.length == 0) return;
-			
-			for (var i = 0; i < selection.length; i++) selection[i].disabled = disabled;
-		});
-	}	
-	
-	/**
-	* Writes a line to the console
-	*
-	* Parameters :
-	*	sender : String, the origin of the message
-	*	message : String, message to log in the console
-	*/
-	static Log(sender, message) {
-		console.log(`%c [${sender}] ${message}`, 'color: #33A1DE');
-	}
-	
-	static RgbToHex(rgb) {
-		return "#" + ((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1);
-	}
-	
-	static HexToRgb(hex) {
-		var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		
-		return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : null;
-	}
-	
-	static WaitForDocument() {
-		var d = Core.Defer();
+	static wait_for_document() {
+		var d = Core.defer();
 		
 		if (document.readyState === "complete") d.Resolve();
 		

@@ -6,7 +6,7 @@ import Tooltip from '../../ui/tooltip.js';
 import Automator from '../../components/automator.js';
 import Diagram from '../diagram/diagram.js';
 
-export default Core.Templatable("Auto.Diagram", class AutoDiagram extends Automator { 
+export default Core.templatable("Api.Widget.Diagram.Auto", class AutoDiagram extends Automator { 
 
 	constructor(node, simulation, options) {
 		if (!options) throw new Error("No options provided for the Diagram widget");
@@ -15,92 +15,92 @@ export default Core.Templatable("Auto.Diagram", class AutoDiagram extends Automa
 		
 		this.options = options;
 		
-		this.widget.SetDiagram(this.simulation);
+		this.widget.set_diagram(this.simulation);
 		
-		this.widget.Draw(this.simulation.current_frame.output_messages);
+		this.widget.draw(this.simulation.current_frame.output_messages);
 		
 		this.selected = [];
 
-		this.AttachHandlers(options);
+		this.attach_handlers(options);
 		
-		this.UpdateSelected();
+		this.update_selected();
 
 		this.tooltip = new Tooltip();
 		
-		this.simulation.On("NewDiagram", this.OnSimulation_NewDiagram.bind(this));
+		this.simulation.on("new-diagram", this.on_simulation_new_diagram.bind(this));
 	}
 	
-	AttachHandlers(options) {
+	attach_handlers(options) {
 		var h = [];
 
-		if (options.hoverEnabled != false) h.push(this.widget.On("MouseMove", this.onMouseMove_Handler.bind(this)));
-		if (options.hoverEnabled != false) h.push(this.widget.On("MouseOut", this.onMouseOut_Handler.bind(this)));
-		if (options.clickEnabled != false) h.push(this.widget.On("Click", this.onClick_Handler.bind(this)));
+		if (options.hoverEnabled != false) h.push(this.widget.on("mousemove", this.on_mousemove.bind(this)));
+		if (options.hoverEnabled != false) h.push(this.widget.on("mouseout", this.on_mouseout.bind(this)));
+		if (options.clickEnabled != false) h.push(this.widget.on("click", this.on_click.bind(this)));
 		
-		h.push(this.simulation.On("Move", this.onSimulationChange_Handler.bind(this)));
-		h.push(this.simulation.On("Jump", this.onSimulationChange_Handler.bind(this)));
-		h.push(this.simulation.On("Selected", this.onSimulationChange_Handler.bind(this)));
+		h.push(this.simulation.on("move", this.on_simulation_change.bind(this)));
+		h.push(this.simulation.on("jump", this.on_simulation_change.bind(this)));
+		h.push(this.simulation.on("selected", this.on_simulation_change.bind(this)));
 		
-		options.On("change", this.OnSettings_Change.bind(this));
+		options.on("change", this.on_settings_change.bind(this));
 		
-		this.Handle(h);
+		this.handle(h);
 	}
 	
-	UpdateSelected() {
+	update_selected() {
 		this.selected = this.simulation.selected;
 	}
 	
-	Resize() {
-		var size = this.options.DiagramSize(this.simulation);
+	resize() {
+		var size = this.options.diagram_size(this.simulation);
 		
 		this.widget.container.style.width = size.width + "px";
 		this.widget.container.style.height = size.height + "px";	
 	}
 	
-	Redraw() {
-		this.widget.Resize();
+	redraw() {
+		this.widget.resize();
 	}
 	
-	OnSimulation_NewDiagram(ev) {
-		this.widget.SetDiagram(this.simulation);
+	on_simulation_new_diagram(ev) {
+		this.widget.set_diagram(this.simulation);
 		
-		this.widget.Draw(this.simulation.current_frame.output_messages);
+		this.widget.draw(this.simulation.current_frame.output_messages);
 	}
 	
-	OnSettings_Change(ev) {
+	on_settings_change(ev) {
 		if (["height", "width", "aspect"].indexOf(ev.property) == -1) return;
 
-		this.Resize();
-		this.Redraw();
+		this.resize();
+		this.redraw();
 	}
 		
-	onSimulationChange_Handler(ev) {		
+	on_simulation_change(ev) {		
 		var messages = this.simulation.current_frame.output_messages;
 		
-		this.widget.Draw(messages);
+		this.widget.draw(messages);
 	}
 	
-	onMouseMove_Handler(ev) {
+	on_mousemove(ev) {
 		var messages = this.simulation.current_frame.output_messages;
 		
-		Dom.Empty(this.tooltip.Elem("content"));
+		Dom.empty(this.tooltip.elems.content);
 		
 		var tY = messages.filter(t => t.model.id == ev.model.id);
 		
 		if (tY.length == 0) return;
 		
 		tY.forEach(t => {
-			var value = JSON.stringify(t.value); // t.value.join(", ");
+			var value = JSON.stringify(t.value);
 			var subs = [t.model.id, value, t.port.name];
-			var html = this.nls.Ressource("Diagram_Tooltip_Y", subs);
+			var html = this.nls("Diagram_Tooltip_Y", subs);
 			
-			Dom.Create("div", { className:"tooltip-label", innerHTML:html }, this.tooltip.Elem("content"));
+			Dom.create("div", { className:"tooltip-label", innerHTML:html }, this.tooltip.elems.content);
 		});
 		
-		this.tooltip.Show(ev.x + 20, ev.y);
+		this.tooltip.show(ev.x + 20, ev.y);
 	}
 	
-	onClick_Handler(ev) {
+	on_click(ev) {
 		var idx = this.selected.indexOf(ev.model);
 
 		// TODO : Selection should be handled by diagram, not auto class
@@ -116,15 +116,13 @@ export default Core.Templatable("Auto.Diagram", class AutoDiagram extends Automa
 		}
 	}
 
-	onMouseOut_Handler(ev) {
-		this.tooltip.Hide();
+	on_mouseout(ev) {
+		this.tooltip.hide();
 	}
 	
-	static Nls() {
-		return {
-			"Diagram_Tooltip_Y" : {
-				"en" : "<b>{0}</b> emitted <b>{1}</b> through port <b>{2}</b>"		
-			}
-		}
+	localize(nls) {
+		super.localize(nls);
+		
+		nls.add("Diagram_Tooltip_Y", "en", "<b>{0}</b> emitted <b>{1}</b> through port <b>{2}</b>");
 	}
 });

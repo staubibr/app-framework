@@ -2,113 +2,156 @@
 
 import Core from '../tools/core.js';
 import Dom from '../tools/dom.js';
+import Widget from '../base/widget.js';
 
-import Templated from '../components/templated.js';
-
-export default Core.Templatable("Basic.UI.Select", class Select extends Templated {
+/** 
+ * A replacement for the select component
+ **/
+export default class Select extends Widget {
 	
+	/**
+	 * Get select box value
+	 * @type {number}
+	 */
 	get value() {
-		return parseInt(this.Elem("root").value);
+		return this.root.value;
 	}
 	
+	/**
+	 * Set select box value
+	 * @type {number}
+	 */
 	set value(value) {
-		if (value == null) value = -1;
+		this.root.value = value;
+	}
+	
+	/**
+	 * Get select box title
+	 * @type {string}
+	 */
+	get title() { return this.root.title; }
+	
+	/**
+	 * Set select box title
+	 * @type {string}
+	 */
+	set title(value) { this.root.title = value; }
+	
+	/**
+	 * Get disabled state of the tooltip
+	 * @type {boolean}
+	 */
+	get disabled() { return this.root.disabled; }
+	
+	/**
+	 * Set disabled state of the tooltip
+	 * @type {boolean}
+	 */
+	set disabled(value) { this.root.disabled = value; }
+	
+	/**
+	 * Get selected element object (label, value)
+	 * @type {object}
+	 */
+	get selected() {
+		var i = this.root.value;
 		
-		this.Elem("root").value = value;
-		
-		if (value == -1) Dom.SetCss(this.Elem("root"), "is-placeholder");
+		return this._items[i];
 	}
 	
-	set disabled(value) {
-		this.Elem("root").disabled = value;
-	}
-	
-	get disabled() {
-		return this.Elem("root").disabled;
-	}
-	
-	get selected() {		
-		return this.items[this.selectedIndex];
-	}
-	
-	get selectedIndex() {
-		return this.Elem("root").value;
-	}
-	
+	/**
+	 * Set the placeholder value of select box
+	 * @type {string}
+	 */
 	set placeholder(value) {
-		this.ph = Dom.Create("option", { innerHTML:value, value:-1, className:"select-placeholder" });
+		this._ph = Dom.create("option", { innerHTML:value, value:-1, className:"select-placeholder" });
 		
-		this.ph.disabled = true;
-		this.ph.selected = true;
+		this._ph.disabled = true;
+		this._ph.selected = true;
 		
-		this.Elem("root").insertBefore(this.ph, this.Elem("root").firstChild);
+		this.root.insertBefore(this._ph, this.root.firstChild);
 	}
 	
-	get length() {
-		return this.items.length;
+	/**
+	 * Constructor for the select element. Follows the widget creation pattern.
+	 * @param {object} container - div container
+	 */	
+	constructor(container) {
+		super(container);
+		
+		this._items = [];
+		
+		this._ph = null;
+		
+		this.root.addEventListener("change", this.on_select_change.bind(this));
 	}
 	
-	constructor(container, options) {
-		super(container, options);
+	/**
+	 * Populate options in select box
+	 * @param {string} label - Label of select option
+	 * @param {string} title - Title of select option
+	 * @param {object} item - Object containing option description, label, and value
+	 */
+	add(label, title, item) {
+		Dom.create("option", { innerHTML:label, value:this._items.length, title:title || "" }, this.root);
+		this.root.querySelectorAll('option').forEach( x=> x.setAttribute("role", "option")); // for accessibility
 		
-		this.items = [];
-		
-		this.ph = null;
-		
-		this.Node("root").On("change", this.OnSelect_Change.bind(this));
+		this._items.push(item);
 	}
 	
-	Add(label, title, item) {
-		Dom.Create("option", { innerHTML:label, value:this.items.length, title:title }, this.Elem("root"));
-		
-		this.items.push(item);
+	/**
+	 * This function selects the first value in the component for which the delegate function returns true.
+	 * @param {function} delegate  - Delegate function
+	 */
+	select(delegate) {		
+		this.value = this.find_index(delegate);
 	}
 	
-	Select(delegate) {		
-		this.value = this.FindIndex(delegate);
-	}
-	
-	FindIndex(delegate) {
-		for (var i = 0; i < this.items.length; i++) {
-			if (delegate(this.items[i], i)) return i;
+	/**
+	 * Finds index of selected classification method through link to styler widget
+	 * @param {function} delegate - Delegate function
+	 * @returns {number} Index number of selected classification method (-1 if none)
+	 */
+	find_index(delegate) {
+		for (var i = 0; i < this._items.length; i++) {
+			if (delegate(this._items[i], i)) return i;
 		}
 		
 		return -1;
 	}
 	
-	OnSelect_Change(ev) {
-		var item = this.items[ev.target.value];
+	/**
+	 * Emit change event when a new option is selected
+	 * @param {object} ev - Event object
+	 */
+	on_select_change(ev) {
+		var item = this._items[ev.target.value];
 		
-		this.Emit("Change", { index:ev.target.value, item:item, label:ev.target.innerHTML });
-		
-		if (ev.target.value == -1) return;
-		
-		Dom.SetCss(this.Elem("root"), null);
+		this.emit("change", { index:ev.target.value, item:item, label:ev.target.innerHTML });
 	}
 	
-	Empty() {
-		Dom.Empty(this.Elem("root"));
-		
-		this.items = [];
-		
-		if (!this.ph) return;
-		
-		Dom.Place(this.ph, this.Elem("root"));
-	
-		this.ph.selected = true;
+	/**
+	 * Create HTML for select element
+	 * @returns {string} HTML for select element
+	 */
+	html() {
+		return '<select handle="root" role="listbox"></select>'; // role for accessibility
 	}
 	
-	Reload(data, delegate) {
-		var i = this.value;
+	/**
+	 * Empty items in select box
+	 */
+	empty() {
+		Dom.empty(this.root);
 		
-		this.Empty();
+		this._items = [];
 		
-		data.forEach(d => this.Add(...delegate(d)));
+		if (!this._ph) return;
 		
-		this.value = i;
-	}
+		Dom.place(this._ph, this.root);
 	
-	Template() {
-		return '<select handle="root"></select>';
+		this._ph.selected = true;
 	}
-});
+};
+
+Core.templatable("Api.UI.Select", Select);

@@ -1,11 +1,11 @@
 'use strict';
 
 import Core from '../tools/core.js';
-import Evented from "../components/evented.js";
-import ChunkReader from "../components/chunkReader.js";
-import IndexedList from "../components/indexed_list.js";
+import Evented from "../base/evented.js";
+import Reader from "../components/chunk-reader.js";
+import List from "../base/list.js";
 import Configuration from '../data_structures/configuration/configuration.js';
-import SimulationCA from "../data_structures/simulation/simulationCA.js";
+import SimulationCA from "../data_structures/simulation/simulation_ca.js";
 import Frame from "../data_structures/simulation/frame.js";
 import MessageStateCA from "../data_structures/simulation/message_state_ca.js"
 import TypeModelCA from '../data_structures/metadata/type_model_ca.js';
@@ -15,6 +15,9 @@ import MessageType from '../data_structures/metadata/message_type.js';
 import Structure from "../data_structures/metadata/structure.js";
 import Info from "../data_structures/metadata/info.js";
 
+/**
+ * A parser component to process the raw Cell-DEVS results from CDpp or Lopez
+ */
 export default class ParserCDpp extends Evented { 
 	
 	constructor() {
@@ -24,7 +27,14 @@ export default class ParserCDpp extends Evented {
 		this.initialRowValues = null;
 	}
 	
-	MakeComponent(structure, name, type) {
+	/**                              
+	 * Parses a component token from the ma file into a structure model. 
+	 * @param {Structure} structure - the simulation structure
+	 * @param {string} name  - the name of the model
+	 * @param {string} type - the type of the model
+	 * @return {Model} the model created
+	 */	
+	make_component(structure, name, type) {
 		var msg_type_id = structure.message_types.length;
 		var model_type_id = structure.model_types.length;
 		
@@ -41,11 +51,16 @@ export default class ParserCDpp extends Evented {
 		return model;
 	}
 	
-	async ParseStructure(ma) {	
+	/**                              
+	 * Parses the *.ma file into a Structure object
+	 * @param {File} ma - the *.ma file
+	 * @return {Structure} the structure object built from the file
+	 */		
+	async parse_structure(ma) {	
 		var s = new Structure(new Info("top", "CDpp", "Cell-DEVS"));	
 		
 		var id = 0;
-		var content = await ChunkReader.ReadAsText(ma); 
+		var content = await Reader.read_as_text(ma); 
 		var lines = content.split("\n");
 		var curr = null;
 
@@ -55,7 +70,7 @@ export default class ParserCDpp extends Evented {
 			if (l.startsWith("[")) {		
 				var name = l.substring(1, l.length - 1);
 				
-				if (name.toLowerCase() == "top") this.MakeComponent(s, name, "coupled");
+				if (name.toLowerCase() == "top") this.make_component(s, name, "coupled");
 				
 				curr = s.model_types.find(m => m.name == name);
 			}
@@ -68,7 +83,7 @@ export default class ParserCDpp extends Evented {
 				kv[0] = kv[0].toLowerCase();
 				
 				if (kv[0] == "components") {				
-					var model = this.MakeComponent(s, kv[1].split(' ')[0].trim(), "atomic");
+					var model = this.make_component(s, kv[1].split(' ')[0].trim(), "atomic");
 					
 					curr.add_submodel(model); 
 				}
@@ -118,9 +133,14 @@ export default class ParserCDpp extends Evented {
 		
 		return s;
 	}
-		
-	async ParsePalette(pal) {
-		var content = await ChunkReader.ReadAsText(pal);		
+	
+	/**                              
+	 * Parses the *.pal file
+	 * @param {File} pal - the *.pal file
+	 * @return {object} the style object
+	 */	
+	async parse_palette(pal) {
+		var content = await Reader.read_as_text(pal);		
 		var lines = content.trim().split("\n").map(l => l.trim());
 		var style = { buckets: [] };
 		
@@ -163,7 +183,14 @@ export default class ParserCDpp extends Evented {
 		return [style];
 	}
 	
-	ReadInitialRowValues(frames, t0, model) {
+	/**                              
+	 * Parses the initialrowvalues token in the ma file. 
+	 * Adds corresponding messages to the frame 0.
+	 * @param {Frame[]} frames - the simulation frames
+	 * @param {string} t0  - the time 0 (i.e. 00:00:000)
+	 * @param {Model} model - the top model of the simulation 
+	 */	
+	read_initial_row_values(frames, t0, model) {
 		if (this.initialRowValues == null) return;
 		
 		var f0 = frames.get(t0) || frames.add(new Frame(t0));
@@ -178,7 +205,15 @@ export default class ParserCDpp extends Evented {
 		});
 	}
 	
-	ReadInitialValue(frames, t0, model, dim) {
+	/**                              
+	 * Parses the initialvalues token in the ma file. 
+	 * Adds corresponding messages to the frame 0.
+	 * @param {Frame[]} frames - the simulation frames
+	 * @param {string} t0  - the time 0 (i.e. 00:00:000)
+	 * @param {Model} model - the top model of the simulation 
+	 * @param {number[]} dim - the dimensions of the cell-space
+	 */	
+	read_initial_value(frames, t0, model, dim) {
 		if (this.initialValue == null) return;
 		
 		var f0 = frames.get(t0) || frames.add(new Frame(t0));
@@ -195,11 +230,17 @@ export default class ParserCDpp extends Evented {
 		}		
 	}
 	
-	async ReadVal(frames, t0, val) {
+	/**                              
+	 * Parses the *.val file. Adds corresponding messages to the frame 0.
+	 * @param {Frame[]} frames - the simulation frames
+	 * @param {string} t0  - the time 0 (i.e. 00:00:000)
+	 * @param {File} val - the *.val file
+	 */	
+	async read_val(frames, t0, val) {
 		if (!val) return;
 		
 		var f0 = frames.get(t0) || frames.add(new Frame(t0));
-		var content = await ChunkReader.ReadAsText(val);		
+		var content = await Reader.read_as_text(val);		
 		var lines = content.trim().split("\n").map(l => l.trim());
 		
         // (0,0,0)=100 2 1
@@ -219,11 +260,19 @@ export default class ParserCDpp extends Evented {
 		}
 	}
 	
-	async ReadMap(frames, t0, model, map) {
+	
+	/**                              
+	 * Parses the *.map file. Adds corresponding messages to the frame 0.
+	 * @param {Frame[]} frames - the simulation frames
+	 * @param {string} t0  - the time 0 (i.e. 00:00:000)
+	 * @param {Model} model - the top model of the simulation 
+	 * @param {File} map - the *.map file
+	 */	
+	async read_map(frames, t0, model, map) {
 		if (!map) return;
 		
 		var f0 = frames.get(t0) || frames.add(new Frame(t0));
-		var content = await ChunkReader.ReadAsText(map);
+		var content = await Reader.read_as_text(map);
 		var lines = content.trim().split("\n").map(l => l.trim());		
 		var i = 0;
 		
@@ -238,21 +287,29 @@ export default class ParserCDpp extends Evented {
 		}
 	}
 	
-	async ParseMessages(structure, log, val, map) {
+	/**                              
+	 * Parses the *val, *map and *.log file
+	 * @param {Structure} structure - the structure object for a simulation
+	 * @param {File} log - the *.log file
+	 * @param {File} val - the *.val file
+	 * @param {File} map - the *.map file
+	 * @return {Frame[]} an array of frames built from the messages.log
+	 */	
+	async parse_messages(structure, log, val, map) {
 		var lopez_test = await log.slice(0, 5).text();
 		var is_lopez = lopez_test == "0 / L";
 		var t0 = is_lopez ? "00:00:00:000:0" : "00:00:00:000";
 		
 		var model = structure.model_types[1];
-		var frames = new IndexedList(f => f.time);
+		var frames = new List(f => f.time);
 		
-		if (!is_lopez) this.ReadInitialValue(frames, t0, model);
-		if (!is_lopez) this.ReadInitialRowValues(frames, t0, model);
+		if (!is_lopez) this.read_initial_value(frames, t0, model);
+		if (!is_lopez) this.read_initial_row_values(frames, t0, model);
 		
-		await this.ReadVal(frames, t0, val);
-		await this.ReadMap(frames, t0, model, map);
+		await this.read_val(frames, t0, val);
+		await this.read_map(frames, t0, model, map);
 		
-		await ChunkReader.ReadByChunk(log, "\n", (parsed, chunk, progress) => {			
+		await Reader.read_by_chunk(log, "\n", (parsed, chunk, progress) => {			
 			var lines = chunk.split("\n");
 			
 			for (var i = 0; i < lines.length; i++) {
@@ -260,12 +317,12 @@ export default class ParserCDpp extends Evented {
 				
 				// Mensaje Y / 00:00:00:100 / flu(18,12)(645) / out /      2.00000 para flu(02)
 				// Mensaje Y / 00:00:20:000 / sender(02) / dataout /     11.00000 para top(01)
-				if (line.startsWith("Mensaje Y")) this.ParseCdppLine(frames, line);
+				if (line.startsWith("Mensaje Y")) this.parse_cdpp_line(frames, line);
 				
-				else if (line.startsWith("0 / L / Y")) this.ParseLopezLine(frames, model, line);
+				else if (line.startsWith("0 / L / Y")) this.parse_lopez_line(frames, model, line);
 			}
 			
-			this.Emit("Progress", { progress: progress });
+			this.emit("progress", { progress: progress });
 		});
 		
 		frames.forEach(f => {
@@ -277,7 +334,12 @@ export default class ParserCDpp extends Evented {
 		return frames;
 	}
 	
-	ParseCdppLine(frames, line) {
+	/**                              
+	 * Parses a CDpp line from the *.log. Adds it to the frame provided.
+	 * @param {Frame[]} frames - a time frame for the simulation
+	 * @param {string} line - a line from the *.log
+	 */	
+	parse_cdpp_line(frames, line) {
 		var split = line.split('/').map(l => l.trim());
 		var model = split[2].replaceAll('(', ' ').replaceAll(')', '').split(' ')
 		var coord = model.length == 3 ? model[1].split(',') : null;
@@ -295,7 +357,13 @@ export default class ParserCDpp extends Evented {
 		}
 	}
 	
-	ParseLopezLine(frames, model_type, line) {
+	/**                              
+	 * Parses a Lopez line from the *.log. Adds it to the frame provided.
+	 * @param {Frame[]} frames - a time frame for the simulation
+	 * @param {TypeModel} model_type - the TypeModel of the top model
+	 * @param {string} line - a line from the *.log
+	 */	
+	parse_lopez_line(frames, model_type, line) {
 		var split = line.split('/').map(l => l.trim());
 		var model = split[4].replaceAll('(', ' ').replaceAll(')', '').split(' ')
 		var c = model.length == 3 ? model[1].split(',') : null;

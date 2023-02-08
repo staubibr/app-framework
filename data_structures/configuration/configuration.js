@@ -1,85 +1,142 @@
 'use strict';
 
-import Evented from '../../components/evented.js';
+import Evented from '../../base/evented.js';
 import Diagram from './diagram.js';
 import Grid from './grid.js';
 import GIS from './gis.js';
 import Playback from './playback.js';
 
+/** 
+ * A configuration class that holds all basic visualization parameters
+ **/
 export default class Configuration extends Evented { 
 
+	/** 
+	* Gets the diagram section
+	* @type {object} 
+	*/
 	get diagram() { return this._diagram; }
 
+	/** 
+	* Sets the diagram section
+	* @type {object} 
+	*/
 	set diagram(value) { this._diagram = value; }
 
+	/** 
+	* Gets the grid section
+	* @type {object} 
+	*/
 	get grid() { return this._grid; }
 
+	/** 
+	* Sets the grid section
+	* @type {object} 
+	*/
 	set grid(value) { this._grid = value; }
 
+	/** 
+	* Gets the GIS section
+	* @type {object} 
+	*/
 	get gis() { return this._gis; }
 
+	/** 
+	* Sets the GIS section
+	* @type {object} 
+	*/
 	set gis(value) { this._gis = value; }
 
+	/** 
+	* Gets the playback section
+	* @type {object} 
+	*/
 	get playback() { return this._playback; }
 
+	/** 
+	* Sets the playback section
+	* @type {object} 
+	*/
 	set playback(value) { this._playback = value; }
-
-	constructor() {
+	
+    /**
+     * @param {simulation} simulation - the simulation object
+     * @param {object} viz - the visualization configuration as json
+     * @param {object} style - the style configuration as json
+     */
+	constructor(simulation, viz, style) {
 		super();
 		
-		this._diagram = null;
-		this._grid = null;
-		this._gis = null;
-		this._playback = null;
+		this.json = {};
+		
+		this.configure(viz, simulation);
+		
+		if (this.grid && style) this.grid.styles = style;
+		
+		if (this.diagram && !simulation.diagram) {
+			throw new Error("Diagram not found for DEVS simulation. Please provide a diagram.svg file and reload the simulation.");
+		}
 	}
 		
-	static FromType(type) {
-		var configuration = new Configuration();
+    /**
+     * Reads the json configuration provided to the section. Any parameter provided should be optional
+	 * and overwrite the default json configuration for the section.
+     * @param {object} json - The provided json configuration.
+     * @param {Simulation} simulation - The simulation object, certain default values are derived from it.
+     */
+	configure(json, simulation) {
+		var type = this.get_type(json, simulation);
 		
-		configuration.playback = new Playback();
+		this.playback = new Playback(json && json.playback);
 		
-		if (type == "Cell-DEVS") configuration.grid = new Grid();
+		if (type == "Cell-DEVS") this.grid = new Grid(json && json.grid, simulation);
 		
-		if (type == "DEVS") configuration.diagram = new Diagram();
+		if (type == "DEVS") this.diagram = new Diagram(json && json.diagram);
 		
-		if (type == "GIS-DEVS") configuration.gis = new GIS();
-		
-		return configuration;
-	}
-	
-	static FromJson(json) {
-		var configuration = new Configuration();
-		
-		configuration.playback = new Playback();
-		
-		if (json.playback) configuration.playback = Playback.FromJson(json.playback);
-		if (json.diagram) configuration.diagram = Diagram.FromJson(json.diagram);
-		if (json.grid) configuration.grid = Grid.FromJson(json.grid);
-		if (json.gis) configuration.gis = GIS.FromJson(json.gis);
-		
-		return configuration;
+		if (type == "GIS-DEVS") this.gis = new GIS(json && json.gis);
 	}
 	
-	ToJson() {
+    /**
+     * Returns the configuration as file object
+     */
+	to_file() {
+		var content = JSON.stringify(this);
+		
+		return new File([content], "visualization.json", { type:"application/json", endings:'native' });
+	}
+	
+    /**
+     * Returns the configuration section as json
+	 * @return {object} the configuration section as json
+     */
+	to_json() {
 		var json = {};
 		
-		if (this.playback) json.playback = this.playback.ToJson();
-		if (this.diagram) json.diagram = this.diagram.ToJson();
-		if (this.grid) json.grid = this.grid.ToJson();
-		if (this.gis) json.gis = this.gis.ToJson();
+		if (this.playback) json.playback = this.playback.to_json();
+		if (this.diagram) json.diagram = this.diagram.to_json();
+		if (this.grid) json.grid = this.grid.to_json();
+		if (this.gis) json.gis = this.gis.to_json();
 		
 		return json;
 	}
 	
-	ToString() {
-		var json = this.ToJson();
-		
-		return JSON.stringify(json);
+    /**
+     * Returns the configuration section as json. Required for JSON.stringify
+	 * @return {object} the configuration section as json
+     */
+	toJSON() {
+		return this.to_json();
 	}
 	
-	ToFile() {
-		var content = this.ToString();
+    /**
+     * Returns the type of simulation for the configuration object.
+	 * @return {string} the type of configuration
+     */
+	get_type(json, simulation) {
+		if (json && json.grid || simulation.type == "Cell-DEVS") return "Cell-DEVS";
+		if (json && json.gis || simulation.type == "DEVS") return "GIS-DEVS";
+		if (json && json.diagram || simulation.type == "DEVS") return "DEVS";
 		
-		return new File([content], "visualization.json", { type:"application/json", endings:'native' });
+		throw new Error("Unable to determine simulation type.");
 	}
 }

@@ -2,16 +2,28 @@
 
 import Core from '../tools/core.js';
 import Dom from '../tools/dom.js';
-
 import Select from './select.js';
 
-export default Core.Templatable("Basic.UI.List", class List extends Select {
+/** 
+ * A replacement for a multi select component
+ **/
+export default class List extends Select {
 	
-	constructor(container, options) {
-		super(container, options);
+	/**
+	 * Constructor for the list element. Follows the widget creation pattern.
+	 * @param {object} container - div container
+	 */	
+	constructor(container) {
+		super(container);
 	}
 	
-	Template() {
+	/**
+	 * Create HTML for select element
+	 * @returns {string} HTML for select element
+	 */
+	html() {
 		return '<select handle="root" multiple></select>';
 	}
-});
+};
+
+Core.templatable("Api.UI.List", List);

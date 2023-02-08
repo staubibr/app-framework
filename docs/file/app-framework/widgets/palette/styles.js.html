@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">app-framework/widgets/palette/styles.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<link rel="stylesheet" href="./inject/css/0-custom.css"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#base">base</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/application.js~Application.html">Application</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/component.js~Component.html">Component</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/evented.js~Evented.html">Evented</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/list.js~List.html">List</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/nls.js~Nls.html">Nls</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/template.js~Template.html">Template</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/widget.js~Widget.html">Widget</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components">components</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/automator.js~Automator.html">Automator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/chunk-reader.js~Reader.html">Reader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/config.js~Config.html">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/parser.js~Parser.html">Parser</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/parserCDpp.js~ParserCDpp.html">ParserCDpp</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/recorder.js~Recorder.html">Recorder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/styler.js~Styler.html">Styler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components-ol">components/ol</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/ol/legend.js~Legend.html">Legend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/ol/map.js~Map.html">Map</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components-style">components/style</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketFill.js~BucketFill.html">BucketFill</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketRadius.js~BucketRadius.html">BucketRadius</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketScale.js~BucketScale.html">BucketScale</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketStroke.js~BucketStroke.html">BucketStroke</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/linestring.js~Linestring.html">Linestring</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/point.js~Point.html">Point</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/pointIcon.js~PointIcon.html">PointIcon</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/polygon.js~Polygon.html">Polygon</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticFill.js~StaticFill.html">StaticFill</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticRadius.js~StaticRadius.html">StaticRadius</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticScale.js~StaticScale.html">StaticScale</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticStroke.js~StaticStroke.html">StaticStroke</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-configuration">data_structures/configuration</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/configuration.js~Configuration.html">Configuration</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/diagram.js~Diagram.html">Diagram</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/gis.js~GIS.html">GIS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/grid.js~Grid.html">Grid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/playback.js~Playback.html">Playback</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/section.js~Section.html">Section</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-metadata">data_structures/metadata</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/info.js~Info.html">Info</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/link.js~Link.html">Link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/message_type.js~MessageType.html">MessageType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/metadata.js~Metadata.html">Metadata</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/model.js~Model.html">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/model_ca.js~ModelCA.html">ModelCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/structure.js~Structure.html">Structure</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type.js~Type.html">Type</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_model.js~TypeModel.html">TypeModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_model_ca.js~TypeModelCA.html">TypeModelCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_port.js~TypePort.html">TypePort</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-simulation">data_structures/simulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/cache.js~Cache.html">Cache</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/frame.js~Frame.html">Frame</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message.js~Message.html">Message</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_output.js~MessageOutput.html">MessageOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_state.js~MessageState.html">MessageState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_state_ca.js~MessageStateCA.html">MessageStateCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation.js~Simulation.html">Simulation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation_ca.js~SimulationCA.html">SimulationCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation_devs.js~SimulationDEVS.html">SimulationDEVS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/state.js~State.html">State</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/stateCA.js~StateCA.html">StateCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/stateDEVS.js~StateDEVS.html">StateDEVS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tools">tools</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/core.js~Core.html">Core</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/dom.js~Dom.html">Dom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/net.js~Net.html">Net</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/style.js~Style.html">Style</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/zip.js~Zip.html">Zip</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#ui">ui</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/box-input-files.js~BoxInputFiles.html">BoxInputFiles</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/list.js~List.html">List</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/picker.js~Picker.html">Picker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/popup.js~Popup.html">Popup</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/select.js~Select.html">Select</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/tooltip.js~Tooltip.html">Tooltip</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/yes-no.js~YesNo.html">YesNo</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">app-framework/widgets/palette/styles.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&apos;use strict&apos;;
+
+import Core from &apos;../../tools/core.js&apos;;
+import Dom from &apos;../../tools/dom.js&apos;;
+import Widget from &apos;../../base/widget.js&apos;;
+import Select from &apos;../../ui/select.js&apos;;
+
+export default Core.templatable(&quot;Api.Widget.Palette.Styles&quot;, class Styles extends Widget { 
+	
+	constructor(container) {
+		super(container);
+		
+		this.items = null;
+		this.tooltip = null;
+		this.bIdx = null;
+		
+		this.build_tooltip();
+		
+		// Need to make Node access uniform (widget vs node vs element)
+		this.elems.selectStyle.on(&quot;change&quot;, this.on_select_style_change.bind(this));
+		this.elems.btnAddStyle.addEventListener(&quot;click&quot;, this.on_button_add_style_click.bind(this));
+		this.elems.btnDelStyle.addEventListener(&quot;click&quot;, this.on_button_del_style_click.bind(this));
+		
+		this.elems.addClass.addEventListener(&quot;click&quot;, this.on_button_add_class_click.bind(this));
+	}
+	
+	build_tooltip() {
+		this.tooltip = Dom.create(&quot;div&quot;, { className:&quot;color-picker-container hidden&quot; }, document.body);
+		
+		this.picker = new iro.ColorPicker(this.tooltip, {
+			width : 170,
+			layoutDirection : &quot;vertical&quot;,
+			sliderSize : 15
+		});
+		
+		this.picker.base.children[0].tabIndex = 0;
+		this.picker.base.children[1].tabIndex = 0;
+		
+		this.picker.on(&quot;input:end&quot;, this.on_picker_color_change.bind(this));
+		
+		this.tooltip.addEventListener(&quot;mouseleave&quot;, (ev) =&gt;&#xA0;{
+			Dom.add_css(this.tooltip, &quot;hidden&quot;);
+		});
+	}
+	
+	initialize(settings, style) {
+		this.settings = settings;
+		
+		this.load_styles_dropdown();		
+		this.show_style(style);
+	}
+	
+	load_styles_dropdown() {
+		this.elems.selectStyle.empty();
+		
+		this.settings.styles.forEach((s, i) =&gt; this.elems.selectStyle.add(i, null, s));
+	}
+	
+	show_style(style) {
+		this.elems.selectStyle.value = style;
+		
+		Dom.empty(this.elems.body);
+		
+		this.items = [];
+		
+		this.settings.styles[style].buckets.forEach(c =&gt; this.add_style_class(c));
+	}
+	
+	add_style_class(c) {
+		var item = {};
+		
+		item.data = c;
+		item.row = Dom.create(&quot;tr&quot;, { className:&quot;table-row&quot; }, this.elems.body);
+		item.start = this.add_start(item.row, c);
+		item.end = this.add_end(item.row, c);
+		item.color = this.add_color(item.row, c, this.items.length);
+		item.btnDelete = this.add_delete_button(item);
+		
+		item.start.addEventListener(&quot;change&quot;, ev =&gt;&#xA0;{
+			item.data.start = +ev.target.value;
+		
+			this.settings.set(&quot;styles&quot;, this.settings.styles);
+		});
+		
+		item.end.addEventListener(&quot;change&quot;, ev =&gt;&#xA0;{ 
+			item.data.end = +ev.target.value;
+		
+			this.settings.set(&quot;styles&quot;, this.settings.styles);
+		});
+		
+		this.items.push(item);
+	}
+	
+	add_start(tr, c) {
+		var td = Dom.create(&quot;td&quot;, { className:&quot;styles-start&quot;}, tr);
+		
+		return Dom.create(&quot;input&quot;, { value:c.start, type:&apos;number&apos; }, td);
+	}
+	
+	add_end(tr, c) {
+		var td = Dom.create(&quot;td&quot;, { className:&quot;styles-end&quot;}, tr);
+		
+		return Dom.create(&quot;input&quot;, { value:c.end, type:&apos;number&apos; }, td);
+	}
+	
+	add_color(tr, c, i) {
+		var td = Dom.create(&quot;td&quot;, { className:&quot;styles-color&quot;}, tr);
+		var btn = Dom.create(&quot;button&quot;, { className:&quot;color&quot; }, td);
+
+		btn.style.backgroundColor = `rgb(${c.color})`;
+
+		btn.addEventListener(&quot;click&quot;, (ev) =&gt;&#xA0;{
+			this.bIdx = i;
+			
+			var geom = ev.target.getBoundingClientRect();
+			
+			this.tooltip.style.left = (geom.left - window.scrollX) + &quot;px&quot;;
+			this.tooltip.style.top = (geom.top - window.scrollY) + &quot;px&quot;;
+			
+			Dom.remove_css(this.tooltip, &quot;hidden&quot;);
+		});
+
+		return btn;
+	}
+	
+	add_delete_button(item) {
+		var td = Dom.create(&quot;td&quot;, { className:&quot;grid-delete&quot;}, item.row);
+		var btn = Dom.create(&quot;button&quot;, { className:&quot;table-button button-delete image-button&quot; }, td);
+		var img = Dom.create(&quot;img&quot;, { className:&quot;image-icon&quot;, src:&quot;./assets/delete.png&quot;, title:this.nls(&quot;Settings_Class_Delete_Title&quot;) }, btn);
+		
+		btn.addEventListener(&apos;click&apos;, this.on_button_delete_class_click.bind(this, item));
+		
+		return btn;
+	}
+	
+	on_button_add_class_click(ev) {	
+		var i = this.elems.selectStyle.value;
+		var c = { start:0, end:0, color:[255, 255, 255] };
+		
+		this.settings.styles[i].buckets.push(c);
+	
+		this.add_style_class(c);
+		
+		this.elems.classes.scrollTop = this.elems.classes.scrollHeight;
+	}	
+	
+	on_button_delete_class_click(item, ev) {		
+		var i = this.elems.selectStyle.value;
+		var j = this.items.indexOf(item);
+		
+		this.settings.styles[i].buckets.splice(j, 1);
+		this.items.splice(j, 1);
+				
+		item.row.remove();
+		
+		this.settings.set(&quot;styles&quot;, this.settings.styles);
+	}
+	
+	on_select_style_change(ev) {		
+		this.show_style(ev.target.value);
+	}	
+	
+	on_button_add_style_click(ev) {
+		var style = this.settings.add_style([]);
+		
+		this.load_styles_dropdown(this.settings.styles);
+		
+		this.show_style(this.settings.styles.length - 1);
+		
+		this.settings.set(&quot;styles&quot;, this.settings.styles);
+	}
+	
+	on_button_del_style_click(ev) {
+		this.settings.remove_style(this.elems.selectStyle.selected);
+		
+		this.load_styles_dropdown(this.settings.styles);
+		
+		this.show_style(0);
+		
+		this.settings.set(&quot;styles&quot;, this.settings.styles);
+		
+		Dom.toggle_css(this.elems.btnDelStyle, &apos;hidden&apos;, this.settings.styles.length == 1);
+		
+		this.emit(&quot;style-deleted&quot;);
+	}
+	
+	on_picker_color_change(ev) {
+		var c = this.picker.color.rgb;
+		
+		this.items[this.bIdx].color.style.backgroundColor = this.picker.color.rgbString;
+		this.items[this.bIdx].data.color = [c.r, c.g, c.b];
+		
+		this.settings.set(&quot;styles&quot;, this.settings.styles);
+	}
+	
+	html() {
+		return 	&quot;&lt;div class=&apos;layers-widget&apos;&gt;&quot; + 
+					&quot;&lt;div class=&apos;settings-title-container&apos;&gt;&quot; +
+						&quot;&lt;h3 class=&apos;settings-group-label Cell-DEVS&apos;&gt;nls(Settings_Styles)&lt;/h3&gt;&quot; +
+						&quot;&lt;div handle=&apos;selectStyle&apos; class=&apos;style-add&apos; widget=&apos;Api.UI.Select&apos;&gt;&lt;/div&gt;&quot; +
+						&quot;&lt;button handle=&apos;btnAddStyle&apos; class=&apos;table-button image-button&apos; title=&apos;nls(Settings_Layers_Add_Style_Title)&apos;&gt;&quot; + 
+						   &quot;&lt;img src=&apos;./assets/add.png&apos; class=&apos;image-icon&apos;/&gt;&quot; +
+						&quot;&lt;/button&gt;&quot; +		
+						&quot;&lt;button handle=&apos;btnDelStyle&apos; class=&apos;table-button image-button&apos; title=&apos;nls(Settings_Layers_Del_Style_Title)&apos;&gt;&quot; + 
+						   &quot;&lt;img src=&apos;./assets/delete.png&apos; class=&apos;image-icon&apos;/&gt;&quot; +
+						&quot;&lt;/button&gt;&quot; +		
+					 &quot;&lt;/div&gt;&quot; + 
+					 &quot;&lt;div handle=&apos;classes&apos; class=&apos;style&apos;&gt;&quot; + 
+						&quot;&lt;table&gt;&quot; + 
+							&quot;&lt;thead&gt;&quot; +
+								&quot;&lt;tr&gt;&quot; + 
+									&quot;&lt;td class=&apos;col-1&apos;&gt;nls(Settings_Style_Start)&lt;/td&gt;&quot; +
+									&quot;&lt;td class=&apos;col-2&apos;&gt;nls(Settings_Style_End)&lt;/td&gt;&quot; +
+									&quot;&lt;td class=&apos;col-3&apos;&gt;nls(Settings_Style_Color)&lt;/td&gt;&quot; +
+									&quot;&lt;td class=&apos;col-4&apos;&gt;&lt;/td&gt;&quot; +
+								&quot;&lt;/tr&gt;&quot; +
+							&quot;&lt;/thead&gt;&quot; + 
+							&quot;&lt;tbody handle=&apos;body&apos;&gt;&lt;/tbody&gt;&quot; + 
+							&quot;&lt;tfoot handle=&apos;foot&apos;&gt;&quot; + 
+								&quot;&lt;tr&gt;&quot; + 
+									&quot;&lt;td class=&apos;col-1&apos;&gt;&lt;/td&gt;&quot; +
+									&quot;&lt;td class=&apos;col-2&apos;&gt;&lt;/td&gt;&quot; +
+									&quot;&lt;td class=&apos;col-3&apos;&gt;&lt;/td&gt;&quot; +
+									&quot;&lt;td class=&apos;col-4&apos;&gt;&quot; + 
+										&quot;&lt;button handle=&apos;addClass&apos; class=&apos;table-button image-button&apos; title=&apos;nls(Settings_Class_Add_Title)&apos;&gt;&quot; + 
+											&quot;&lt;img src=&apos;./assets/add.png&apos; class=&apos;image-icon&apos;/&gt;&quot; +
+										&quot;&lt;/button&gt;&quot; +
+									&quot;&lt;/td&gt;&quot; +
+								&quot;&lt;/tr&gt;&quot; +
+							&quot;&lt;/tfoot&gt;&quot; + 
+						&quot;&lt;/table&gt;&quot; + 
+					 &quot;&lt;/div&gt;&quot; +
+				 &quot;&lt;/div&gt;&quot;;
+	}
+	
+	localize(nls) {
+		nls.add(&quot;Settings_Styles&quot;, &quot;en&quot;, &quot;Modify style no.&quot;);
+		nls.add(&quot;Settings_Layers_Add_Style_Title&quot;, &quot;en&quot;, &quot;Add a new style to the visualization&quot;);
+		nls.add(&quot;Settings_Layers_Del_Style_Title&quot;, &quot;en&quot;, &quot;Remove this style from the visualization&quot;);
+		nls.add(&quot;Settings_Style_Start&quot;, &quot;en&quot;, &quot;Start&quot;);
+		nls.add(&quot;Settings_Style_End&quot;, &quot;en&quot;, &quot;End&quot;);
+		nls.add(&quot;Settings_Style_Color&quot;, &quot;en&quot;, &quot;Color&quot;);
+		nls.add(&quot;Settings_Class_Add_Title&quot;, &quot;en&quot;, &quot;Add a color classification to the visualization&quot;);
+		nls.add(&quot;Settings_Class_Delete_Title&quot;, &quot;en&quot;, &quot;Remove color classification from visualization&quot;);
+	}
+})</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

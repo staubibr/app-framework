@@ -2,23 +2,42 @@
 
 import Core from '../tools/core.js';
 import Dom from '../tools/dom.js';
-import Templated from '../components/templated.js';
+import Widget from '../base/widget.js';
 
-export default Core.Templatable("Widget.Box-Input-Files", class Dropzone extends Templated { 
+/** 
+ * A box element that allows users to drag and drop files
+ **/
+export default class BoxInputFiles extends Widget { 
 
-	set label(value) { this.Elem("label").innerHTML = value; }
+	/**
+	 * Set the label on the box-input
+	 * @type {number[]}
+	 */
+	set label(value) { this.elems.label.innerHTML = value; }
 
-	set icon(value) { Dom.AddCss(this.Elem("icon"), value); }
+	/**
+	 * Set the icon on the box-input
+	 * @type {number[]}
+	 */
+	set icon(value) { Dom.add_css(this.elems.icon, value); }
 	
+	/**
+	 * Constructor for the Box input element. Follows the widget creation pattern.
+	 * @param {object} container - div container
+	 */	
 	constructor(container) {
 		super(container);
 		
 		this.files = [];
 		
-		this.Node("input").On("change", this.OnInput_Change.bind(this));
+		this.elems.input.addEventListener("change", this.on_input_change.bind(this));
 	}
 	
-	Template() {
+	/**
+	 * Create HTML for select element
+	 * @returns {string} HTML for select element
+	 */
+	html() {
 		return "<div class='box-input-files'>" +
 				   "<div class='box-inner'>" +
 					  "<label handle='label' class='top'>nls(Dropzone_Upload_Label)</label>" +
@@ -29,68 +48,93 @@ export default Core.Templatable("Widget.Box-Input-Files", class Dropzone extends
 			   "</div>";
 	}
 	
-	Update(newFiles) {
+	/**
+	 * Update the box-input element with a set of files
+	 * @param {File[]} newFiles - An array of files to assign to the box-input
+	 */
+	update(newFiles) {
 		// Set css on condition of having files or not
-		Dom.ToggleCss(this.Elem("files"), "hidden", this.files.length == 0);
+		Dom.toggle_css(this.elems.files, "hidden", this.files.length == 0);
 		
 		var css = this.files.length > 0 ? "fas fa-thumbs-up" : "fas fa-exclamation-triangle";
 		
-		Dom.SetCss(this.Elem("icon"), css);
+		Dom.set_css(this.elems.icon, css);
 		
 		// Reload individual file boxes
-		this.Refresh(this.files);
+		this.refresh(this.files);
 	}
 	
-	Clear() {
+	/**
+	 * Clears the files 
+	 */
+	clear() {
 		this.files = [];
 		
-		this.Refresh(this.files);
+		this.refresh(this.files);
 	}
 	
-	Refresh(files) {
+	/**
+	 * Refresh the box-input element, creates the files button below the box-input
+	 * @param {File[]} files - An array of files to assign to the box-input
+	 */
+	refresh(files) {
 		// load the individual file label buttons
-		Dom.Empty(this.Elem("files"));
+		Dom.empty(this.elems.files);
 				
 		for (var i = 0; i < files.length; i++) {
-			var options = { className:"file", title:this.nls.Ressource("Dropzone_File_Title"), innerHTML:files[i].name };
-			var lbl = Dom.Create("label", options, this.Elem("files"));
+			var options = { className:"file", title:this.nls("Dropzone_File_Title"), innerHTML:files[i].name };
+			var lbl = Dom.create("label", options, this.elems.files);
 			
-			Dom.Create("span", { className:"fa fa-times-circle" }, lbl);
+			Dom.create("span", { className:"fa fa-times-circle" }, lbl);
 			
-			lbl.addEventListener("click", this.OnFileLabel_Click.bind(this, lbl, files[i]));
+			lbl.addEventListener("click", this.on_file_label_click.bind(this, lbl, files[i]));
 		}
 	}
 	
-	OnFileLabel_Click(lbl, file, ev) {
+	/**
+	 * Handles click event on single file buttons
+	 * removes the clicked file from the box-input selection
+	 * @param {string} lbl - the label of the file
+	 * @param {event} file - the file object to remove
+	 * @param {event} ev - event object
+	 */
+	on_file_label_click(lbl, file, ev) {
 		this.files.splice(this.files.indexOf(file), 1);
 		
-		this.Elem("files").removeChild(lbl);
+		this.elems.files.removeChild(lbl);
 	}
 	
-	OnInput_Change(ev) {
+	/**
+	 * Handles input event on the box-input
+	 * adds the file to the selection, shows the file button and bubbles the event externally
+	 * @param {event} ev - event object
+	 */
+	on_input_change(ev) {
 		for (var i = 0; i < ev.target.files.length; i++) {
 			var exists = this.files.find(f => f.name === ev.target.files[i].name);
 			
 			if (!exists) this.files.push(ev.target.files[i]);
 		}
 		
-		this.Update(this.files);
+		this.update(this.files);
 
 		ev.target.value = null;
 
-		this.Emit("change", { files:this.files });
+		this.emit("change", { files:this.files });
 	}
 	
-	static Nls() {
-		return {
-			"Dropzone_Upload_Label": {
-				"en": "DRAG AND DROP<BR> FILES HERE",
-				"fr": "GLISSER ET DÉPOSER<BR> LES FICHIERS ICI"
-			},
-			"Dropzone_File_Title" : {
-				"en" : "Click to remove file",
-				"fr" : "Cliquer pour retirer le fichier"
-			}
-		}
+	/**
+	 * Defines the localized strings used in this component
+	 * @param {Nls} nls - The nls object containing the strings
+	 */
+	localize(nls) {
+		super.localize(nls);
+		
+		nls.add("Dropzone_Upload_Label", "en", "DRAG AND DROP<BR> FILES HERE");
+		nls.add("Dropzone_Upload_Label", "fr", "GLISSER ET DÉPOSER<BR> LES FICHIERS ICI");
+		nls.add("Dropzone_File_Title", "en", "Click to remove file");
+		nls.add("Dropzone_File_Title", "fr", "Cliquer pour retirer le fichier");
 	}
-});
+};
+
+Core.templatable("Api.Widget.BoxInputFiles", BoxInputFiles);

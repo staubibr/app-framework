@@ -2,16 +2,15 @@
 
 import Core from '../tools/core.js';
 import Dom from '../tools/dom.js';
-import Templated from '../components/templated.js';
+import Widget from '../base/widget.js';
 import BoxInputFiles from '../ui/box-input-files.js';
 import Parser from '../components/parser.js';
 import ParserCDpp from '../components/parserCDpp.js';
-import ChunkReader from '../components/chunkReader.js';
-import Grid from '../data_structures/configuration/grid.js';
-import SimulationDEVS from '../data_structures/simulation/simulationDEVS.js';
-import SimulationCA from '../data_structures/simulation/simulationCA.js';
+import Configuration from '../data_structures/configuration/configuration.js';
+import SimulationDEVS from '../data_structures/simulation/simulation_devs.js';
+import SimulationCA from '../data_structures/simulation/simulation_ca.js';
 
-export default Core.Templatable("Widget.Loader", class Loader extends Templated { 
+export default Core.templatable("Api.Widget.Loader", class Loader extends Widget { 
 
 	set files(value) {
 		this._files = { 
@@ -34,125 +33,118 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 	constructor(node) {		
 		super(node);
 		
-		this.Node("parse").On("click", this.onParseButton_Click.bind(this));
-		this.Node("clear").On("click", this.onClearButton_Click.bind(this));
-		this.Widget("dropzone").On("change", this.onDropzone_Change.bind(this));
+		this.elems.parse.addEventListener("click", this.on_parse_button_click.bind(this));
+		this.elems.clear.addEventListener("click", this.on_clear_button_click.bind(this));
+		this.elems.dropzone.on("change", this.on_dropzone_change.bind(this));
 	}
 	
-	UpdateButton() {
-		this.Elem("parse").disabled = this.Widget("dropzone").files.length == 0;
+	update_button() {
+		this.elems.parse.disabled = this.elems.dropzone.files.length == 0;
 	}
 
-	RestoreUI() {
-		Dom.AddCss(this.Elem("wait"), "hidden");
+	restore_ui() {
+		Dom.add_css(this.elems.wait, "hidden");
 		
-		this.Elem("parse").style.backgroundImage = null;	
+		this.elems.parse.style.backgroundImage = null;	
 	}
 	
-	async Load(files) {
+	async load(files) {
 		try {
-			if (files.cd_ma && files.cd_log) await this.ParseCDpp(files);
+			if (files.cd_ma && files.cd_log) await this.parse_cdpp(files);
 			
 			else if (!files.structure) throw new Error("Missing structure.json file, cannot parse.");
 			
 			else if (!files.messages) throw new Error("Missing messages.log file, cannot parse.");
 			
-			else await this.Parse(files);
+			else await this.parse(files);
 		}
 		catch (error) {
-			this.onWidget_Error(error);
+			this.on_widget_error(error);
 		}
 	}
 	
-	async ParseCDpp(files) {		
+	async parse_cdpp(files) {		
 		var parser = new Parser();
 		var parserCDpp = new ParserCDpp();
 		
-		parserCDpp.On("Progress", this.OnParser_Progress.bind(this));
+		parserCDpp.on("progress", this.on_parser_progress.bind(this));
 		
-		var structure = await parserCDpp.ParseStructure(files.cd_ma);
-		var messages = await parserCDpp.ParseMessages(structure, files.cd_log, files.cd_val, files.cd_map);
-		var config = await parser.ParseVisualization(structure.type, files.visualization);
+		var structure = await parserCDpp.parse_structure(files.cd_ma);
+		var messages = await parserCDpp.parse_messages(structure, files.cd_log, files.cd_val, files.cd_map);
+		var visualization = await parser.parse_visualization(files.visualization);
+		var style = await parserCDpp.parse_palette(files.cd_pal);
 		
-		var simulation = new SimulationCA(structure, messages, config.playback.cache);
-			
-		if (config.grid.layers.length == 0) config.grid = Grid.FromSimulation(simulation);
+		var simulation = new SimulationCA(structure, messages);
+		var config = new Configuration(simulation, visualization, style);
 		
-		if (files.style) config.grid.styles = await parser.ParseStyle(files.style);
-		
-		else config.grid.styles = await parserCDpp.ParsePalette(files.cd_pal);
+		simulation.initialize(config.playback.cache);
 
-		this.RestoreUI();
+		this.restore_ui();
 		
-		this.Emit("ready", { files: files, simulation: simulation, configuration: config });			
+		this.emit("ready", { files: files, simulation: simulation, configuration: config });			
 	}
 	
-	async Parse(files) {
+	async parse(files) {
 		var parser = new Parser();
 		
-		parser.On("Progress", this.OnParser_Progress.bind(this));
+		parser.on("progress", this.on_parser_progress.bind(this));
 		
-		var structure = await parser.ParseStructure(files.structure);
-		var messages = await parser.ParseMessages(structure, files.messages);
-		var diagram = await parser.ParseDiagram(files.diagram);
-		var config = await parser.ParseVisualization(structure.type, files.visualization);
-				
-		if (config.grid) {
-			var simulation = new SimulationCA(structure, messages, config.playback.cache);
-			
-			if (config.grid.layers.length == 0) config.grid = Grid.FromSimulation(simulation);
-			
-			if (files.style) config.grid.styles = await parser.ParseStyle(files.style);
-		}
-	
-		else var simulation = new SimulationDEVS(structure, messages, config.playback.cache, diagram);
+		var structure = await parser.parse_structure(files.structure);
+		var messages = await parser.parse_messages(structure, files.messages);
+		var diagram = await parser.parse_diagram(files.diagram);
+		var visualization = await parser.parse_visualization(files.visualization);
+		var style = await parser.parse_style(files.style);
+
+		if (structure.type != "Cell-DEVS") var simulation = new SimulationDEVS(structure, messages, diagram);
 		
-		this.RestoreUI();
+		else var simulation = new SimulationCA(structure, messages); 
+			
+		var config = new Configuration(simulation, visualization, style);
+		
+		simulation.initialize(config.playback.cache);
+		
+		this.restore_ui();
 
-		if (config.diagram && !simulation.diagram) {
-			this.onWidget_Error(new Error("Diagram not found for DEVS simulation. Please provide a diagram.svg file and reload the simulation."));
-		}
-
-		else this.Emit("ready", { files: files, simulation: simulation, configuration: config });			
+		this.emit("ready", { files: files, simulation: simulation, configuration: config });			
 	}
 	
-	OnParser_Progress(ev) {		
+	on_parser_progress(ev) {		
 		var c1 = "#198CFF";
 		var c2 = "#0051A3";
 		
 		var bg = `linear-gradient(to right, ${c1} 0%, ${c1} ${ev.progress}%, ${c2} ${ev.progress}%, ${c2} 100%)`;
 		
-		this.Elem("parse").style.backgroundImage = bg;		
+		this.elems.parse.style.backgroundImage = bg;		
 	}
 	
-	onDropzone_Change(ev) {		
-		this.UpdateButton();
+	on_dropzone_change(ev) {		
+		this.update_button();
 	}
 		
-	onParseButton_Click(ev) {
-		Dom.RemoveCss(this.Elem("wait"), "hidden");
+	on_parse_button_click(ev) {
+		Dom.remove_css(this.elems.wait, "hidden");
 		
-		this.files = this.Widget("dropzone").files;
+		this.files = this.elems.dropzone.files;
 		
-		this.Load(this.files);
-	}
-	
-	onClearButton_Click(ev) {
-		this.Widget("dropzone").Clear();
-		
-		this.UpdateButton();
+		this.load(this.files);
 	}
 	
-	onWidget_Error(error) {
-		console.error(error);
-		this.Emit("error", { error:error });
-		this.RestoreUI();
+	on_clear_button_click(ev) {
+		this.elems.dropzone.clear();
+		
+		this.update_button();
+	}
+	
+	on_widget_error(error) {
+		this.restore_ui();
+		
+		this.error(error);
 	}
 
-	Template() {
-		return "<div class='loader'>" +
+	html() {
+		return "<div class='loader-widget'>" +
 				  "<div handle='wait' class='wait hidden'><img src='./assets/loading.svg'></div>" + 
-			      "<div handle='dropzone' widget='Widget.Box-Input-Files'></div>" +
+			      "<div handle='dropzone' widget='Api.Widget.BoxInputFiles'></div>" +
 				  "<div class='box-input-files'>" +
 					 "<button handle='clear' class='clear'>nls(Loader_Clear)</button>" +
 					 "<button handle='parse' class='parse' disabled>nls(Loader_Parse)</button>" +
@@ -160,17 +152,11 @@ export default Core.Templatable("Widget.Loader", class Loader extends Templated 
 			   "</div>";
 	}
 	
-	static Nls() {
-		return {
-			"Loader_Clear" : {
-				"en" : "Clear"
-			},
-			"Loader_Parse" : {
-				"en" : "Load simulation"
-			},
-			"Dialog_Linker": {
-				"en": "This visualization uses an SVG diagram. Do you want to review the associations between the diagram and the structure file?"
-			}
-		}
+	localize(nls) {
+		super.localize(nls);
+		
+		nls.add("Loader_Clear", "en", "Clear");
+		nls.add("Loader_Parse", "en", "Load simulation");
+		nls.add("Dialog_Linker", "en", "This visualization uses an SVG diagram. Do you want to review the associations between the diagram and the structure file?");
 	}
 });

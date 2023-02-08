@@ -1,63 +1,140 @@
-'use strict'
+'use strict';
 
-import Templated from '../../components/templated.js';
+import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 
-export default class Linker extends Templated {
+import Widget from '../../base/widget.js';
+import Reader from '../../components/chunk-reader.js';
 
-    get svg() { return this.Elem('svg-content'); }
+export default Core.templatable("Api.Widget.Linker", class Linker extends Widget { 
 	
-	get svg_file() { return new File([this.svg.innerHTML], "diagram.svg", { type:"image/svg+xml", endings:'native' }); }
+    get svg() { return this.elems.svg_content; }
+	
+	get svg_file() { 
+		return new File([this.svg.innerHTML], "diagram.svg", { type:"image/svg+xml", endings:'native' }); 
+	}
 	
 	get current() { return this._current; }
-
-    constructor(container, options) {
-		super(container, options);
-		
+	
+	constructor(container) {
+		super(container);
+	}
+	
+	async initialize(simulation, diagram) {
 		this._current = {
 			button: null,
 			page: null,
 			card: null
 		}
 		
-		this.LoadSVG();
-		this.MakePages(this.options.pages);
+		this.simulation = simulation;
 		
-		this.Node("chk_thick").On('click', this.OnLinker_Thicken.bind(this));
-		this.Node("btn_clear").On('click', this.OnLinker_Clear.bind(this));
+		this.options = await this.make_options(simulation, diagram);
+		
+		this.load_svg(this.options.diagram);
+		this.make_pages(this.options.pages);
+		
+		this.elems.chk_thick.addEventListener('click', this.on_linker_thicken.bind(this));
+		this.elems.btn_clear.addEventListener('click', this.on_linker_clear.bind(this));
 		
 		this.options.pages.forEach(c => {
-			c.button = Dom.Create("button", { type: "button", className: "m-1 inactive", innerHTML: c.caption }, this.Elem("buttons"));
+			c.button = Dom.create("button", { type: "button", className: "m-1 inactive", innerHTML: c.caption }, this.elems.buttons);
 			
-			c.button.addEventListener('click', (ev) => this.ChangePage(c));
+			c.button.addEventListener('click', (ev) => this.change_page(c));
 		});
 		
-		this.ChangePage(this.options.pages[0]);
+		this.change_page(this.options.pages[0]);
+	}
+	
+	async make_options(simulation, diagram) {
+		var diagram = await Reader.read_as_text(diagram);
+		var ports = [];
+		var links = [];
+		
+		simulation.models.forEach(m => {
+			m.ports.forEach(p => ports.push({ model:m, port:p }));
+		});
+		
+		simulation.models.forEach(m => links = links.concat(m.links));
+		
+		return {
+			diagram: diagram,
+			selector : Linker.SVG_FORMAT.DRAW_IO,
+			pages: [{
+				caption: 'Models',
+				empty: 'No models found in the structure file.',
+				label: d => `<b>${d.id}</b>`,
+				items: simulation.models,
+				attrs: {
+					"devs-model-id" : d => d.id
+				}
+			}, {
+				caption: 'Output ports',
+				empty: 'No output ports found in the structure file.',
+				label: d => `<div><b>${d.port.name}</b> @ <b>${d.model.id}</b></div>`,
+				items: ports,
+				attrs: {
+					"devs-port-model" :  d => d.model.id,
+					"devs-port-name" : d => d.port.name
+				}
+			}, {
+				caption: 'Links',
+				empty: 'No links found in the structure file.',
+				label: d => `<div><b>${d.port_a.name}</b> @ <b>${d.model_a.id}</b> to</div><div><b>${d.port_b.name}</b> @ <b>${d.model_b.id}</b></div>`,
+				items: links,
+				attrs: {
+					"devs-link-mA" : d => d.model_a.id,
+					"devs-link-pA" : d => d.port_a.name
+				}
+			}]
+		}
+	}
+	
+    load_svg(diagram) {
+		var selector = Linker.SVG_FORMAT.DRAW_IO;
+		
+		this.svg.innerHTML = diagram;
+		
+		this.reset_pointer_events();
+		
+		this.svg.querySelectorAll(selector).forEach((n, index) => {
+			n.addEventListener('click', this.on_svg_click.bind(this), false);
+			
+			n.style.cursor = "pointer";
+			n.style.pointerEvents = "all"
+		});
     }
 	
-	MakePages(pages) {
-		pages.forEach(page => {
-			page.items = page.items.map(item => this.MakeItem(page,item));
+	reset_pointer_events() {
+		this.svg.querySelectorAll('*').forEach(n => {
+			n.style.cursor = "none";
+			n.style.pointerEvents = "none"
 		});
 	}
 	
-	MakeItem(page, item) {
+	make_pages(pages) {
+		pages.forEach(page => {
+			page.items = page.items.map(item => this.make_item(page, item));
+		});
+	}
+	
+	make_item(page, item) {
 		var item = { data:item, attrs:{}, node:null, svg:[] }
 		
 		for (var attr in page.attrs) item.attrs[attr] = page.attrs[attr](item.data);
 		
-		item.node = Dom.Create("div", { innerHTML:page.label(item.data), className:"card m-1 dwl-pointer dwl-card" });
+		item.node = Dom.create("div", { innerHTML:page.label(item.data), className:"card m-1 dwl-pointer dwl-card" });
 		
-		Dom.Create("i", { className:"fas fa-exclamation-triangle warning-icon" }, item.node);
+		Dom.create("i", { className:"fas fa-exclamation-triangle warning-icon" }, item.node);
 		
-		item.node.addEventListener('click', this.OnCardNode_Click.bind(this, item), false);
+		item.node.addEventListener('click', this.on_card_click.bind(this, item), false);
 		
-		item.svg = this.GetAssociations(item.attrs);
+		item.svg = this.get_associations(item.attrs);
 		
 		return item;
 	}
 	
-	GetAssociations(attrs) {
+	get_associations(attrs) {
 		var selector = "";
 		
 		for (var attr in attrs) selector += `[${attr}=${attrs[attr]}]`
@@ -65,105 +142,69 @@ export default class Linker extends Templated {
 		return Array.from(this.svg.querySelectorAll(selector));
 	}
 	
-    LoadSVG() {
-		var selector = Linker.SVG_FORMAT.DRAW_IO;
+	change_page(page) {
+		Dom.empty(this.elems.cards);
 		
-		this.svg.innerHTML = this.options.diagram;
-		
-		this.ResetPointerEvents();
-		
-		this.svg.querySelectorAll(selector).forEach((n, index) => {
-			n.addEventListener('click', this.OnSVG_Click.bind(this), false);
-			
-			n.style.cursor = "pointer";
-			n.style.pointerEvents = "all"
-		});
-    }
-	
-	ChangePage(page) {
-		Dom.Empty(this.Elem("cards"));
-		
-		if (this.current.button) Dom.AddCss(this.current.button, 'inactive');
+		if (this.current.button) Dom.add_css(this.current.button, 'inactive');
 		
 		this.current.button = page.button;
 		
-		Dom.RemoveCss(this.current.button, 'inactive');
+		Dom.remove_css(this.current.button, 'inactive');
 		
-        this.ClearSVG();
+        this.clear_svg();
 		
 		this.current.page = page;
 		
 		if (page.items.length == 0) {
-			return Dom.Create("p", { innerHTML:page.empty }, this.Elem("cards"));
+			return Dom.create("p", { innerHTML:page.empty }, this.elems.cards);
 		}
 		
 		page.items.forEach(item => {
-			Dom.Place(item.node, this.Elem("cards"));
+			Dom.place(item.node, this.elems.cards);
 			
-			Dom.ToggleCss(item.node, 'hide-warning', item.svg.length > 0);
+			Dom.toggle_css(item.node, 'hide-warning', item.svg.length > 0);
 		});
 	}
 	
-	ClearSVG() {
+	clear_svg() {
 		if (!this.current.card) return;
 		
-		Dom.RemoveCss(this.current.card.node, 'dwl-highlight-card');
+		Dom.remove_css(this.current.card.node, 'dwl-highlight-card');
 	}
 	
-	ClearCards() {
+	clear_cards() {
 		if (!this.current.card) return;
 		
 		this.current.card.svg.forEach(n => n.classList.remove('dwl-selected'));
 	}
 	
-	RefreshWarnings() {
+	refresh_warnings() {
 		this.options.pages.forEach(p => {
 			p.items.forEach(card => {
-				Dom.ToggleCss(card.node, 'hide-warning', card.svg.length > 0);
+				Dom.toggle_css(card.node, 'hide-warning', card.svg.length > 0);
 			});
 		});
 	}
 	
-	ResetPointerEvents() {
-		this.svg.querySelectorAll('*').forEach(n => {
-			n.style.cursor = "none";
-			n.style.pointerEvents = "none"
-		});
-	}
-	
-	ResetThickness() {
-		this.Elem("chk_thick").checked = false;
+	reset_thickness() {
+		this.elems.chk_thick.checked = false;
 		
 		this.svg.classList.toggle("dwl-thick", false);	
 	}
 	
-	Clear() {
-		this.ClearSVG();
-		this.ClearCards();
-		this.RefreshWarnings();
+	clear() {
+		this.clear_svg();
+		this.clear_cards();
+		this.refresh_warnings();
 	}
 	
-	Reset() {
-		this.Clear();
-		this.ResetPointerEvents();
-		this.ResetThickness();
+	reset() {
+		this.clear();
+		this.reset_pointer_events();
+		this.reset_thickness();
 	}
-		
-	OnCardNode_Click(card, ev) {
-		this.Clear();
-		
-		if (this.current.card == card) this.current.card = null;
-		
-		else {
-			this.current.card = card;
-			
-			Dom.AddCss(card.node, 'dwl-highlight-card');
-			
-			card.svg.forEach(a => a.classList.add('dwl-selected'));
-		}
-	} 
-
-	OnSVG_Click(ev) {
+	
+	on_svg_click(ev) {
 		var card = this.current.card;
 		
 		if (!card) return;
@@ -186,31 +227,50 @@ export default class Linker extends Templated {
 			for (var attr in card.attrs) ev.target.setAttribute(attr, card.attrs[attr]);
 		}
 		
-		Dom.ToggleCss(card.node, 'hide-warning', card.svg.length > 0);
+		Dom.toggle_css(card.node, 'hide-warning', card.svg.length > 0);
+	}
+		
+	on_card_click(card, ev) {
+		this.clear();
+		
+		if (this.current.card == card) this.current.card = null;
+		
+		else {
+			this.current.card = card;
+			
+			Dom.add_css(card.node, 'dwl-highlight-card');
+			
+			card.svg.forEach(a => a.classList.add('dwl-selected'));
+		}
+	} 
+	
+	on_linker_thicken(ev) {
+		this.svg.classList.toggle("dwl-thick", ev.target.checked);	
 	}
 	
-	OnLinker_Clear(ev) {
+	on_linker_clear(ev) {
+		debugger;
+		// TODO: There are a few bugs here. The attributes get cleared correctly but the element on the right hand side
+		// stays highlighted. Afterwards, when animating the diagram, the couplings still get highlighted.
 		this.options.pages.forEach(p => {
 			p.items.forEach(card => {
 				card.svg.forEach(svg => {
 					for (var attr in card.attrs) svg.removeAttribute(attr);
 				});
+				
+				card.svg = [];
 			});
 		});
 		
-		this.Clear();
+		this.clear();
 	}
 	
-	OnLinker_Thicken(ev) {
-		this.svg.classList.toggle("dwl-thick", ev.target.checked);	
-	}
-
-	Template() {
-		return `<div class="d-flex flex-row h-100 w-100">` + 
+	html() {
+		return `<div class="linker-widget d-flex flex-row h-100 w-100">` + 
 			      `<div id="json-container" class="d-flex flex-column card me-1 h-100 w-100">` + 
 					 `<div handle="buttons" class="p-3"></div>` + 
 					 `<div handle="cards" id="cards" class="h-100 d-flex flex-row flex-wrap align-content-start justify-content-center overflow-auto">` + 
-					    `<div handle="svg-content"></div>`+					 
+					    `<div handle="svg_content"></div>`+					 
 					 `</div>` + 
 					 `<p class="m-2">NOTE: Input ports will be automatically associated.</p>` + 
 				  `</div>` + 
@@ -222,9 +282,13 @@ export default class Linker extends Templated {
 						`</div>` +
 						`<button handle="btn_clear" type="button" class="m-1 float-end" data-button-type="clear" title="Remove all associations.">Clear</button>` +
 					 `</div>` +
-					 `<div handle="svg-content" id="svg-content"></div>` +
+					 `<div handle="svg_content" id="svg-content"></div>` +
 				  `</div>` + 
-			   `</div>`
+			   `</div>`;
+	}
+	
+	localize(nls) {
+		super.localize(nls);
 	}
 
 	static get SVG_FORMAT() {
@@ -232,4 +296,4 @@ export default class Linker extends Templated {
 			DRAW_IO: 'foreignObject div > div > div, rect:not([fill="none"][stroke="none"]), circle, ellipse, path, polygon, text'
 		}
 	}
-}
+});

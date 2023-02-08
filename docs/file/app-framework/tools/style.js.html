@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">app-framework/tools/style.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<link rel="stylesheet" href="./inject/css/0-custom.css"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#base">base</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/application.js~Application.html">Application</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/component.js~Component.html">Component</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/evented.js~Evented.html">Evented</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/list.js~List.html">List</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/nls.js~Nls.html">Nls</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/template.js~Template.html">Template</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/base/widget.js~Widget.html">Widget</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components">components</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/automator.js~Automator.html">Automator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/chunk-reader.js~Reader.html">Reader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/config.js~Config.html">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/parser.js~Parser.html">Parser</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/parserCDpp.js~ParserCDpp.html">ParserCDpp</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/recorder.js~Recorder.html">Recorder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/styler.js~Styler.html">Styler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components-ol">components/ol</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/ol/legend.js~Legend.html">Legend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/ol/map.js~Map.html">Map</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#components-style">components/style</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketFill.js~BucketFill.html">BucketFill</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketRadius.js~BucketRadius.html">BucketRadius</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketScale.js~BucketScale.html">BucketScale</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/bucketStroke.js~BucketStroke.html">BucketStroke</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/linestring.js~Linestring.html">Linestring</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/point.js~Point.html">Point</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/pointIcon.js~PointIcon.html">PointIcon</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/polygon.js~Polygon.html">Polygon</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticFill.js~StaticFill.html">StaticFill</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticRadius.js~StaticRadius.html">StaticRadius</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticScale.js~StaticScale.html">StaticScale</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/components/style/staticStroke.js~StaticStroke.html">StaticStroke</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-configuration">data_structures/configuration</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/configuration.js~Configuration.html">Configuration</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/diagram.js~Diagram.html">Diagram</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/gis.js~GIS.html">GIS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/grid.js~Grid.html">Grid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/playback.js~Playback.html">Playback</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/configuration/section.js~Section.html">Section</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-metadata">data_structures/metadata</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/info.js~Info.html">Info</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/link.js~Link.html">Link</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/message_type.js~MessageType.html">MessageType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/metadata.js~Metadata.html">Metadata</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/model.js~Model.html">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/model_ca.js~ModelCA.html">ModelCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/structure.js~Structure.html">Structure</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type.js~Type.html">Type</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_model.js~TypeModel.html">TypeModel</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_model_ca.js~TypeModelCA.html">TypeModelCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/metadata/type_port.js~TypePort.html">TypePort</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#data-structures-simulation">data_structures/simulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/cache.js~Cache.html">Cache</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/frame.js~Frame.html">Frame</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message.js~Message.html">Message</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_output.js~MessageOutput.html">MessageOutput</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_state.js~MessageState.html">MessageState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/message_state_ca.js~MessageStateCA.html">MessageStateCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation.js~Simulation.html">Simulation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation_ca.js~SimulationCA.html">SimulationCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/simulation_devs.js~SimulationDEVS.html">SimulationDEVS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/state.js~State.html">State</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/stateCA.js~StateCA.html">StateCA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/data_structures/simulation/stateDEVS.js~StateDEVS.html">StateDEVS</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tools">tools</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/core.js~Core.html">Core</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/dom.js~Dom.html">Dom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/net.js~Net.html">Net</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/style.js~Style.html">Style</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/tools/zip.js~Zip.html">Zip</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#ui">ui</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/box-input-files.js~BoxInputFiles.html">BoxInputFiles</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/list.js~List.html">List</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/picker.js~Picker.html">Picker</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/popup.js~Popup.html">Popup</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/select.js~Select.html">Select</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/tooltip.js~Tooltip.html">Tooltip</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/app-framework/ui/yes-no.js~YesNo.html">YesNo</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">app-framework/tools/style.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import BucketFill from &quot;../components/style/bucketFill.js&quot;;
+import BucketRadius from &quot;../components/style/bucketRadius.js&quot;;
+import BucketStroke from &quot;../components/style/bucketStroke.js&quot;;
+import BucketScale from &quot;../components/style/bucketScale.js&quot;;
+import StaticFill from &quot;../components/style/staticFill.js&quot;;
+import StaticRadius from &quot;../components/style/staticRadius.js&quot;;
+import StaticStroke from &quot;../components/style/staticStroke.js&quot;;
+import StaticScale from &quot;../components/style/staticScale.js&quot;;
+import Polygon from &quot;../components/style/polygon.js&quot;;
+import Point from &quot;../components/style/point.js&quot;;
+import PointIcon from &quot;../components/style/pointIcon.js&quot;;
+import Linestring from &quot;../components/style/linestring.js&quot;;
+
+/** 
+ * A utility class that contains a series of basic functions for styling maps
+ **/
+export default class Style {
+	
+	/**
+	* calculates a series of statistics useful for map classification (min, max, sorted values, etc.)
+	* @param {Simulation} simulation - the simulation object
+	* @return {object} the statistics calculated from the simulation.
+	*/
+	static statistics(simulation) {		
+		var values = {};
+
+		// TODO :Something doesn&apos;t work here now that there can be multiple model types. 
+		// Statistics should be computed in the GIS part of the app, by property on the map.
+		for (var i = 0; i &lt; simulation.frames.length; i++) {
+			var fr = simulation.frames[i];
+			
+			for (var j = 0; j &lt; fr.state_messages.length; j++) {
+				var m = fr.state_messages[j];
+				
+				for (var f in m.value) {
+					if (!values[f]) values[f] = [];
+					
+					values[f].push(m.value[f]);
+				}
+			}
+		}
+			
+		for (var f in values) {
+			values[f] = values[f].filter(v =&gt; !isNaN(v));
+			values[f] = values[f].sort((a, b) =&gt; (a &lt;&#xA0;b) ? -1 : 1);
+		} 
+		
+		var stats = {};
+		
+		for (var f in values) {
+			var length = values[f].length;
+			
+			stats[f] = {
+				sorted: values[f],
+				length: length,
+				min: values[f][0],
+				max: values[f][length - 1]
+			}
+		}
+		
+		return stats;
+	}
+	
+	/**
+	* calculates a classification buckets using quantiles
+	* @param {number[]} values - an array of numbers, all the values in the simulation
+	* @param {number} n - the number of buckets
+	* @param {boolean} zero - if true, filter out 0 values.
+	* @return {number[]} an array of numbers representing upper limits of buckets.
+	*/
+	static quantile_buckets(values, n, zero) {
+		var buckets = [];
+		
+		var zValues = zero ?  values.filter(v =&gt; v != 0) : values;
+		
+		if (zValues.length == 0) return [0];
+		
+		var interval = Math.floor(zValues.length / n);
+		
+		for (var i = 1; i&#xA0;&lt; n; i++) buckets.push(zValues[i * interval]);
+		
+		buckets.push(zValues[zValues.length - 1]);
+		
+		return buckets;
+	}
+	
+	/**
+	* calculates a classification buckets using equivalent ranges
+	* @param {number} min - the minimum value among all simulation values
+	* @param {number} max - the maximum value among all simulation values
+	* @param {number} n - the number of buckets.
+	* @return {number[]} an array of numbers representing upper limits of buckets.
+	*/
+	static equivalent_buckets(min, max, n) {
+		var buckets = [];
+		
+		var interval = (max - min) / n;
+		
+		for (var i = 1; i&#xA0;&lt; n; i++) buckets.push(min + i * interval);
+		
+		buckets.push(max);
+		
+		return buckets;
+	}
+	
+	/**
+	* Apply buckets to a style definition. Adds a buckets property on the style definition.
+	* @param {object} style - the style definition
+	* @param {object} stats - the simulation statistics
+	*/
+	static bucketize_style(style, stats) {
+		if (style.type == &quot;quantile&quot;) {	
+			style.buckets = Style.quantile_buckets(stats[style.property].sorted, style.length, !!style.zero);
+		}
+		else if (style.type == &quot;equivalent&quot;) {
+			style.buckets = Style.equivalent_buckets(stats[style.property].min, stats[style.property].max, style.length);
+		}
+	}
+	
+	/**
+	* Get an OpenLayers style object from a type and a style definition
+	* @param {string} type - the type of style (point, pointIcon, polygon, linestring)
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object
+	*/
+	static get_style(type, json) {
+		if (type == &quot;point&quot;) return this.point_style(json);
+		
+		if (type == &quot;pointIcon&quot;) return this.point_icon_style(json);
+		
+		if (type == &quot;polygon&quot;) return this.polygon_style(json);
+		
+		if (type == &quot;linestring&quot;) return this.linestring_style(json);
+	}
+	
+	/**
+	* Get an OpenLayers point icon style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Icon
+	*/
+	static point_icon_style(json) {
+		return new ol.style.Style({
+			image: new ol.style.Icon({
+				anchor: [0.5, 0.5],
+				anchorXUnits: &apos;fraction&apos;,
+				anchorYUnits: &apos;fraction&apos;,
+				scale: json.scale,
+				offset: [0,0],
+				opacity: 1,
+				src: json.src
+			})
+		});
+	}
+	
+	/**
+	* Get an OpenLayers point style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Circle
+	*/
+	static point_style(json) {
+		return new ol.style.Style({
+			image: new ol.style.Circle({
+				radius: json.radius,
+				fill: new ol.style.Fill({
+					color: json.fill.color
+				}),
+				stroke: new ol.style.Stroke({
+					color: json.stroke.color,
+					width: json.stroke.width,
+				})
+			})
+		});
+	}
+	
+	/**
+	* Get an OpenLayers polygon style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Stroke and ol.style.Fill
+	*/
+	static polygon_style(json) {
+		return new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: json.stroke.color,
+				width: json.stroke.width,
+			}),
+			fill: new ol.style.Fill({
+				color: json.fill.color,
+			})
+		});
+	}
+	
+	/**
+	* Get an OpenLayers linestring style from a style definition
+	* @param {object} json - the style definition
+	* @return an ol.style.Style object using an ol.style.Stroke
+	*/
+	static linestring_style(json) {
+		return new ol.style.Style({
+			stroke: new ol.style.Stroke({
+				color: json.stroke.color,
+				width: json.stroke.width
+			})
+		})
+	}
+	
+	/**
+	* Get a fill style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticFill, BucketFill} the style object created
+	*/
+	static fill_style_from_json(json) {
+		if (json.type == &quot;equivalent&quot; ||&#xA0;json.type == &quot;quantile&quot; || json.type == &quot;user-defined&quot;) {
+			return BucketFill.from_json(json);
+		}
+
+		if (json.type == &quot;static&quot;) return StaticFill.from_json(json);
+	}
+	
+	/**
+	* Get a stroke style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticStroke, BucketStroke} the style object created
+	*/
+	static stroke_style_from_json(json) {
+		if (json.type == &quot;equivalent&quot; ||&#xA0;json.type == &quot;quantile&quot; || json.type == &quot;user-defined&quot;) {
+			return BucketStroke.from_json(json);
+		}
+		
+		if (json.type == &quot;static&quot;) return StaticStroke.from_json(json);
+	}
+	
+	/**
+	* Get a radius style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticRadius, BucketRadius} the style object created
+	*/
+	static radius_style_from_json(json) {
+		if (json.type == &quot;equivalent&quot; ||&#xA0;json.type == &quot;quantile&quot; || json.type == &quot;user-defined&quot;) {
+			return BucketRadius.from_json(json);
+		}
+		
+		if (json.type == &quot;static&quot;) return StaticRadius.from_json(json.radius);	
+	}
+	
+	/**
+	* Get a scale style from visual variable definition
+	* @param {object} json - the visual variable definition
+	* @return {StaticScale, BucketScale} the style object created
+	*/
+	static scale_style_from_json(json) {
+		if (json.type == &quot;equivalent&quot; ||&#xA0;json.type == &quot;quantile&quot; || json.type == &quot;user-defined&quot;) {
+			return BucketScale.from_json(json);
+		}
+		
+		if (json.type == &quot;static&quot;) return StaticScale.from_json(json.scale);	
+	}
+	
+	/**
+	* Get a style for a geometry type and visual variable definition
+	* @param {string} type - the gepometry type
+	* @param {object} json - the visual variable definition
+	* @return a style for the geometry initialized from the type and visual variable definition
+	*/
+	static from_json(type, json) {
+		if (type == &quot;polygon&quot;) return Polygon.from_json(json);
+		
+		if (type == &quot;point&quot;) {
+			if (json.radius) return Point.from_json(json);
+			
+			if (json.src) return PointIcon.from_json(json);
+		}
+		
+		if (type == &quot;linestring&quot;) return Linestring.from_json(json);
+	}
+}</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

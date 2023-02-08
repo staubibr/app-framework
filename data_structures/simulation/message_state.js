@@ -25,6 +25,7 @@ export default class MessageState extends Message {
 	
     /**
      * Reverses the message. Used to move backwards in the simulation
+	 * @return {MessageState} the reversed message.
      */
 	reverse() {		
 		// TODO: Only place where we use GetDiff I think.		

@@ -77,7 +77,7 @@ export default class Frame {
      * Get the reverse of the frame object. A reverse frame is obtained by reversing
 	 * all the messages in a frame. A reverse message has the values required to move a 
 	 * model's state back to the preceding frame. 
-	 * @return {Message} the added message.
+	 * @return {Frame} the reversed message.
      */
 	reverse () {
 		var reverse = new Frame(this.time);

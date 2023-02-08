@@ -1,7 +1,7 @@
 'use strict';
 
-import Evented from '../../components/evented.js';
-import IndexedList from '../../components/indexed_list.js';
+import Evented from '../../base/evented.js';
+import IndexedList from '../../base/list.js';
 import Cache from './cache.js';
 
 /** 
@@ -112,7 +112,7 @@ export default class Simulation extends Evented {
      * @param {Frame[]} frames - An array of all the simulation frames.
      * @param {number} nCache - The cache interval.
      */
-	constructor(structure, frames, nCache) {
+	constructor(structure, frames) {
 		super();
 		
 		this._structure = structure
@@ -121,8 +121,25 @@ export default class Simulation extends Evented {
 		
 		this._frames = new IndexedList(f => f.time);
 		
-		for (var i = 0; i < frames.length; i++) this.frames.add(frames[i]);
+		// for (var i = 0; i < frames.length; i++) this.frames.add(frames[i]);
+		for (var i = 0; i < frames.length; i++) this.add_frame(frames[i]);
+	}
+	
+	// TODO: This is a workaround due to Cadmium log files being weird.
+	// Cadmium can have multiple time frames with the same time. We merge
+	// them together when it happens.
+	add_frame(add) {
+		var f = this.frames.get(add.time);
 		
+		if (f) {
+			add.output_messages.forEach(m => f.add_output_message(m));
+			add.state_messages.forEach(m => f.add_state_message(m));
+		}
+			
+		else this.frames.add(add);
+	}
+	
+	initialize(nCache) {
 		this._cache = new Cache(nCache, this.frames, this.state);
 		
 		for (var i = 0; i < this.frames.length; i++) {
@@ -178,7 +195,7 @@ export default class Simulation extends Evented {
 	go_to_frame(index) {
 		this.state = this.get_state(index);
 		
-		this.Emit("Jump", { state:this.state, i: index });
+		this.emit("jump", { state:this.state, i: index });
 	}
 	
     /**
@@ -189,7 +206,7 @@ export default class Simulation extends Evented {
 		
 		this.state.forward(frame);
 		
-		this.Emit("Move", { frame : frame, direction:"next" });
+		this.emit("move", { frame : frame, direction:"next" });
 	}
 	
     /**
@@ -200,7 +217,7 @@ export default class Simulation extends Evented {
 		
 		this.state.backward(frame);
 		
-		this.Emit("Move", { frame : frame, direction:"previous"});
+		this.emit("move", { frame : frame, direction:"previous"});
 	}
 	
     /**
@@ -242,7 +259,7 @@ export default class Simulation extends Evented {
 		
 		this.selected.push(model);
 		
-		this.Emit("Selected", { model:model, selected:true });
+		this.emit("selected", { model:model, selected:true });
 	}
 	
 	
@@ -258,6 +275,6 @@ export default class Simulation extends Evented {
 		
 		this.selected.splice(idx, 1);
 		
-		this.Emit("Selected", { model:model, selected:false });
+		this.emit("selected", { model:model, selected:false });
 	}
 }
