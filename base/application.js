@@ -25,8 +25,8 @@ export default class Application extends Widget {
 	 * @returns {object} an error object
 	 */
 	handle_error(error) {
+		console.error(error.stack);
 		alert(error.message);
-		console.error(error);
 	}
 	
 	/**

@@ -4,7 +4,7 @@ import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 import Widget from '../../base/widget.js';
 import Select from '../../ui/select.js';
-import Ports from './ports.js';
+import Fields from './fields.js';
 
 export default Core.templatable("Api.Widget.Palette.Layers", class Layers extends Widget { 
 	
@@ -32,10 +32,10 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 		});
 	}
 	
-	initialize(simulation, settings) {	
+	initialize(grid, settings) {	
 		this.items = [];
 		
-		this.simulation = simulation;
+		this.grid = grid;
 		this.settings = settings;
 		
 		this.settings.layers.forEach((l) => this.add_layer(l));
@@ -46,8 +46,8 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 		
 		item.data = l;
 		item.row = Dom.create("tr", { className:"table-row" }, this.elems.body);		
-		item.z = this.add_z(item, this.simulation.max_z);
-		item.ports = this.add_ports(item, this.simulation.ports);
+		item.z = this.add_z(item, this.grid.dimensions.z);
+		item.fields = this.add_fields(item, this.grid.state.fields);
 		item.style = this.add_style(item, this.settings.styles);
 		item.btnDelete = this.add_delete_button(item);
 		
@@ -60,7 +60,7 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 		this.items.splice(i, 1);
 	}
 	
-	add_z(item, max, selected) {
+	add_z(item, max) {
 		var td = Dom.create("td", { className:"grid-z"}, item.row);
 		var select = new Select(td);
 
@@ -77,17 +77,17 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 		return select;
 	}
 	
-	add_ports(item, ports, selected) {
-		var td = Dom.create("td", { className:"grid-ports"}, item.row);
+	add_fields(item, fields) {
+		var td = Dom.create("td", { className:"grid-fields"}, item.row);
 		
-		var select = new Ports(td);
+		var select = new Fields(td);
 		
-		select.available = ports;
+		select.available = fields;
 		
-		select.select(item.data.ports);
+		select.select(item.data.fields);
 		
 		select.on("change", ev => {
-			item.data.ports = ev.target.value;
+			item.data.fields = ev.target.value;
 			
 			this.settings.set("layers", this.settings.layers);
 		})
@@ -95,7 +95,7 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 		return select;
 	}
 		
-	add_style(item, styles, selected) {
+	add_style(item, styles) {
 		var td = Dom.create("td", { className:"grid-styles"}, item.row);
 		
 		var select = new Select(td);
@@ -124,7 +124,7 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 	}
 	
 	on_button_add_layer_click(ev) {
-		var layer = this.settings.add_layer(0, this.simulation.ports, 0);
+		var layer = this.settings.add_layer(0, this.grid.state.fields, 0);
 		
 		this.add_layer(layer);
 		
@@ -137,7 +137,7 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 		this.settings.remove_layer(item.data);
 		
 		this.remove_layer(item);
-				
+		
 		item.row.remove();
 		
 		this.items.forEach((item, i) => item.data.i = i + 1);
@@ -151,7 +151,7 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 					  "<thead>" +
 						 "<tr>" + 
 							"<td class='col-1'>nls(Settings_Layers_Z)</td>" +
-							"<td class='col-2'>nls(Settings_Layers_Ports)</td>" +
+							"<td class='col-2'>nls(Settings_Layers_Fields)</td>" +
 							"<td class='col-3'>nls(Settings_Layers_Styles)</td>" +
 							"<td class='col-4'></td>" +
 						 "</tr>" +
@@ -177,7 +177,7 @@ export default Core.templatable("Api.Widget.Palette.Layers", class Layers extend
 		super.localize(nls);
 		
 		nls.add("Settings_Layers_Z", "en", "Z");
-		nls.add("Settings_Layers_Ports", "en", "Ports");
+		nls.add("Settings_Layers_Fields", "en", "Fields");
 		nls.add("Settings_Layers_Styles", "en", "Style");
 		nls.add("Settings_Layers_Add_Title", "en", "Add another grid to the visualization");
 		nls.add("Settings_Layers_Delete_Title", "en", "Remove grid no from visualization");

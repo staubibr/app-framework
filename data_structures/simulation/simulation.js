@@ -1,8 +1,9 @@
 'use strict';
 
 import Evented from '../../base/evented.js';
-import IndexedList from '../../base/list.js';
+import List from '../../base/list.js';
 import Cache from './cache.js';
+import State from './state.js';
 
 /** 
  * The Simulation object contains all the data and metadata required to visually
@@ -13,35 +14,51 @@ import Cache from './cache.js';
  **/
 export default class Simulation extends Evented { 
 	
+	get position() { return this.state.position; }
+	
 	/** 
 	* Gets the simulation model structure
 	* @type {Structure} 
 	*/
-	get structure() { return this._structure; }
+	get metadata() { return this._metadata; }
+	
+	get name() { return this.root.model_type.title; }
 	
 	/** 
-	* Gets the simulation name
-	* @type {string} 
+	* Gets the simulation model root
+	* @type {Model[]} 
 	*/
-	get name() { return this.structure.info.name; }
-	
-	/** 
-	* Gets the simulation type (DEVS, Cell-DEVS, GIS-DEVS)
-	* @type {string} 
-	*/
-	get type() { return this.structure.info.type; }
+	get root() { return this.metadata.root; }
 	
 	/** 
 	* Gets the simulation models
 	* @type {Model[]} 
 	*/
-	get models() { return this.structure.models; }
+	get models() { return this.metadata.models; }
 	
 	/** 
-	* Gets the time for the state of the simulation
-	* @type {string} 
+	* Gets the simulation model types
+	* @type {Model[]} 
 	*/
-	get timestep() { return this.state.index; }
+	get model_types() { return this.metadata.types; }
+	
+	/** 
+	* Gets the simulation atomic model types
+	* @type {Model[]} 
+	*/
+	get atomic_model_types() { return this.metadata.atomic_types; }
+	
+	/** 
+	* Gets the simulation coupled model types
+	* @type {Model[]} 
+	*/
+	get coupled_model_types() { return this.metadata.coupled_types; }
+	
+	/** 
+	* Gets the simulation coupled model types
+	* @type {Model[]} 
+	*/
+	get grid_model_types() { return this.metadata.grid_types; }
 	
 	/** 
 	* Gets the current state of the simulation
@@ -50,7 +67,7 @@ export default class Simulation extends Evented {
 	get state() { return this._state; }
 	
 	/** 
-	* Sets the current state of the simulation
+	* Gets the current state of the simulation
 	* @type {State} 
 	*/
 	set state(value) { this._state = value; }
@@ -60,12 +77,6 @@ export default class Simulation extends Evented {
 	* @type {Cache} 
 	*/
 	get cache() { return this._cache; }
-
-	/** 
-	* Gets currently selected models in the simulation
-	* @type {Model[]} 
-	*/
-	get selected() { return this._selected; }
 	
 	/** 
 	* Gets all frames in the simulation
@@ -77,7 +88,7 @@ export default class Simulation extends Evented {
 	* Gets the current frame of the simulation
 	* @type {Frame} 
 	*/
-	get current_frame() { return this.frames[this.timestep]; }
+	get current_frame() { return this.frames[this.position]; }
 	
 	/** 
 	* Gets the first frame of the simulation
@@ -91,82 +102,34 @@ export default class Simulation extends Evented {
 	*/
 	get last_frame() { return this.frames[this.frames.length - 1]; }
 	
-	/** 
-	* Gets the height / width ratio for visual representation
-	* @type {number} 
-	*/
-	get ratio() { 
-		throw new Error("get ratio must be defined in child simulation class.");
-	}
-	
-	/** 
-	* Gets the size of the simulation (number of models)
-	* @type {number} 
-	*/
-	get size() {
-		return this.models.length;
-	}
-
     /**
      * @param {Structure} structure - The simulation model structure.
      * @param {Frame[]} frames - An array of all the simulation frames.
-     * @param {number} nCache - The cache interval.
+     * @param {number} cache_interval - The cache interval.
      */
-	constructor(structure, frames) {
+	constructor(metadata, n_cache) {
 		super();
 		
-		this._structure = structure
-		this._state = this.get_initial_state(structure);
-		this._selected = [];
-		
-		this._frames = new IndexedList(f => f.time);
-		
-		// for (var i = 0; i < frames.length; i++) this.frames.add(frames[i]);
-		for (var i = 0; i < frames.length; i++) this.add_frame(frames[i]);
+		this._position = 0;
+		this._metadata = metadata;
+		this._frames = new List(f => f.time);
+		this._cache = new Cache(n_cache, this.models);	
+		this._state = null;
 	}
 	
-	// TODO: This is a workaround due to Cadmium log files being weird.
-	// Cadmium can have multiple time frames with the same time. We merge
-	// them together when it happens.
-	add_frame(add) {
-		var f = this.frames.get(add.time);
-		
-		if (f) {
-			add.output_messages.forEach(m => f.add_output_message(m));
-			add.state_messages.forEach(m => f.add_state_message(m));
-		}
+	initialize(frames) {	
+		for (var i = 0; i < frames.length; i++) {
+			var add = frames[i];
 			
-		else this.frames.add(add);
-	}
-	
-	initialize(nCache) {
-		this._cache = new Cache(nCache, this.frames, this.state);
+			if (this.frames.has(add)) throw new Error("Cannot add frame to simulation, it already exists.");
 		
-		for (var i = 0; i < this.frames.length; i++) {
-			this.frames[i].difference(this.state);
-			this.state.apply_messages(this.frames[i]);
+			if (i > 0) add.link_previous(this.cache.last());
+			
+			this.cache.add_frame(add, this.frames.length);
+			this.frames.add(add);
 		}
 		
-		this._state = this.cache.first();
-	}
-	
-    /**
-     * Returns the model corresponding to the id provided.
-     * @param {string} id - the id for the model to retrieve.
-	 * @return {Model} the model instance corresponding to the id provided.
-     */
-	get_model(id) {
-		return this.structure.get_model(id);
-	}
-	
-    /**
-     * Returns the port corresponding to the model id and port name provided.
-     * @param {string} model_id - the id for the port's model.
-     * @param {string} port_name - the name of the port to retrieve.
-	 * @return {TypePort} the port corresponding to the model id and port name provided.
-     */
-	get_port(model_id, port_name) {
-		return this.structure.get_port(model_id, port_name);
+		this.state = this.cache.first().clone();
 	}
 	
     /**
@@ -175,14 +138,14 @@ export default class Simulation extends Evented {
 	 * @return {State} the state corresponding to frame identified by the index provided.
      */
 	get_state(index) {
-		if (index == this.frames.length - 1) return this.cache.last();
+		if (index == this.frames.length - 1) return this.cache.last().clone();
 		
-		if (index == 0) return this.cache.first();
+		if (index == 0) return this.cache.first().clone();
 		
-		var cached = this.cache.get_closest(index);
+		var cached = this.cache.get_closest(index).clone();		
 		
-		for (var j = cached.index + 1; j <= index; j++) {
-			cached.forward(this.frames[j]);
+		for (var j = cached.position + 1; j <= index; j++) {
+			cached.apply_frame(this.frames[j]);
 		}
 		
 		return cached;
@@ -195,86 +158,28 @@ export default class Simulation extends Evented {
 	go_to_frame(index) {
 		this.state = this.get_state(index);
 		
-		this.emit("jump", { state:this.state, i: index });
+		this.emit("jump", { state:this.state, frame:this.current_frame, i:this.position });
 	}
 	
     /**
      * Moves the simulation state to the next frame.
      */
-	go_to_next_frame() {
-		var frame = this.frames[this.timestep + 1];
+	go_to_next_frame() {		
+		var frame = this.frames[this.position + 1];
 		
-		this.state.forward(frame);
+		this.state.apply_frame(frame);
 		
-		this.emit("move", { frame : frame, direction:"next" });
+		this.emit("next", { state:this.state, frame:this.current_frame, i:this.position });
 	}
 	
     /**
      * Moves the simulation state to the previous frame.
      */
 	go_to_previous_frame() {
-		var frame = this.frames[this.state.index].reverse();
+		var frame = this.frames[this.position];
 		
-		this.state.backward(frame);
+		this.state.rollback_frame(frame);
 		
-		this.emit("move", { frame : frame, direction:"previous"});
-	}
-	
-    /**
-     * Gets a model from the selected models.
-     * @param {Model} model - the model to retrieve.
-	 * @return {Model} the model in the selection if present
-     */
-	get_selected(model) {
-		return this.selected.find(s => s == model);
-	}
-	
-    /**
-     * Gets the model index from the selected models.
-     * @param {Model} model - the model for which to retrieve the index.
-	 * @return {number} the model index from the selected models
-     */
-	get_selected_index(model) {
-		return this.selected.indexOf(this.get_selected(model));
-	}
-	
-    /**
-     * Determine whether a model is currently selected
-     * @param {Model} model - the model to verify.
-	 * @return {boolean} true if the model is selected, false otherwise
-     */
-	is_selected(model) {
-		return !!this.get_selected(model);
-	}
-	
-    /**
-     * Add a model to the currently selected models
-     * @param {Model} model - the model to select.
-     */
-	select(model) {
-		var item = this.get_selected(model);
-		
-		// Already selected
-		if (item) return;
-		
-		this.selected.push(model);
-		
-		this.emit("selected", { model:model, selected:true });
-	}
-	
-	
-    /**
-     * Remove a model from the currently selected models
-     * @param {Model} model - the model to deselect.
-     */
-	deselect(model) {
-		var idx = this.get_selected_index(model);
-		
-		// Already not selected
-		if (idx == -1) return;
-		
-		this.selected.splice(idx, 1);
-		
-		this.emit("selected", { model:model, selected:false });
+		this.emit("previous", { state:this.state, frame : frame, i:this.position });
 	}
 }

@@ -25,6 +25,8 @@ export default class Frame {
 	*/
 	get state_messages() { return this.messages.state; }
 	
+	get previous_messages() { return this.messages.previous; }
+	
 	/** 
 	* Gets the time representation for the frame.
 	* @type {string} 
@@ -39,7 +41,8 @@ export default class Frame {
 		
 		this._messages = {
 			output : [],
-			state : []
+			state : [],
+			previous : []		// previous state messages for this frame
 		}
 	}
 	
@@ -73,35 +76,15 @@ export default class Frame {
 		return this.add_message(message, "state");
 	}
 	
-    /**
-     * Get the reverse of the frame object. A reverse frame is obtained by reversing
-	 * all the messages in a frame. A reverse message has the values required to move a 
-	 * model's state back to the preceding frame. 
-	 * @return {Frame} the reversed message.
-     */
-	reverse () {
-		var reverse = new Frame(this.time);
-		
-		for (var i = 0; i < this.state_messages.length; i++) {
-			var m = this.state_messages[i];
-			
-			reverse.add_state_message(m.reverse());
-		}
-		
-		return reverse;
+	add_previous_message(message) {
+		return this.add_message(message, "previous");
 	}
 	
-    /**
-     * This function computes the differences between the state messages of this frame and 
-	 * the state provided. Difference values are assigned to each message object
-	 * @see Message, Model
-     */
-	difference(state) {
-		for (var i = 0; i < this.state_messages.length; i++) {
-			var m = this.state_messages[i];			
-			var v = state.get_value(m.model);
-			
-			m.difference(v);
+	link_previous(state) {
+		for (var i = 0; i < this.state_messages.length; i++) { 
+			var m = this.state_messages[i].model;
+		
+			this.add_previous_message(state.get_message(m));
 		}
 	}
 }

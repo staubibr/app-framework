@@ -1,5 +1,8 @@
 'use strict';
 
+import State from './state.js';
+import List from '../../base/list.js';
+
 /** 
  * The Cache object contains an array of states of the simulation at a specified interval. 
  * It is used to navigate the simulation trace more efficiently with the playback bar.
@@ -38,23 +41,18 @@ export default class Cache {
 	
     /**
      * @param {number} interval - The interval between cached states (1 cached state out of interval value).
-     * @param {Frame[]} frames - An array of frame containing all the frames in the simulation.
-     * @param {State} zero - An empty state object, valid for the simulation structure.
+     * @param {Subcomponent[]} models - The list of models in the simulation
      */
-	constructor(interval, frames, zero) {
+	constructor(interval, models) {
+		this.states = [new State(models)];
 		this.interval = interval;
+	}
+	
+	add_frame(frame, position) {
+		// TODO: Test with state messages (ABP has none)
+		if (position % this.interval == 1) this.states.push(this.last().clone());
 		
-		this.states = [];
-		
-		var state = zero.clone();
-		
-		for (var i = 0; i < frames.length; i++) {
-			state.forward(frames[i]);
-			
-			if (i % interval === 0) this.add_state(state);
-		}
-		
-		if (i % interval != 0) this.add_state(state);
+		this.last().apply_frame(frame);
 	}
 	
     /**
@@ -62,18 +60,10 @@ export default class Cache {
 	 * @param {number} index - position of the state to find the closest cached state.
      * @return {State} the closest state to the position of the frame indicated by index.
      */
-	get_closest(index) {
-		var diff = index % this.interval;
+	get_closest(position) {
+		var diff = position % this.interval;
 		
-		return this.get_state((index - diff) / this.interval);
-	}
-	
-    /**
-     * Adds a cached state to the cache.
-	 * @param {State} state - the state to add to the cache.
-     */
-	add_state(state) {
-		this.states.push(state.clone());
+		return this.get_state((position - diff) / this.interval);
 	}
 	
     /**
@@ -81,8 +71,8 @@ export default class Cache {
 	 * @param {number} index - position of the cached state to find
      * @return {State} the cached state at position index.
      */
-	get_state(index) {
-		return this.states[index].clone();
+	get_state(position) {
+		return this.states[position];
 	}
 	
 	

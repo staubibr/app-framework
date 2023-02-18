@@ -14,6 +14,11 @@ export class Config {
 	 */
 	get URLs() { return this.json.URLs; }
 	
+	/**                              
+	 * Set the json object
+	 */
+	get logs() { return this.json["log-files"]; }
+	
 	/**
 	 * Loads the configuration from a JSON file url
 	 * @param {string} url - the url for the configuration file

@@ -4,8 +4,11 @@ if (!window.streamSaver || !window.ZIP || !window.zip) {
 	console.warn("Unable to zip or unzip, some required scripts were not added.");
 }
 
-else zip.workerScriptsPath = "../app-references/zip/";
-		
+else {
+	var path = location.href.split("/").slice(0,-2).join("/");
+	
+	zip.workerScriptsPath = path + "/app-references/zip/";
+}	
 /** 
  * A utility class that contains a series functions used to read / write Zip files.
  * Requires the zip.js library.

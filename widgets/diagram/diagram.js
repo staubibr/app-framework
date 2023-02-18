@@ -2,157 +2,186 @@
 
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
-import Widget from '../../base/widget.js';
+import Evented from '../../base/evented.js';
+import ModelAtomic from '../../data_structures/metadata/model-atomic.js';
 
-export default Core.templatable("Api.Widget.Diagram", class Diagram extends Widget { 
-
-	get canvas() { return this.elems.canvas; }
-
-	get svg() { return this.simulation.diagram; }
-
-	constructor(container) {
-		super(container);
+export default class Diagram extends Evented { 
+	
+	constructor(simulation, diagram) {
+		super();
+		
+		this.svg = this.make_svg(simulation, diagram);
+		this.canvas = this.make_canvas();
+		this.links = this.load_links(simulation);
+		this.origins = this.load_origin_svg_nodes(simulation);
+		this.dests = this.load_destination_svgs(simulation);
 	}
 
-	set_diagram(simulation) {
-		this.simulation = simulation;
+	make_svg(simulation, diagram) {
+		var svg = Dom.create("div", { innerHTML:diagram }).children[0];
 		
-		this._svg = { dests: {}, origins: {} };
+		var style = `.highlighted {
+						stroke: #1e94c3 !important;
+						fill: #d6f2fd !important;
+						color: #1e94c3 !important;
+					}
+
+					path.highlighted,
+					text.highlighted,
+					marker.highlighted path {
+						fill: #1e94c3 !important;
+					}
+
+					.highlighted.origin {
+						stroke: #b36402 !important;
+						fill: #f9e5c1 !important;
+						color: #b36402 !important;
+					}
+
+					path.highlighted.origin,
+					text.highlighted.origin,
+					marker.highlighted.origin path {
+						fill: #b36402 !important;
+						stroke: #b36402 !important;
+					}`
 		
-		this.load_origin_svg_nodes();
-		this.load_destination_svgs();
+		Dom.create("style", { innerHTML:style }, svg);
 		
-		Dom.empty(this.elems.diagram);
+		svg.setAttribute("preserveAspectRatio", "none");
 		
-		this.elems.diagram.appendChild(this.svg);
+		this.set_pointer_events(svg);
 		
-		var style = "marker.highlighted path {fill: #1e94c3 !important;stroke: #1e94c3 !important;}marker.highlighted.origin path {fill: #b36402 !important;stroke: #b36402 !important;}text.highlighted {fill: #1e94c3 !important;}text.highlighted.origin {fill: #b36402 !important;}path.highlighted {stroke: #1e94c3 !important;}path.highlighted.origin {stroke: #b36402 !important;}.highlighted:not(text):not(path) {stroke: #1e94c3 !important;fill: #d6f2fd !important;}.highlighted.origin:not(text):not(path) {stroke: #b36402 !important;fill: #f9e5c1 !important;}";
-		
-		Dom.create("style", { innerHTML:style }, this.elems.diagram.querySelector("svg"));
-				
-		this.svg.setAttribute("preserveAspectRatio", "none");
-		
-		this.set_pointer_events();
+		return svg;
 	}
 	
-	set_pointer_events() {		
-		this.svg.querySelectorAll("*").forEach(n => {			
+	make_canvas() {
+		return Dom.create("canvas", { className:"hidden" });
+	}
+	
+	set_pointer_events(svg) {		
+		svg.querySelectorAll("*").forEach(n => {			
 			n.style.cursor = "none";
 			n.style.pointerEvents = "none";
 		});
 		
-		this.svg.querySelectorAll("[devs-model-id]").forEach(n => {
+		svg.querySelectorAll("[devs-model-id]").forEach(n => {
+			var id = n.getAttribute("devs-model-id");
+			
 			n.style.cursor = "pointer";
 			n.style.pointerEvents = "all"
 			
-			n.addEventListener("mousemove", this.on_svg_mousemove.bind(this, n));
-			n.addEventListener("click", this.on_svg_click.bind(this, n));
-			n.addEventListener("mouseout", this.on_svg_mouseout.bind(this, n));
+			n.addEventListener("mousemove", this.on_svg_mousemove.bind(this, id));
+			n.addEventListener("click", this.on_svg_click.bind(this, id));
+			n.addEventListener("mouseout", this.on_svg_mouseout.bind(this, id));
 		});
 	}
 	
-	get_link_svg_nodes(l) {
-		var selector = `[devs-link-mA=${l.model_a.id}][devs-link-pA=${l.port_a.name}]`;
+	load_origin_svg_nodes(simulation) {
+		var origins = {};
 		
-		return Array.from(this.svg.querySelectorAll(selector));
-	}
-	
-	get_port_svg_nodes(m, p) {
-		var selector = `[devs-model-id=${m.id}],[devs-port-model=${m.id}][devs-port-name=${p.name}]`;
-		
-		return Array.from(this.svg.querySelectorAll(selector));
-	}
-	
-	load_origin_svg_nodes() {
-		this.simulation.models.forEach(m => {
-			m.ports.forEach(p => {
-				if (!this._svg.origins[m.id]) this._svg.origins[m.id] = {};
+		simulation.models.forEach(m => {
+			m.port.forEach(p => {
+				if (!origins[m.id]) origins[m.id] = {};
 
-				var nodes = this.get_port_svg_nodes(m, p);
+				var nodes = this.get_port_svg(m, p);
 				
-				m.get_port_links(p).forEach(l => nodes = nodes.concat(this.get_link_svg_nodes(l)));
-				
-				this._svg.origins[m.id][p.name] = nodes;
-			});
-		});
-	}
-	
-	load_destination_svgs() {
-		this.simulation.models.forEach(m => {
-			m.ports.forEach(p => {
-				if (!this._svg.dests[m.id]) this._svg.dests[m.id] = {};
-				
-				var links = m.get_port_links(p);
-				
-				for (var i = 0; i < m.get_port_links(p).length; i++) {
-					var mB = links[i].model_b;
-					var pB = links[i].port_b;
-					
-					if (mB.type == "atomic") continue;
-					
-					links = links.concat(mB.get_port_links(pB));
-				}
-				
-				var svg = [];
-				
-				links.forEach(l => {
-					svg = svg.concat(this.get_link_svg_nodes(l));
-					svg = svg.concat(this.get_port_svg_nodes(l.model_b, l.port_b));
+				this.get_links(m, p).forEach(l => {
+					nodes = nodes.concat(this.get_link_svg(l.from_model, l.from_port));
 				});
 				
-				this._svg.dests[m.id][p.name] = Array.from(svg);
+				origins[m.id][p.name] = nodes;
 			});
 		});
-	}
-	
-	get_destination(model, port) {
-		return this._svg.dests[model.id][port.name];
-	}
-	
-	get_origin(model, port) {
-		return this._svg.origins[model.id][port.name];
-	}
-	
-	on_svg_mousemove(node, ev) {
-		var id = node.getAttribute("devs-model-id");
-		var model = this.simulation.get_model(id);
 		
-		if (!model) return;
-		
-		this.emit("mousemove", { x:ev.pageX, y:ev.pageY, model:model, svg:ev.target });
+		return origins;
 	}
 	
-	on_svg_mouseout(node, ev) {
-		var id = node.getAttribute("devs-model-id");
+	load_destination_svgs(simulation) {
+		var dests = {};
 		
-		this.emit("mouseout", { x:ev.pageX, y:ev.pageY, model:this.simulation.get_model(id), svg:ev.target });
+		simulation.models.forEach(m => {
+			m.port.forEach(p => {				
+				if (!dests[m.id]) dests[m.id] = {};
+				
+				var links = this.get_links(m, p);
+				
+				links.forEach(l => {
+					if (l.to_model instanceof ModelAtomic) return;
+					
+					links = links.concat(this.get_links(l.to_model, l.to_port));
+				});
+				
+				var nodes = [];
+				
+				links.forEach(l => {
+					nodes = nodes.concat(this.get_link_svg(l.from_model, l.from_port));
+					nodes = nodes.concat(this.get_port_svg(l.to_model, l.to_port));
+				});
+				
+				dests[m.id][p.name] = Array.from(nodes);
+			});
+		});
+		
+		return dests;
 	}
 	
-	on_svg_click(node, ev) {	
-		var id = node.getAttribute("devs-model-id");
+	load_links(simulation) {
+		var links = {}
 		
-		this.emit("click", { x:ev.pageX, y:ev.pageY, model:this.simulation.get_model(id), svg:ev.target });
+		simulation.coupled_model_types.forEach(m => {			
+			m.coupling.forEach(c => {
+				if (!links[c.from_model.id]) links[c.from_model.id] = {};
+				
+				var m_id = c.from_model.id;
+				var p_id = c.from_port.name
+				
+				if (!links[m_id][p_id]) links[m_id][p_id] = []
+				
+				links[m_id][p_id].push(c);
+			});
+		});
+		
+		return links;
 	}
+	
+	get_links(model, port) {
+		return this.links[model.id]?.[port.name] ?? [];
+	}
+	
+	get_link_svg(m, p) {
+		var selector = `[devs-link-mA=${m.id}][devs-link-pA=${p.name}]`;
+		
+		return Array.from(this.svg.querySelectorAll(selector));
+	}
+	
+	get_port_svg(m, p) {
+		var selector = `[devs-model-id=${m.id}],[devs-port-model=${m.id}][devs-port-name=${p.name}]`
+		
+		return Array.from(this.svg.querySelectorAll(selector));
+	}
+	
+	draw(messages) {		
+		this.reset();
+		
+		messages.forEach(m => this.draw_y_message(m));
+		
+		this.draw_to_canvas(this.svg);
+	}
+	
+	draw_y_message(message) {
+		var p = message.port;
+		var m = message.model;
 
-	resize() {		
-		this.size = Dom.geometry(this.elems.diagram);
-		
-		var pH = 30;
-		var pV = 30;
-
-		this.elems.canvas.setAttribute('width', this.size.w);	
-		this.elems.canvas.setAttribute('height', this.size.h);
+		this.add_css(this.origins[m.id][p.name], ["highlighted", "origin"]);
+		this.add_css(this.dests[m.id][p.name], ["highlighted"]);		
 	}
 		
-	draw_to_canvas(node) {
+	draw_to_canvas(svg) {
+		var cv = this.canvas;
 		var serializer = new XMLSerializer();
-		var source = serializer.serializeToString(node);
-		var cv = this.elems.canvas;
-		
-		// create a file blob of our SVG.
+		var source = serializer.serializeToString(svg);
 		var blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
 		var url = window.URL.createObjectURL(blob);
-		
 		var ctx = cv.getContext('2d');
 		var img = new Image();
 
@@ -166,54 +195,69 @@ export default Core.templatable("Api.Widget.Diagram", class Diagram extends Widg
 		
 		img.src = url;
 	}
-	
-	draw(messages) {		
-		this.reset();
-		
-		messages.forEach((m) => this.draw_y_message(m));
-		
-		this.draw_to_canvas(this.svg);
-	}
-	
-	draw_y_message(message) {
-		var p = message.port;
-		var m = message.model;
-
-		this.add_css(this.get_origin(m, p), ["highlighted", "origin"]);
-		
-		this.add_css(this.get_destination(m, p), ["highlighted"]);		
-	}
 
 	add_css(nodes, css) {		
-		nodes.forEach(node => {
-			css.forEach(c => node.classList.add(c));
-		});
+		nodes.forEach(node => css.forEach(c => node.classList.add(c)));
 	}
 	
 	remove_css(nodes, css) {
-		nodes.forEach(node => {
-			css.forEach(c => node.classList.remove(c));
-		});
+		nodes.forEach(node => css.forEach(c => node.classList.remove(c)));
 	}
 	
 	reset() {		
-		for (var m in this._svg.dests) {
-			for (var p in this._svg.dests[m]) {
-				this.remove_css(this._svg.dests[m][p], ["highlighted", "origin"]);
+		for (var m in this.dests) {
+			for (var p in this.dests[m]) {
+				this.remove_css(this.dests[m][p], ["highlighted", "origin"]);
 			}
 		}
 		
-		for (var m in this._svg.origins) {
-			for (var p in this._svg.origins[m]) {
-				this.remove_css(this._svg.origins[m][p], ["highlighted", "origin"]);
+		for (var m in this.origins) {
+			for (var p in this.origins[m]) {
+				this.remove_css(this.origins[m][p], ["highlighted", "origin"]);
 			}
 		}
 	}
 		
-	html() {
-		return "<div>" +
-				   "<div handle='diagram' class='diagram-widget'></div>" +
-				   "<canvas handle='canvas' class='diagram-canvas hidden'></canvas>" +
-			   "</div>";
+    /**
+     * Returns the diagram size considering the  width, height and optionally, the aspect ratio
+	 * @param {SVG Element} an svg element used to determine the ratio between width and height
+	 * @return the diagram size { width, height }
+	 */
+	get_diagram_size(options) {		
+		var vb = this.svg.getAttribute("viewBox");
+		
+		if (!vb) throw new Error("The viewBox attribute must be specified on the svg element.");
+
+		var split = vb.split(" ");
+		var ratio = split[2] / split[3];
+		
+		return { 
+			width : options.width, 
+			height : options.aspect ? options.width / ratio : options.height 
+		}
 	}
-});
+	
+	resize(options) {	
+		var svg_size = options.get_diagram_size(this.svg);
+		
+		this.widget.container.style.width = svg_size.width + "px";
+		this.widget.container.style.height = svg_size.height + "px";	
+
+		var cv_size = Dom.geometry(this.elems.diagram);
+		
+		this.diagram.canvas.setAttribute('width', cv_size.w);	
+		this.diagram.canvas.setAttribute('height', cv_size.h);
+	}
+	
+	on_svg_mousemove(id, ev) {		
+		this.emit("mousemove", { x:ev.pageX, y:ev.pageY, id:id, svg:ev.target });
+	}
+	
+	on_svg_mouseout(id, ev) {		
+		this.emit("mouseout", { x:ev.pageX, y:ev.pageY, id:id, svg:ev.target });
+	}
+	
+	on_svg_click(id, ev) {			
+		this.emit("click", { x:ev.pageX, y:ev.pageY, id:id, svg:ev.target });
+	}
+};

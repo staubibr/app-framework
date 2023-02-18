@@ -3,6 +3,8 @@
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 import Widget from '../../base/widget.js';
+import ConfigurationDiagram from '../../data_structures/visualization/configuration-diagram.js';
+import ConfigurationGrid from '../../data_structures/visualization/configuration-grid.js';
 
 export default Core.templatable("Api.Widget.Settings", class Settings extends Widget { 
 	
@@ -14,31 +16,27 @@ export default Core.templatable("Api.Widget.Settings", class Settings extends Wi
 		super(container);
 	}
 	
-	initialize(simulation, settings) {
-		Dom.toggle_css(this.elems.diagram, 'hidden', !settings.diagram);
-		Dom.toggle_css(this.elems.grid, 'hidden', !settings.grid);
-		Dom.toggle_css(this.elems.playback, 'hidden', !settings.playback);
+	initialize(settings) {
+		Dom.toggle_css(this.elems.diagram, 'hidden', settings.type != "diagram");
+		Dom.toggle_css(this.elems.grid, 'hidden', settings.type != "grid");
 		
-		this._simulation = simulation;
 		this._settings = settings;
 		
 		// Link UI to setting parameters. Each item requires two delegates, setting is used to update 
 		// the settings object from the ui, ui is used to update the ui from the settings object
 		this.ui = [
-			{ group:"playback", property:"speed", node:"playbackSpeed", setting: el => +el.value, ui: (el,v) => { el.value = v; } },
-			{ group:"playback", property:"loop", node:"playbackLoop", setting: el => el.checked, ui: (el,v) => { el.checked = v; } }
+			{ property:"speed", node:"playbackSpeed", setting: el => +el.value, ui: (el,v) => { el.value = v; } },
+			{ property:"loop", node:"playbackLoop", setting: el => el.checked, ui: (el,v) => { el.checked = v; } }
 		]
 		
-		if (simulation.type == "DEVS") this.initialize_devs(settings);
+		if (settings.type == "diagram") this.initialize_devs(settings);
 		
-		else if (simulation.type == "Cell-DEVS") this.initialize_cell_devs(settings);
-		
-		else if (simulation.type == "GIS-DEVS") this.initialize_gis_devs(settings);
+		else if (settings.type == "grid") this.initialize_cell_devs(settings);
 		
 		// Hook up change event for each ui element, when ui element changes, update corresponding setting
 		this.ui.forEach(u => {
 			this.elems[u.node].addEventListener("change", ev => {
-				this.settings[u.group].set(u.property, u.setting(ev.target));
+				this.settings.set(u.property, u.setting(ev.target));
 			});
 		})
 		
@@ -53,45 +51,41 @@ export default Core.templatable("Api.Widget.Settings", class Settings extends Wi
 		if ("grid" in settings) css.push("grid");
 		if ("playback" in settings) css.push("playback");
 
-		Dom.set_css(this.elems.top, `settings ${simulation.type}`);
+		Dom.set_css(this.elems.top, `settings ${this.settings.type}`);
 	}
 	
 	initialize_devs(settings) {
-		this.ui.push({ group:"diagram", property:"height", node:"diagramHeight", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
-		this.ui.push({ group:"diagram", property:"width", node:"diagramWidth", setting: el => +el.value, ui: (el,v) => { el.value = v; } });
-		this.ui.push({ group:"diagram", property:"aspect", node:"diagramAspect", setting: el => el.checked, ui: (el,v) => { el.checked = v; }});
+		this.ui.push({ property:"height", node:"diagramHeight", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
+		this.ui.push({ property:"width", node:"diagramWidth", setting: el => +el.value, ui: (el,v) => { el.value = v; } });
+		this.ui.push({ property:"aspect", node:"diagramAspect", setting: el => el.checked, ui: (el,v) => { el.checked = v; }});
 		
-		this.elems[this.ui[2].node].disabled = this.settings.diagram.aspect;
+		this.elems[this.ui[2].node].disabled = this.settings.aspect;
 		
 		this.elems[this.ui[4].node].addEventListener("change", (ev) => {
-			this.elems[this.ui[2].node].disabled = this.settings.diagram.aspect;
+			this.elems[this.ui[2].node].disabled = ev.target.checked;
 		});
 	}
 	
 	initialize_cell_devs() {
 		// Link UI to setting parameters. Each item requires two delegates, setting is used to update 
 		// the settings object from the ui, ui is used to update the ui from the settings object
-		this.ui.push({ group:"grid", property:"columns", node:"gridColumns", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
-		this.ui.push({ group:"grid", property:"height", node:"gridHeight", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
-		this.ui.push({ group:"grid", property:"width", node:"gridWidth", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
-		this.ui.push({ group:"grid", property:"spacing", node:"gridSpacing", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
-		this.ui.push({ group:"grid", property:"show_grid", node:"gridShowGrid", setting: el => el.checked, ui: (el,v) => { el.checked = v; }});
-		this.ui.push({ group:"grid", property:"aspect", node:"gridAspect", setting: el => el.checked, ui: (el,v) => { el.checked = v; }});
+		this.ui.push({ property:"columns", node:"gridColumns", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
+		this.ui.push({ property:"height", node:"gridHeight", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
+		this.ui.push({ property:"width", node:"gridWidth", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
+		this.ui.push({ property:"spacing", node:"gridSpacing", setting: el => +el.value, ui: (el,v) => { el.value = v; }});
+		this.ui.push({ property:"show_grid", node:"gridShowGrid", setting: el => el.checked, ui: (el,v) => { el.checked = v; }});
+		this.ui.push({ property:"aspect", node:"gridAspect", setting: el => el.checked, ui: (el,v) => { el.checked = v; }});
 		
-		this.elems[this.ui[3].node].disabled = this.settings.grid.aspect;
+		this.elems[this.ui[3].node].disabled = this.settings.aspect;
 		
 		this.elems[this.ui[7].node].addEventListener("change", (ev) => {
-			this.elems[this.ui[3].node].disabled = this.settings.grid.aspect;
+			this.elems[this.ui[3].node].disabled = ev.target.checked;
 		});
-	}
-	
-	initialize_gis_devs() {
-		alert("Not implemented yet.");
 	}
 	
 	update_ui() {
 		this.ui.forEach(u => {			
-			var value = this.settings[u.group][u.property];
+			var value = this.settings[u.property];
 			
 			u.ui(this.elems[u.node], value);
 		});
@@ -172,11 +166,11 @@ export default Core.templatable("Api.Widget.Settings", class Settings extends Wi
 							 "<input class='settings-value' handle='playbackLoop' type='checkbox'></input>" +
 						  "</label>" + 
 					   "</div>"+
-					   "<div class='settings-line'>" +
-						  "<label class='settings-label'>nls(Settings_Playback_Cache)" +
-							 "<input class='settings-value' handle='playbackCache' type='number' min=10 max=1000 disabled></input>" +
-						  "</label>" + 
-					   "</div>"+
+					   //"<div class='settings-line'>" +
+						//  "<label class='settings-label'>nls(Settings_Playback_Cache)" +
+						//	 "<input class='settings-value' handle='playbackCache' type='number' min=10 max=1000 disabled></input>" +
+						//  "</label>" + 
+					   //"</div>"+
 					"</div>" +
 				 "</div>" +
 			  "</div>";
@@ -186,7 +180,7 @@ export default Core.templatable("Api.Widget.Settings", class Settings extends Wi
 		nls.add("Settings_Grid_Options", "en", "Grid options");
 		nls.add("Settings_Grid_Width", "en", "Width:");
 		nls.add("Settings_Grid_Height", "en", "Height:");
-		nls.add("Settings_Grid_Aspect", "en", "Simulation aspect ratio:");
+		nls.add("Settings_Grid_Aspect", "en", "Preserve aspect ratio:");
 		nls.add("Settings_Grid_Columns", "en", "Columns:");
 		nls.add("Settings_Grid_Spacing", "en", "Spacing:");
 		nls.add("Settings_Grid_ShowGrid", "en", "Show grid:");
@@ -194,9 +188,9 @@ export default Core.templatable("Api.Widget.Settings", class Settings extends Wi
 		nls.add("Settings_Diagram_Options", "en", "Diagram options");
 		nls.add("Settings_Diagram_Width", "en", "Width:");
 		nls.add("Settings_Diagram_Height", "en", "Height:");
-		nls.add("Settings_Diagram_Aspect", "en", "Simulation aspect ratio:");
+		nls.add("Settings_Diagram_Aspect", "en", "Preserve aspect ratio:");
 		nls.add("Settings_Playback_Options", "en", "Playback options");
-		nls.add("Settings_Playback_Speed", "en", "Playback speed:");
+		nls.add("Settings_Playback_Speed", "en", "Speed:");
 		nls.add("Settings_Playback_Loop", "en", "Loop:");
 		nls.add("Settings_Playback_Cache", "en", "Cache step:");
 	}

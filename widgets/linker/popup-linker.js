@@ -8,18 +8,17 @@ export default Core.templatable("App.Popup.Linker", class PopupLinker extends Po
 	
 	get widget() { return this.elems.linker; }
 	
-	initialize(simulation, diagram) {		
-		this.simulation = simulation;
-		this.diagram = diagram;
-				
-		this.elems.linker.initialize(simulation, diagram);
+	initialize(simulation, options) {		
+		this.options = options;
+		
+		this.elems.linker.initialize(simulation, options.diagram);
 	}
 	
 	show() {	
 		return super.show().then(ev => {
 			this.widget.reset();
-			
-			this.simulation.diagram = this.simulation.load_svg(this.widget.svg.innerHTML);
+
+			this.options.diagram = this.widget.svg.innerHTML;
 		})
 	}
 	

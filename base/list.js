@@ -64,15 +64,19 @@ export default class List extends Array {
 		return this.index[key];
 	}
 	
+	set(key, value) {
+		this.index[key] = value;
+	}
+	
 	/**
 	 * @description
 	 * Removes an item from the list
 	 * @param {object} item - an item to remove from the list
 	 * @returns {object} the removed item
 	 */
-	remove(item) {
+	remove(item) {		
 		var key = this.fn_key(item);
-		var idx = this.get_index(item);
+		var idx = this.get_index(key);
 		var g = this[idx];
 		
 		this.splice(idx, 1);
@@ -97,9 +101,7 @@ export default class List extends Array {
 	 * @param {object} item - the item for which to retrieve the index
 	 * @returns {number} the index of the item found, -1 otherwise
 	 */
-	get_index(item) {
-		var key = this.fn_key(item);
-		
+	get_index(key) {		
 		return this.indexOf(this.index[key]);
 	}
 
@@ -132,6 +134,7 @@ export default class List extends Array {
 	 * @returns {boolean} true if the item is found, false otherwise
 	 */
 	reindex(fn_key) {
+		debugger;
 		this.index = {};
 		this.fn_key = fn_key;
 		

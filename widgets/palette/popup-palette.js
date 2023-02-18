@@ -6,16 +6,17 @@ import Layers from './layers.js';
 import Styles from './styles.js';
 
 export default Core.templatable("Api.Widget.Popup.Palette", class PopupPalette extends Popup { 
-			
+	
 	initialize(simulation, settings) {		
 		this.simulation = simulation;
 		this.settings = settings;
+		this.model = simulation.grid_model_types[0];
 		
 		// TODO: Review event names
 		this.elems.styles.on("style-deleted", ev => this.elems.layers.refresh());
 		
-		this.elems.layers.initialize(this.simulation, this.settings.grid);
-		this.elems.styles.initialize(this.settings.grid, 0);
+		this.elems.layers.initialize(this.model, this.settings);
+		this.elems.styles.initialize(this.settings, 0);
 	}
 	
 	html() {

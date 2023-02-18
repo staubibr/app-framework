@@ -103,29 +103,29 @@
 	display: none;
 }
 
-.layers-widget table .select-ports {
+.layers-widget table .select-fields {
     position: relative;	
 }
 
-.layers-widget table .select-ports .select-ports-input {
+.layers-widget table .select-fields .select-fields-input {
     cursor: pointer;
     height: 30px;
     border-radius: 4px 4px 0px 0px;
 }
 
-.layers-widget table .select-ports.collapsed .select-ports-input {
+.layers-widget table .select-fields.collapsed .select-fields-input {
     border-radius: 4px;
 }
 
-.layers-widget table .select-ports .select-ports-dropdown {
+.layers-widget table .select-fields .select-fields-dropdown {
     border: solid thin silver;
     background: white;
 	text-align: left;
     box-sizing: border-box;
-    padding: 0px 6px;
+    padding: 0px;
 }
 
-.layers-widget table .select-ports .select-ports-dropdown {
+.layers-widget table .select-fields .select-fields-dropdown {
     position: absolute;
 	list-style-type: none;
     margin: 0;
@@ -136,13 +136,17 @@
     border-top: none;
 }
 
-.layers-widget table .select-ports.collapsed .select-ports-dropdown {
+.layers-widget table .select-fields.collapsed .select-fields-dropdown {
 	display: none;
 }
 
-.layers-widget table .select-ports .select-ports-dropdown .select-ports-dropdown-item {
-	padding: 3px;
+.layers-widget table .select-fields .select-fields-dropdown .select-fields-dropdown-item {
+	padding: 4px;
 	cursor: pointer;
+}
+
+.layers-widget table .select-fields .select-fields-dropdown .select-fields-dropdown-item:hover {
+	background-color: #ecf5fe;
 }
 
 .layers-widget table .styles-start input,

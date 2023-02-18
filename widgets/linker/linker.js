@@ -2,23 +2,13 @@
 
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
-
 import Widget from '../../base/widget.js';
-import Reader from '../../components/chunk-reader.js';
 
 export default Core.templatable("Api.Widget.Linker", class Linker extends Widget { 
 	
     get svg() { return this.elems.svg_content; }
 	
-	get svg_file() { 
-		return new File([this.svg.innerHTML], "diagram.svg", { type:"image/svg+xml", endings:'native' }); 
-	}
-	
 	get current() { return this._current; }
-	
-	constructor(container) {
-		super(container);
-	}
 	
 	async initialize(simulation, diagram) {
 		this._current = {
@@ -47,15 +37,16 @@ export default Core.templatable("Api.Widget.Linker", class Linker extends Widget
 	}
 	
 	async make_options(simulation, diagram) {
-		var diagram = await Reader.read_as_text(diagram);
 		var ports = [];
 		var links = [];
 		
 		simulation.models.forEach(m => {
-			m.ports.forEach(p => ports.push({ model:m, port:p }));
+			m.port.forEach(p => ports.push({ model:m, port:p }));
 		});
 		
-		simulation.models.forEach(m => links = links.concat(m.links));
+		simulation.coupled_model_types.forEach(m => {
+			links = links.concat(m.coupling);
+		});
 		
 		return {
 			diagram: diagram,
@@ -80,11 +71,11 @@ export default Core.templatable("Api.Widget.Linker", class Linker extends Widget
 			}, {
 				caption: 'Links',
 				empty: 'No links found in the structure file.',
-				label: d => `<div><b>${d.port_a.name}</b> @ <b>${d.model_a.id}</b> to</div><div><b>${d.port_b.name}</b> @ <b>${d.model_b.id}</b></div>`,
+				label: d => `<div><b>${d.from_port.name}</b> @ <b>${d.from_model.id}</b> to</div><div><b>${d.to_port.name}</b> @ <b>${d.to_model.id}</b></div>`,
 				items: links,
 				attrs: {
-					"devs-link-mA" : d => d.model_a.id,
-					"devs-link-pA" : d => d.port_a.name
+					"devs-link-mA" : d => d.from_model.id,
+					"devs-link-pA" : d => d.from_port.name
 				}
 			}]
 		}

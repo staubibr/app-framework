@@ -2,252 +2,227 @@
 
 import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
-import Widget from '../../base/widget.js';
-import Styler from '../../components/styler.js';
+import Evented from '../../base/evented.js';
+import ModelGrid from '../../data_structures/metadata/model-grid.js';
 
 const STROKE_WIDTH = 2;
 const DEFAULT_COLOR = "#fff";
 
-export default Core.templatable("Api.Widget.Grid", class Grid extends Widget { 
+export default Core.templatable("Api.Widget.Grid", class Grid extends Evented { 
+	
+	set canvas(value) { this._canvas = value; }
+	get canvas() { return this._canvas; }
+	
+	get context() { return this.canvas.getContext("2d"); }
+	
+	set model(value) { this._model = value; }
+	get model() { return this._model; }
+	
+	get styler() { return this._styler; }
+	set styler(value) { this._styler = value; }
 
-	get canvas() { return this.elems.canvas; }
+	get dimensions() { return this.model.dimensions; }
+	get columns() { return this.options.columns; }
+	get rows() { return Math.ceil(this.n_grids / this.columns); }
+	get spacing() { return this.options.spacing; }
+	get styles() { return this.options.styles; }
+	get width() { return this.options.width; }
+	get height() { return this.options.height; }
+	get layers() { return this.options.layers; }
+	get aspect() { return this.options.aspect; }
+	get n_grids() { return this.layers.length || this.dimensions.z; }
+
+	set cell_height(value) { this._cell_height = value; }
+	get cell_height() { return this._cell_height; }
 	
-	set dimensions(value) { this._dimensions = value; }
-	get dimensions() { return this._dimensions; }
+	set cell_width(value) { this._cell_width = value; }
+	get cell_width() { return this._cell_width; }
 	
-	set columns(value) { this._columns = value; }
-	get columns() { return this._columns; }
-	
-	set spacing(value) { this._spacing = value; }
-	get spacing() { return this._spacing; }
-	
-	set layers(value) { 
-		this._layers = value; 
-		this._index = {};
+	set index(value) { this._index = value; }
+	get index() { return this._index; }
+
+	constructor(container, simulation, options) {
+		super();
 		
-		this._layers.forEach((l, i) => {			
-			if (!this._index.hasOwnProperty(l.z)) this._index[l.z] = {};
+		this.options = options;
+		this.model = simulation.grid_model_types[0];
+		this.canvas = Dom.create("canvas", null, container);
+
+		this.canvas.addEventListener("mousemove", this.on_canvas_mousemove.bind(this));
+		this.canvas.addEventListener("mouseout", this.on_canvas_mouseout.bind(this));
+
+		this.update_layers(options.layers);
+	}
+	
+	update_layers(layers) {
+		var index = {};
+		
+		layers.forEach((l, i) => {			
+			if (!index[l.z]) index[l.z] = {};
 			
-			l.ports.forEach(p => {
-				if (!this._index[l.z].hasOwnProperty(p)) this._index[l.z][p] = [];
+			l.fields.forEach(f => {
+				if (!index[l.z][f]) index[l.z][f] = [];
 				
-				this._index[l.z][p].push(l);
+				index[l.z][f].push(l);
 			});
 		});
-	}
-	
-	get layers() { return this._layers; }
-	
-	set styles(value) { 
-		this._styles = value;
-		this._styler = new Styler(value);
-	}
-	
-	get styles() { return this._styles; }
-	get styler() { return this._styler; }
-
-	constructor(container) {
-		super(container);
-
-		this._cell = { w:null, h:null };
-		this._dimensions = null;
-		this._columns = null;
-		this._spacing = null;
-		this._size = null;
-		this._styles = null;
-		this._layers = [];
-		this._grids = [];
-
-		this._ctx = this.elems.canvas.getContext("2d");
 		
-		this.elems.canvas.addEventListener("mousemove", this.on_canvas_mousemove.bind(this));
-		this.elems.canvas.addEventListener("mouseout", this.on_canvas_mouseout.bind(this));
-		this.elems.canvas.addEventListener("click", this.on_canvas_click.bind(this));
-	}
-	
-	html() {
-		return "<div class='grid-widget'>" + 
-				  "<div handle='canvas_container' class='grid-canvas-container'>" +
-					"<canvas handle='canvas' class='grid-canvas'></canvas>" +
-				  "</div>" + 
-			   "</div>";
-	}
-
-	get_rows(columns, layers) {
-		return Math.ceil(layers.length / columns) ;
+		this.index = index;
 	}
 	
 	resize() {
-		this._size = Dom.geometry(this.elems.canvas_container);
-		
-		// Number of columns and rows
-		this._layout = {
-			columns : this.columns,
-			rows : this.get_rows(this.columns, this.layers)
-		}
+		// var size = Dom.geometry(this.canvas);
+		var size = this.get_canvas_size(this.options);
 
 		// Size of one layer drawn, only used to determine cell size, shouldn't be used after
-		var layer = {
-			w : (this._size.w - (this._layout.columns * this.spacing - this.spacing)) / this._layout.columns,
-			h : (this._size.h - (this._layout.rows * this.spacing - this.spacing)) / this._layout.rows
-		}
+		var layer_width = (size.width - (this.columns * this.spacing - this.spacing)) / this.columns;
+		var layer_height = (size.height - (this.rows * this.spacing - this.spacing)) / this.rows;
 		
-		// Size of a cell
-		this._cell = {
-			w : Math.floor(layer.w / this.dimensions.x),
-			h : Math.floor(layer.h / this.dimensions.y)
-		}
+		this.cell_width = Math.floor(layer_width / this.dimensions.x);
+		this.cell_height = Math.floor(layer_height / this.dimensions.y);
 		
 		// Total effective size of drawing space 
-		this._total = {
-			w : (this._cell.w * this.dimensions.x) * this._layout.columns + this._layout.columns * this.spacing - this.spacing,
-			h : (this._cell.h * this.dimensions.y) * this._layout.rows + this._layout.rows * this.spacing - this.spacing
-		}
+		var total_width = (this.cell_width * this.dimensions.x) * this.columns + this.columns * this.spacing - this.spacing;
+		var total_height = (this.cell_height * this.dimensions.y) * this.rows + this.rows * this.spacing - this.spacing;
 
-		// Determine offset w, h to center grid as much as possible
-		this._margin = {
-			w : (this._size.w - this._total.w) / 2,
-			h : (this._size.h - this._total.h) / 2
-		}
-		
-		this._grids = this.layers.map((l, i) => {	
-			var row = Math.floor(i / this._layout.columns);
-			var col = i - (row * this._layout.columns);
-
-			var x1 = col * (this.dimensions.x * this._cell.w + this.spacing);
-			var y1 = row * (this.dimensions.y * this._cell.h + this.spacing);
-			var x2 = x1 + this._cell.w * this.dimensions.x;
-			var y2 = y1 + this._cell.h * this.dimensions.y;
-
-			return { x1:x1, y1:y1, x2:x2, y2:y2, z:l.z } 
-		}) 
-		
-		this.elems.canvas.style.margin = `${this._margin.h}px ${this._margin.w}px`;		
-		
 		// Redefine with and height to fit with number of cells and cell size
-		this.elems.canvas.width = this._total.w;	
-		this.elems.canvas.height = this._total.h;	
-	}
-	
-	// TODO : grid shouldn't use simulation object maybe?
-	draw(state, simulation) {
-		if (this.dimensions) this.draw_state(state, simulation);
+		this.canvas.width = total_width;	
+		this.canvas.height = total_height;	
 		
-		else this.default(DEFAULT_COLOR);
+		// Determine offset w, h to center grid as much as possible
+		var margin_width = (size.width - total_width) / 2;
+		var margin_height = (size.height - total_height) / 2;
+		
+		this.canvas.style.margin = `${margin_height}px ${margin_width}px`;		
+		
+		this.layers.forEach((l, i) => {	
+			var row = Math.floor(i / this.columns);
+			var col = i - (row * this.columns);
+
+			var x1 = col * (this.dimensions.x * this.cell_width + this.spacing);
+			var y1 = row * (this.dimensions.y * this.cell_height + this.spacing);
+			var x2 = x1 + this.cell_width * this.dimensions.x;
+			var y2 = y1 + this.cell_height * this.dimensions.y;
+
+			l.geom = { x1:x1, y1:y1, x2:x2, y2:y2, z:l.z } 
+		});
+	}
+
+	get_canvas_size(options) {
+		var height = this.height;
+		
+		if (this.aspect) height = this.width / (this.dimensions.x / this.dimensions.y);
+		
+		return { 
+			width : this.columns * this.width + this.spacing * this.columns - this.spacing, 
+			height : this.rows * height + this.rows * this.spacing - this.spacing 
+		}
 	}
 	
-	clear() {
-		this._ctx.clearRect(0, 0, this._size.w, this._size.h);
-	}
-	
-	default(color) {
-		this._ctx.fillStyle = color;
-		this._ctx.fillRect(0, 0, this._size.w, this._size.h);
-	}
-	
-	// TODO : grid shouldn't use simulation object maybe?
-	draw_state(state, simulation) {
+	draw_state(state) {
 		for (var i = 0; i < this.layers.length; i++) {
 			var l = this.layers[i];
-			var scale = this.styler.get_scale(l.style);
 			
 			for (var x = 0; x < this.dimensions.x; x++) {
 				for (var y = 0; y < this.dimensions.y; y++) {
-					for (var p = 0; p < l.ports.length; p++) {
-						var v = state.get_value([x, y, l.z]); // value of cell to draw
-						var f = l.ports[p]; 
+					for (var p = 0; p < l.fields.length; p++) {
+						var c = this.model.get_cell(x, y, l.z);
+						var m = state.get_message(c);
+						var v = m.get_value(l.fields[p]);
 						
-						var color = this.styler.get_color(scale, v[f]) || 'rgb(200, 200, 200)';
-						
-						this.draw_cell(x, y, i, color);
+						this.draw_cell(x, y, i, this.get_color(l.style, v));
 					}
-					
-					var id = x + "-" + y + "-" + l.z; // id of cell to draw
-					
-					if (simulation.is_selected(id)) this.draw_cell_border(x, y, i, 'rgb(255,0,0)');
 				}
 			}
 		}
 	}
 	
-	// TODO : grid shouldn't use simulation object maybe?
-	draw_changes(frame, simulation) {
-		for (var i = 0; i < frame.state_messages.length; i++) {
-			var m = frame.state_messages[i];
+	draw_changes(messages) {
+		for (var i = 0; i < messages.length; i++) {
+			var m = messages[i];
+			var c = m.model;
 			
-			for (var f in m.value) {
-				var layers = this._index[m.z] && this._index[m.z][f] || [];
-				var v = m.value[f];
+			for (var j = 0; j < m.value.length; j++) {			
+				var layers = this.index[c.z]?.[c.state.fields[j].name] ?? [];
 				
-				for (var j = 0; j < layers.length; j++) {
-					var l = layers[j];
-					var scale = this.styler.get_scale(l.style);
-			
-					this.draw_cell(m.x, m.y, l.position, this.styler.get_color(scale, v));
+				for (var k = 0; k < layers.length; k++) {
+					var l = layers[k];
 					
-					if (simulation.is_selected(m.coord)) this.draw_cell_border(m.x, m.y, l.position, 'rgb(255,0,0)');
+					this.draw_cell(c.x, c.y, l.position, this.get_color(l.style, m.value[j]));
 				}
 			}
 		}
+	}
+
+	get_color(ramp_idx, value) {
+		var ramp = this.styles[ramp_idx];
+		
+		for (var i = 0; i < ramp.buckets.length; i++) {
+			var c = ramp.buckets[i];
+			
+			if (value >= c.start && value <= c.end) return `rgb(${c.color.join(",")})`;
+		}
+		
+		return 'rgb(200, 200, 200)'
 	}
 	
 	get_cell(clientX, clientY) {
-		var rect = this.elems.canvas.getBoundingClientRect();
-		
+		var rect = this.canvas.getBoundingClientRect();
 		var x = clientX - rect.left;
 		var y = clientY - rect.top;
-		
 		var zero = null;
 		
-		for (var k = 0; k < this._grids.length; k++) {
-			if (x < this._grids[k].x1 || x > this._grids[k].x2) continue;
+		for (var k = 0; k < this.layers.length; k++) {
+			var l = this.layers[k];
 			
-			if (y < this._grids[k].y1 || y > this._grids[k].y2) continue;
+			if (x < l.geom.x1 || x > l.geom.x2) continue;
 			
-			zero = this._grids[k];
+			if (y < l.geom.y1 || y > l.geom.y2) continue;
+			
+			zero = l;
 			
 			break;
 		}
 		
-		if (!zero || zero.y2 == y) return null;
+		if (!zero || zero.geom.y2 == y) return null;
 		
-		x = x - zero.x1;
-		y = y - zero.y1;
+		x = x - zero.geom.x1;
+		y = y - zero.geom.y1;
 		
 		// Find the new X, Y coordinates of the clicked cell
-		var pX = x - x % this._cell.w;
-		var pY = y - y % this._cell.h;
+		var pX = x - x % this.cell_width;
+		var pY = y - y % this.cell_height;
 		
-		return { x:pX / this._cell.w, y:pY / this._cell.h, z:zero.z, k:k, layer:this.layers[k] };
+		return { x:pX / this.cell_width, y:pY / this.cell_height, z:zero.geom.z, k:k, layer:this.layers[k] };
 	}
 	
 	draw_cell(x, y, k, color) {			
-		var zero = this._grids[k];
-			
-		var x = zero.x1 + x * this._cell.w;
-		var y = zero.y1 + y * this._cell.h;
+		var zero = this.layers[k].geom;
 		
-		this._ctx.fillStyle = color;
-		this._ctx.fillRect(x, y, this._cell.w, this._cell.h);
+		var x = zero.x1 + x * this.cell_width;
+		var y = zero.y1 + y * this.cell_height;
+		
+		this.context.fillStyle = color;
+		this.context.fillRect(x, y, this.cell_width, this.cell_height);
 	}
-	
+	/*
 	draw_cell_border(x, y, k, color) {	
 		var zero = this._grids[k];
 		
 		// Find the new X, Y coordinates of the clicked cell
-		var pX = zero.x1 + x * this._cell.w;
-		var pY = zero.y1 + y * this._cell.h;
+		var pX = zero.x1 + x * this.cell_width;
+		var pY = zero.y1 + y * this.cell_height;
 		
 		var dX = pX + (STROKE_WIDTH / 2);
 		var dY = pY + (STROKE_WIDTH / 2);
 		
 		// Define a stroke style and width
-		this._ctx.lineWidth = STROKE_WIDTH;
-		this._ctx.strokeStyle = color;
+		this.context.lineWidth = STROKE_WIDTH;
+		this.context.strokeStyle = color;
 		
 		// Draw rectangle, add offset to fix anti-aliasing issue. Subtract from height and width 
 		// to draw border internal to the cell
-		this._ctx.strokeRect(dX, dY, this._cell.w - STROKE_WIDTH, this._cell.h - STROKE_WIDTH);
+		this.context.strokeRect(dX, dY, this.cell_width - STROKE_WIDTH, this.cell_height - STROKE_WIDTH);
 	}
 	
 	on_canvas_click(ev) {		
@@ -257,13 +232,16 @@ export default Core.templatable("Api.Widget.Grid", class Grid extends Widget {
 		
 		this.emit("click", { x:ev.pageX, y:ev.pageY, data:data });
 	}
+	*/
 	
 	on_canvas_mousemove(ev) {				
 		var data = this.get_cell(ev.clientX, ev.clientY);
 		
 		if (!data) return;
 		
-		this.emit("mousemove", { x:ev.pageX, y:ev.pageY, data:data });
+		var cell = this.model.get_cell(data.x, data.y, data.z)
+		
+		this.emit("mousemove", { x:ev.pageX, y:ev.pageY, cell:cell });
 	}
 		
 	on_canvas_mouseout(ev) {		

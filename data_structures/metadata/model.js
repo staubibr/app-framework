@@ -1,149 +1,67 @@
 'use strict';
 
-/** 
- * Model class to hold an instance of a model type. A model instance is an association between
- * a unique id and a model type.
- **/
-export default class Model { 
+import JsonObject from '../../base/json-object.js';
+import List from '../../base/list.js';
+import MessageType from './message-type.js';
+
+/**
+ * Metadata elements common to both atomic and coupled models
+ * @module metadata/model
+ * @extends JsonObject
+ */
+export default class Model extends JsonObject { 
 	
-	/** 
-	* Gets the unique id for this model
-	* @type {string} 
-	*/
-	get id() { return this._json.id; }
+	get id() { return this.json["identifier"]; }
 	
-	/** 
-	* Sets the unique id for this model
-	* @type {string} 
-	*/
-	set id(value) { this._json.id = value; }
+	get title() { return this.json["title"]; }
 	
-	/** 
-	* Gets the model type for this model
-	* @type {TypeModel} 
-	*/
-	get model_type() { return this._json.model_type; }
+	//get alternative() { return this.json["alternative"]; }
 	
-	/** 
-	* Sets the model type for this model
-	* @type {TypeModel} 
-	*/
-	set model_type(value) { this._json.model_type = value; }
+	//get creator() { return this.json["creator"]; }
 	
-	/** 
-	* Gets the name for this model
-	* @type {string} 
-	*/
-	get name() { return this.model_type.name; }
+	//get contributor() { return this.json["contributor"]; }
 	
-	/** 
-	* Sets the name for this model
-	* @type {string} 
-	*/
-	set name(value) { this.model_type.name = value; }
+	//get language() { return this.json["language"]; }
 	
-	/** 
-	* Gets the type for this model (atomic or coupled)
-	* @type {TypeModel} 
-	*/
-	get type() { return this.model_type.type; }
+	//get description() { return this.json["description"]; }
 	
-	/** 
-	* Sets the type for this model (atomic or coupled)
-	* @type {TypeModel} 
-	*/
-	set type(value) { this.model_type.type = value; }
+	//get subject() { return this.json["subject"]; }
 	
-	/** 
-	* Gets the template for this model (usually json object)
-	* @type {object} 
-	*/
-	get template() { return this.model_type.template; }
+	//get spatial_coverage() { return this.json["spatial coverage"]; }
 	
-	/** 
-	* Sets the template for this model (usually json object)
-	* @type {object} 
-	*/
-	set template(value) { this.model_type.template = value; }
+	//get temporal_coverage() { return this.json["temporal coverage"]; }
 	
-	/** 
-	* Gets the ports for this model
-	* @type {TypePort[]} 
-	*/
-	get ports() { return this.model_type.ports; }
+	//get license() { return this.json["license"]; }
 	
-	/** 
-	* Gets the links for this model
-	* @type {Link[]} 
-	*/
-	get links() { return this._json._links; }
+	//get created() { return this.json["created"]; }
 	
-	/** 
-	* Sets the links for this model
-	* @type {Link[]} 
-	*/
-	set links(value) { 
-		this._json._links = [];
+	//get modified() { return this.json["modified"]; }
+	
+	//get behavior() { return this.json["behavior"]; }
+	
+	get port() { return this.json["port"]; }
+	
+	get message_type() { return this.json["message type"]; }
+	
+    /**
+     * @param {object} json - JSON used to initialize the object.
+     */
+	constructor(json) {
+		super(json);
 		
-		value.forEach(l => this.add_link(l));
-	}
-	
-    /**
-     * @param {string} id - unique id for the model type
-     * @param {TypeModel} model_type - model type for this model
-     * @param {Link[]} Links - the message type associated to this model type
-     */
-	constructor(id, model_type, links) {		
-		this._json = {};
+		if (!this.port) this.json["port"] = [];
+		this.json["port"] = new List(p => p.name, this.ports);
 		
-		this.id = id || null;
-		this.model_type = model_type || null;
-		this.links = links || [];
+		if (!this.message_type) this.json["message type"] = [];
+		this.json["message type"] = new List(m => m.id, this.message_type);
 	}
 	
-    /**
-     * Returns the port corresponding to the port name provided.
-     * @param {string} name - the name of the port to retrieve.
-	 * @return {TypePort} the port corresponding to the port name provided.
-     */
-	get_port(name) {
-		return this.model_type.get_port(name);
-	}
-	
-    /**
-     * Adds a link to the model
-     * @param {Link} link - the link to add
-	 * @return {Link} the link added
-     */
-	add_link(link) {
-		this.links.push(link);
-		
-		return link;
-	}
-	
-    /**
-     * Returns all outgoing links from a port
-     * @param {TypePort} port - the port for which to retrieve outgoing links
-	 * @return {Link[]} the outgoing links from the port provided
-     */
-	get_port_links(port) {
-		return this.links.filter(l => l.port_a.name == port.name);
-	}
-	
-    /**
-     * Applies the data template to an array of values
-     * @param {string[]} values - the values to template
-	 * @return {object} the values templated as an object 
-     */
-	apply_template(values) {
-		return this.model_type.apply_template(values);
-	}
-	
-    /**
-     * Get an empty templated object 
-	 * @return {object} templated 0 values
-     */
-	get_template_0() {
-		this.model_type.get_template_0();
+	static make(id, title) {
+		return new Model({
+			"identifier": id,
+			"title": title,
+			"port": null,
+			"message type": null
+		});
 	}
 }

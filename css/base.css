@@ -39,6 +39,7 @@ body main {
 h1, h2, h3, table, input, select,
 .popup .popup-title {
 	font-family: 'Varela Round', sans-serif;
+	font-weight: normal;
 }
 
 h1, h2 {

@@ -1,70 +1,48 @@
 'use strict';
 
-/** 
-* A class that contains contextual information about a model
-*/
-export default class Metadata {
+import List from '../../base/list.js';
+import ModelAtomic from './model-atomic.js';
+import ModelCoupled from './model-coupled.js';
+import ModelGrid from './model-grid.js';
+import Subcomponent from './subcomponent.js';
 
-	/** 
-	* Gets the model author
-	* @type {string} 
-	*/
-	get author() {  return this._json.author; }
+/**
+ * Metadata field element
+ * @module metadata/metadata
+ * @extends List
+ */
+export default class Metadata { 
 	
-	/** 
-	* Sets the model author
-	* @type {string} 
-	*/
-	set author(value) { this._json.author = value; }
+	get root() { return this._root; }
 	
-	/** 
-	* Gets the model creation date
-	* @type {string} 
-	*/
-	get created() { return this._json.created; }
+	get models() { return this._models; }
 	
-	/** 
-	* Sets the model creation date
-	* @type {string} 
-	*/
-	set created(value) { this._json.created = value; }
+	get types() { return this._types; }
 	
-	/** 
-	* Gets the model description
-	* @type {string} 
-	*/
-	get description() { return this._json.description; }
+	get coupled_types() { return this.types.filter(t => t instanceof ModelCoupled); }
 	
-	/** 
-	* Sets the model description
-	* @type {string} 
-	*/
-	set description(value) { this._json.description = value; }
+	get atomic_types() { return this.types.filter(t => t instanceof ModelAtomic); }
 	
-	/** 
-	* Gets the tags associated to the model. Tags are used to organize models in topics.
-	* @type {string} 
-	*/
-	get tags() { return this._json.tags; }
+	get grid_types() { return this.types.filter(t => t instanceof ModelGrid); }
 	
-	/** 
-	* Sets the tags associated to the model. Tags are used to organize models in topics.
-	* @type {string} 
-	*/
-	set tags(value) { this._json.tags = value; }
+	get atomic_models() { return this.models.filter(m => m.model_type instanceof ModelAtomic); }
 	
-    /**
-     * @param {string} author - the model author
-     * @param {string} created - the model creation date
-     * @param {string} description - the model description
-     * @param {string[]} tags - the tags associated to the model
-     */
-	constructor(author, created, description, tags) {		
-		this._json = {}
+	get links() { return this._links; }
 		
-		this.author = author || null;
-		this.created = created || null;
-		this.description = description || null;
-		this.tags = tags || [];
+    /**
+	 * The metadata for the simulation (list of model types)
+     */
+	constructor(root_id, root_type, simulation_name) {		
+		var type = ModelCoupled.make(root_type, simulation_name);
+		var root = Subcomponent.make(root_id, type);
+		
+		this._models = new List(m => m.id, [root]);
+		this._types = new List(t => t.id, [type]);
+		
+		this._root = root;
+	}
+	
+	toJSON() {
+		return this.types;
 	}
 }

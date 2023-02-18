@@ -6,60 +6,31 @@
 export default class State { 
 	
 	/** 
-	* Gets the current position of the current state within the simulation frames.
-	* @type {number} 
-	*/
-	get index() { return this._index; }
-	/** 
-	* Sets the current position of the current state within the simulation frames.
-	* @type {number} 
-	*/
-	set index(value) { this._index = value; }
-	
-	/** 
-	* Gets the current state values for all models.
+	* Gets the models for the state object.
 	* @type {object} 
-	*/
-	get data() { return this._data; }
-	
-	/** 
-	* Sets the current state values for all models.
-	* @type {object} 
-	*/
-	set data(value) { this._data = value; }
-	
-	/** 
-	* Gets all the models in the simulation.
-	* @type {object[]} 
 	*/
 	get models() { return this._models; }
 	
 	/** 
-	* Sets all the models in the simulation.
-	* @type {object[]} 
+	* Gets the state messages for the state object.
+	* @type {object} 
 	*/
-	set models(value) { this._models = value; }
+	get messages() { return this._messages; }
 	
-	/** 
-	* Gets the number of models in the simulation
-	* @type {number} 
-	*/
-	get size() { return this._size; }
+	set position(value) { this._position = value; }
 	
-	/** 
-	* Sets the number of models in the simulation
-	* @type {number} 
-	*/
-	set size(value) { this._size = value; }
-	
+	get position() { return this._position; }
+		
     /**
+	 * The state class holds the last state messages for all models in the simulation.
      * @param {Model[]} models - An array of all the models in the simulation.
      */
-	constructor(models, size) {
-		this.index = -1;
-		this.models = models || [];
-		this.size = size;
-		this.data = null;
+	constructor(models) {
+		this._position = -1;
+		this._models = models;
+		this._messages = {};
+		
+		for (var i = 0; i < models.length; i++) this.messages[models[i].id] = null;
 	}
 	
     /**
@@ -67,60 +38,47 @@ export default class State {
      * @return {State} the cloned state.
      */
 	clone() {
-		throw new Error("The clone method must be implemented by the state specialization class.");
+		var clone = new State(this.models);
+		
+		for (var i = 0; i < this.models.length; i++) {
+			var m = this.models[i];
+			
+			clone.messages[m.id] = this.messages[m.id];
+		}
+		
+		clone.position = this.position;
+		
+		return clone;
 	}
-	
+		
     /**
      * Returns the state value of a model for the current state.
      * @param {Model} model - a model instance for which to retrieve the state value.
 	 * @return {object} a state value (usually JSON).
      */
-	get_value(model) {		
-		throw new Error("The get_value method must be implemented by the state specialization class.");
+	get_message(model) {
+		return this.messages[model.id] || null;
 	}
 	
     /**
      * Determine a new state by applying all the messages for the provided frame.
      * @param {Frame} frame - the frame to apply to the state.
 	 */
-	apply_messages(frame) {
-		for (var i = 0; i < frame.state_messages.length; i++) {
-			this.apply_message(frame.state_messages[i]);
+	apply_frame(frame) {
+		this.position++;
+		
+		for (var i = 0; i < frame.state_messages.length; i++) {
+			var message = frame.state_messages[i];
+			this.messages[message.model.id] = message;
 		}
 	}
+	
+	rollback_frame(frame) {
+		this.position--;
 
-    /**
-     * Determine a new state by applying a single message to the current state.
-     * @param {Message} m - the message to apply to the state.
-	 */
-	apply_message(m) {		
-		throw new Error("The apply_messages method must be implemented by the state specialization class.");
-	}
-	
-    /**
-     * Advance to the next state by applying all messages in a frame.
-     * @param {Frame} frame - the frame to apply to the state.
-	 */
-	forward(frame) {
-		this.apply_messages(frame);
-		
-		this.index++;
-	}
-	
-    /**
-     * Return to the previous state by applying all messages in a frame. The frame must be reversed prior to this operation.
-     * @param {Frame} frame - the frame to apply to the state.
-	 */
-	backward(frame) {
-		this.apply_messages(frame);
-		
-		this.index--;
-	}
-	
-    /**
-     * Resets the state to a zero template for all models.
-	 */
-	initialize() {
-		throw new Error("The initialize method must be implemented by the state specialization class.");
+		for (var i = 0; i < frame.state_messages.length; i++) {
+			var message = frame.state_messages[i];
+			this.messages[message.model.id] = message.prev;
+		}
 	}
 }

@@ -4,11 +4,10 @@ import Core from '../../tools/core.js';
 import Dom from '../../tools/dom.js';
 import Net from '../../tools/net.js';
 import GIS from '../gis/gis.js';
-import Automator from '../../components/automator.js';
 import Reader from '../../components/chunk-reader.js';
 import AppConfig from '../../components/config.js';
 
-export default Core.templatable("Api.Widget.GIS.Auto", class AutoGIS extends Automator { 
+export default Core.templatable("Api.Widget.GIS.Auto", class AutoGIS { 
 
 	get canvas() { return this.widget.canvas; }
 	
