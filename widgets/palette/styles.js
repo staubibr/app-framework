@@ -63,7 +63,7 @@ export default Core.templatable("Api.Widget.Palette.Styles", class Styles extend
 		
 		this.items = [];
 		
-		this.settings.styles[style].buckets.forEach(c => this.add_style_class(c));
+		this.settings.styles[style].forEach(c => this.add_style_class(c));
 	}
 	
 	add_style_class(c) {
@@ -137,7 +137,7 @@ export default Core.templatable("Api.Widget.Palette.Styles", class Styles extend
 		var i = this.elems.selectStyle.value;
 		var c = { start:0, end:0, color:[255, 255, 255] };
 		
-		this.settings.styles[i].buckets.push(c);
+		this.settings.styles[i].push(c);
 	
 		this.add_style_class(c);
 		
@@ -148,7 +148,7 @@ export default Core.templatable("Api.Widget.Palette.Styles", class Styles extend
 		var i = this.elems.selectStyle.value;
 		var j = this.items.indexOf(item);
 		
-		this.settings.styles[i].buckets.splice(j, 1);
+		this.settings.styles[i].splice(j, 1);
 		this.items.splice(j, 1);
 				
 		item.row.remove();

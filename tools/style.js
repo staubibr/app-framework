@@ -32,10 +32,12 @@ export default class Style {
 			for (var j = 0; j < fr.state_messages.length; j++) {
 				var m = fr.state_messages[j];
 				
-				for (var f in m.value) {
+				for (var k = 0; k < m.value.length; k++) {
+					var f = m.model.state.fields[k].name;
+
 					if (!values[f]) values[f] = [];
 					
-					values[f].push(m.value[f]);
+					values[f].push(m.value[k]);
 				}
 			}
 		}
@@ -128,7 +130,7 @@ export default class Style {
 		
 		if (type == "pointIcon") return this.point_icon_style(json);
 		
-		if (type == "polygon") return this.polygon_style(json);
+		if (type == "polygon" || type == "multipolygon") return this.polygon_style(json);
 		
 		if (type == "linestring") return this.linestring_style(json);
 	}

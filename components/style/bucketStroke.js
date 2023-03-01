@@ -37,8 +37,8 @@ export default class BucketStroke {
 	 * @param {number} value - the value used to determine the style
      * @return {ol.style.Stroke} an OL style for strokes
      */
-	symbol(value) {
-		var v = value[this.property];
+	symbol(message) {
+		var v = message.get_value(this.property);
 		
 		if (v == 0 && this.zero) return new ol.style.Stroke({ color: this.zero,	width: this.width[0] });
 		

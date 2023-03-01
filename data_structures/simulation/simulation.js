@@ -22,7 +22,7 @@ export default class Simulation extends Evented {
 	*/
 	get metadata() { return this._metadata; }
 	
-	get name() { return this.root.model_type.title; }
+	get name() { return this.root.type.title; }
 	
 	/** 
 	* Gets the simulation model root
@@ -40,25 +40,25 @@ export default class Simulation extends Evented {
 	* Gets the simulation model types
 	* @type {Model[]} 
 	*/
-	get model_types() { return this.metadata.types; }
+	get types() { return this.metadata.types; }
 	
 	/** 
 	* Gets the simulation atomic model types
 	* @type {Model[]} 
 	*/
-	get atomic_model_types() { return this.metadata.atomic_types; }
+	get atomic_types() { return this.metadata.atomic_types; }
 	
 	/** 
 	* Gets the simulation coupled model types
 	* @type {Model[]} 
 	*/
-	get coupled_model_types() { return this.metadata.coupled_types; }
+	get coupled_types() { return this.metadata.coupled_types; }
 	
 	/** 
 	* Gets the simulation coupled model types
 	* @type {Model[]} 
 	*/
-	get grid_model_types() { return this.metadata.grid_types; }
+	get grid_types() { return this.metadata.grid_types; }
 	
 	/** 
 	* Gets the current state of the simulation
@@ -113,11 +113,13 @@ export default class Simulation extends Evented {
 		this._position = 0;
 		this._metadata = metadata;
 		this._frames = new List(f => f.time);
-		this._cache = new Cache(n_cache, this.models);	
+		this._cache = null;	
 		this._state = null;
 	}
 	
-	initialize(frames) {	
+	initialize(frames, n_cache) {
+		this._cache = new Cache(n_cache, this.models);	
+		
 		for (var i = 0; i < frames.length; i++) {
 			var add = frames[i];
 			

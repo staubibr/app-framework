@@ -12,31 +12,31 @@ export default class Subcomponent extends JsonObject {
 	
 	get id() { return this.json["identifier"]; }
 	
-	get model_type() { return this.json["model type"]; }
+	get type() { return this.json["model type"]; }
 	
-	set model_type(value) { this.json["model type"] = value; }
+	set type(value) { this.json["model type"] = value; }
 	
-	get port() { return this.model_type.port; }
+	get port() { return this.type.port; }
 	
-	get state() { return this.model_type.state ?? null; }
+	get state() { return this.type.state ?? null; }
 	
-	get message_type() { return this.model_type.message_type; }
+	get message_type() { return this.type.message_type; }
 	
-	get subcomponent() { return this.model_type.subcomponent ?? null; }
+	get subcomponent() { return this.type.subcomponent ?? null; }
 	
-	get coupling() { return this.model_type.coupling ?? null; }
+	get coupling() { return this.type.coupling ?? null; }
 		
 	toJSON() {
 		return {
 			"identifier": this.id,
-			"model type": this.model_type instanceof Model ? this.model_type.id : this.model_type
+			"model type": this.type.id
 		}
 	}
-	
-	static make(id, model_type) {
-		return new Subcomponent({
+
+	static make(id, type_id) {
+		return {
 			"identifier": id,
-			"model type": model_type
-		});
+			"model type": type_id
+		};
 	}
 }

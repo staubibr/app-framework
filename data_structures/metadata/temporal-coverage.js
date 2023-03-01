@@ -14,12 +14,20 @@ export default class TemporalCoverage extends JsonObject {
 	get end() { return this.json["end"]; }
 	
 	get scheme() { return this.json["scheme"]; }
-	
+	/*
 	static make(start, end, scheme) {
 		return new TemporalCoverage({
 			"start": start,
 			"end": end,
 			"scheme": scheme
 		});
+	}
+	*/
+	static make(start, end, scheme) {
+		return {
+			"start": start,
+			"end": end,
+			"scheme": scheme
+		};
 	}
 }

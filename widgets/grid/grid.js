@@ -45,7 +45,7 @@ export default Core.templatable("Api.Widget.Grid", class Grid extends Evented {
 		super();
 		
 		this.options = options;
-		this.model = simulation.grid_model_types[0];
+		this.model = simulation.grid_types[0];
 		this.canvas = Dom.create("canvas", null, container);
 
 		this.canvas.addEventListener("mousemove", this.on_canvas_mousemove.bind(this));
@@ -157,8 +157,8 @@ export default Core.templatable("Api.Widget.Grid", class Grid extends Evented {
 	get_color(ramp_idx, value) {
 		var ramp = this.styles[ramp_idx];
 		
-		for (var i = 0; i < ramp.buckets.length; i++) {
-			var c = ramp.buckets[i];
+		for (var i = 0; i < ramp.length; i++) {
+			var c = ramp[i];
 			
 			if (value >= c.start && value <= c.end) return `rgb(${c.color.join(",")})`;
 		}

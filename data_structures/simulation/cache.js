@@ -49,7 +49,6 @@ export default class Cache {
 	}
 	
 	add_frame(frame, position) {
-		// TODO: Test with state messages (ABP has none)
 		if (position % this.interval == 1) this.states.push(this.last().clone());
 		
 		this.last().apply_frame(frame);

@@ -8,6 +8,7 @@ import MessageState from '../data_structures/simulation/message-state.js';
 import Frame from '../data_structures/simulation/frame.js';
 import Metadata from '../data_structures/metadata/metadata.js';
 import Subcomponent from '../data_structures/metadata/subcomponent.js';
+import ModelCoupled from '../data_structures/metadata/model-coupled.js'
 import ModelGrid from '../data_structures/metadata/model-grid.js'
 import ConfigurationGrid from '../data_structures/visualization/configuration-grid.js';
 import Parser from './parser.js';
@@ -23,7 +24,33 @@ export default class ParserCDpp extends Parser {
 	 * @return {String} A string identifying the parser to use ("CDpp-Cell-DEVS", "Cadmium-V1" or "OGSE")
 	 */		
 	static detect(files) {
-		return files.cd_ma && files.cd_log ? true : false;
+		if (!files.find(f => f.name.toLowerCase().endsWith('.ma'))) return false;
+		
+		if (!files.find(f => f.name.toLowerCase().includes('.log'))) return false;
+		
+		return true;
+	}
+	
+	constructor(files) {
+		super(files);
+		
+		this.files.ma = files.find(f => f.name.toLowerCase().endsWith('.ma'));
+		this.files.log = files.find(f => f.name.toLowerCase().includes('.log'));
+		this.files.pal = files.find(f => f.name.toLowerCase().endsWith('.pal'));
+		this.files.val = files.find(f => f.name.toLowerCase().endsWith('.val'));
+		this.files.map = files.find(f => f.name.toLowerCase().endsWith('.map'));
+	}
+	
+	/**                              
+	 * Parses the visualization.json file
+	 * @return {Configuration} a visualization configuration file
+	 */		
+	async default_visualization() {
+		var viz = new ConfigurationGrid();
+
+		if (this.files.pal) viz.styles = await this.parse_style();
+		
+		return viz;
 	}
 	
 	/**                              
@@ -32,10 +59,10 @@ export default class ParserCDpp extends Parser {
 	 * @return {Structure} the structure object built from the file
 	 */		
 	async parse_metadata() {	
-		var title = this.files.cd_ma.name.slice(0,-3);
-		var tokens = await MaUtil.tokenize(this.files.cd_ma);
+		var title = this.files.ma.name.slice(0,-3);
+		var tokens = await MaUtil.tokenize(this.files.ma);
 		var t = tokens.find(t => !!t.dim);
-		var metadata = new Metadata("top", "top", title);
+		var metadata = new Metadata(title, "top");
 		
 		// In CDpp and Lopez, cells only log output messages. For visualization, we consider 
 		// output messages as state messages. Lopez outputs through ports while CDpp outputs 
@@ -59,7 +86,7 @@ export default class ParserCDpp extends Parser {
 	}
 	
 	async parse_style() {
-		var content = await Reader.read_as_text(this.files.cd_pal);		
+		var content = await Reader.read_as_text(this.files.pal);		
 		var lines = content.trim().split("\n").map(l => l.trim());
 		var buckets = [];
 		
@@ -97,20 +124,7 @@ export default class ParserCDpp extends Parser {
 			});
 		}
 		
-		return [{ buckets:buckets }];
-	}
-	
-	/**                              
-	 * Parses the visualization.json file
-	 * @return {Configuration} a visualization configuration file
-	 */		
-	async parse_visualization() {
-		var json = await Reader.read_as_json(this.files.visualization);
-		var visualization = new ConfigurationGrid(json);
-		
-		if (this.files.cd_pal) visualization.styles = await this.parse_style();
-		
-		return visualization;
+		return [buckets];
 	}
 	
 	/**                              
@@ -119,11 +133,11 @@ export default class ParserCDpp extends Parser {
 	 * @return {Frame[]} an array of frames built from the messages.log
 	 */	
 	async parse_messages(simulation, val, map) {
-		var lopez_test = await this.files.cd_log.slice(0, 5).text();
+		var lopez_test = await this.files.log.slice(0, 5).text();
 		var is_lopez = lopez_test == "0 / L";
 		var t0 = is_lopez ? "00:00:00:000:0" : "00:00:00:000";
 		
-		var grid = simulation.model_types[1];
+		var grid = simulation.types[1];
 		var frames = new List(f => f.time);
 		
 		if (!is_lopez) this.read_initial_value(frames, t0, grid);
@@ -131,7 +145,7 @@ export default class ParserCDpp extends Parser {
 		await this.read_val(frames, t0, grid);
 		await this.read_map(frames, t0, grid);
 		
-		await Reader.read_by_chunk(this.files.cd_log, "\n", (parsed, chunk, progress) => {			
+		await Reader.read_by_chunk(this.files.log, "\n", (parsed, chunk, progress) => {			
 			var lines = chunk.split("\n");
 			
 			for (var i = 0; i < lines.length; i++) {
@@ -178,10 +192,10 @@ export default class ParserCDpp extends Parser {
 	 * @param {File} val - the *.val file
 	 */	
 	async read_val(frames, t0, grid) {
-		if (!this.files.cd_val) return;
+		if (!this.files.val) return;
 		
 		var f0 = frames.get(t0) || frames.add(new Frame(t0));
-		var content = await Reader.read_as_text(this.files.cd_val);		
+		var content = await Reader.read_as_text(this.files.val);		
 		var lines = content.trim().split("\n").map(l => l.trim());
 		
         // (0,0,0)=100 2 1
@@ -211,7 +225,7 @@ export default class ParserCDpp extends Parser {
 	 * @param {File} map - the *.map file
 	 */	
 	async read_map(frames, t0, grid, map) {
-		if (!this.files.cd_map) return;
+		if (!this.files.map) return;
 		
 		var f0 = frames.get(t0) || frames.add(new Frame(t0));
 		var content = await Reader.read_as_text(map);
@@ -254,7 +268,6 @@ export default class ParserCDpp extends Parser {
 	/**                              
 	 * Parses a Lopez line from the *.log. Adds it to the frame provided.
 	 * @param {Frame[]} frames - a time frame for the simulation
-	 * @param {TypeModel} model_type - the TypeModel of the top model
 	 * @param {string} line - a line from the *.log
 	 */	
 	parse_lopez_line(frames, grid, line) {

@@ -8,7 +8,7 @@ import JsonObject from '../../base/json-object.js';
  * @extends JsonObject
  */
 export default class InstancesSet extends JsonObject { 
-	    
+	
 	get id() { return this.json["id"]; }
 	
 	get type() { return this.json["type"]; }
@@ -16,6 +16,4 @@ export default class InstancesSet extends JsonObject {
 	get properties() { return this.json["properties"]; }
 	
 	get models() { return this.json["models"]; }
-	
-	get couplings() { return this.json["couplings"]; }
 }

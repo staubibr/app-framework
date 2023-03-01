@@ -2,6 +2,8 @@
 
 import Reader from "../components/chunk-reader.js";
 import Metadata from '../data_structures/metadata/metadata.js';
+import ModelCoupled from '../data_structures/metadata/model-coupled.js'
+import Subcomponent from '../data_structures/metadata/subcomponent.js'
 import MessageOutput from '../data_structures/simulation/message-output.js';
 import MessageState from '../data_structures/simulation/message-state.js';
 import Frame from '../data_structures/simulation/frame.js';
@@ -19,7 +21,32 @@ export default class ParserCadmium extends Parser {
 	 * @return {String} A string identifying the parser to use ("CDpp-Cell-DEVS", "Cadmium-V1" or "OGSE")
 	 */		
 	static detect(files) {
-		return files.cd_ma && (files.cadmium_output || files.cadmium_state) ? true : false;
+		if (!files.find(f => f.name.toLowerCase().endsWith('_output_state.txt'))) return false;
+		
+		if (!files.find(f => f.name.toLowerCase().endsWith('_output_messages.txt'))) return false;
+		
+		return true;
+	}
+	
+	constructor(files) {
+		super(files);
+		
+		this.files.ma = files.find(f => f.name.toLowerCase().endsWith('.ma'));
+		this.files.state = files.find(f => f.name.toLowerCase().endsWith('_output_state.txt'));
+		this.files.output = files.find(f => f.name.toLowerCase().endsWith('_output_messages.txt'));
+		this.files.diagram = files.find(f => f.name == 'diagram.svg');
+	}
+	
+	/**                              
+	 * Parses the visualization.json file
+	 * @return {Configuration} a visualization configuration file
+	 */		
+	async default_visualization() {
+		var viz = new ConfigurationDiagram();
+
+		viz.diagram = await Reader.read_as_text(this.files.diagram);
+
+		return viz;
 	}
 	
 	/**
@@ -27,9 +54,9 @@ export default class ParserCadmium extends Parser {
 	 * @return {ModelCoupled} the coupled model metadata
 	 */		
 	async parse_metadata() {
-		var title = this.files.cd_ma.name.slice(0,-3);
-		var tokens = await MaUtil.tokenize(this.files.cd_ma);
-		var metadata = new Metadata("top", "top", title);
+		var title = this.files.ma.name.slice(0,-3);
+		var tokens = await MaUtil.tokenize(this.files.ma);
+		var metadata = new Metadata(title, "top");
 		
 		tokens.forEach(t => {
 			var curr = metadata.models.get(t.id);
@@ -45,42 +72,13 @@ export default class ParserCadmium extends Parser {
 					else type = MaUtil.add_atomic(metadata, c.type, [`s_${c.type}`]);
 				}
 				
-				MaUtil.add_subcomponent(metadata, curr, c.id, c.type);
+				MaUtil.add_subcomponent(metadata, curr.type, c.id, c.type);
 			});
 			
-			if (t.links) t.links.forEach(l => {
-				// Three possible cases:
-				// 		- out@receiver1 in2@Network
-				//		- controlIn controlIn@sender1
-				//		- packetSentOut@sender1 packetSentOut
-				var m_from = !l.from.model ? curr : curr.subcomponent.get(l.from.model);
-				var p_from = m_from.port.get(l.from.port);
-
-				if (!p_from) p_from = MaUtil.add_port(m_from, "output", l.from.port, [l.from.port]);
-				
-				var m_to = !l.to.model ? curr : curr.subcomponent.get(l.to.model);
-				var p_to = m_to.port.get(l.to.port);
-				
-				if (!p_to) p_to = MaUtil.add_port(m_to, "input", l.to.port, [l.to.port]);
-				
-				MaUtil.add_coupling(curr, m_from, p_from, m_to, p_to);
-			});
+			if (t.links) t.links.forEach(link => MaUtil.add_coupling(curr, link));
 		});
 		
 		return metadata;
-	}
-	
-	/**                              
-	 * Parses the visualization.json file
-	 * @return {Configuration} a visualization configuration file
-	 */		
-	async parse_visualization() {
-		var json = await Reader.read_as_json(this.files.visualization);
-		var viz = new ConfigurationDiagram(json);
-		
-		viz.diagram = await Reader.read_as_text(this.files.diagram);
-		
-		return viz;
 	}
 	
 	/**                              
@@ -95,7 +93,7 @@ export default class ParserCadmium extends Parser {
 		// var s_frames = await this.parse_file(structure, states, this.parse_state_line);
 		// var index = new List(f => f.time, s_frames);
 		
-		var o_frames = await this.parse_file(simulation.models, this.files.cadmium_output, this.parse_output_line);
+		var o_frames = await this.parse_file(simulation.models, this.files.output, this.parse_output_line);
 		
 		return o_frames;
 	}

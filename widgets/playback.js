@@ -42,7 +42,7 @@ export default Core.templatable("Api.Widget.Playback", class Playback extends Wi
 	initialize(simulation, settings) {
 		this.simulation = simulation;
 		this.settings = settings;
-				
+		
 		this.values = this.simulation.frames.map((f) => { return f.time; });
 		
 		this.min = 0;

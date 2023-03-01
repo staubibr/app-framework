@@ -112,56 +112,68 @@ export default class MaUtil {
 		return tokens;
 	}
 	
-	static add_coupled(metadata, type) {
-		var _coupled = ModelCoupled.make(type, type);
-		
-		return metadata.types.add(_coupled);
-	}
-	
 	static add_coupled_grid(metadata, type, fields, dimensions) {
 		var _dimensions = Dimensions.make(dimensions);
 		var _fields = fields.map(f => Field.make(f))
 		var _msg = MessageType.make(0, _fields);
-		var _state = State.make(_msg);
-		var _grid = ModelGrid.make(type, type, _state, _dimensions);
+		var _state = State.make(0);
+		var _grid = ModelGrid.make(type, type, _state, [_msg], _dimensions);
 		
-		return metadata.types.add(_grid);
+		return metadata.add_type(new ModelGrid(_grid));
 	} 
 	
+	static add_coupled(metadata, type) {
+		var _coupled = ModelCoupled.make(type, type);
+		
+		return metadata.add_type(new ModelCoupled(_coupled));
+	}
+	
 	static add_atomic(metadata, type, fields) {
-		var _fields = fields.map(f => Field.make(f))
+		var _fields = fields.map(f => Field.make(f));
 		var _msg = MessageType.make(0, _fields);
-		var _state = State.make(_msg);
+		var _state = State.make(0);
+		var _atomic = ModelAtomic.make(type, type, _state, [_msg]);
 		
-		var _atomic = ModelAtomic.make(type, type, _state);
+		return metadata.add_type(new ModelAtomic(_atomic));
+	}
+	
+	static add_port(type, port_type, port_name, fields) {
+		var _id = type.message_type.length;
+		var _fields = fields.map(f => Field.make(f));
+		var _msg = MessageType.make(_id, _fields);
+		var _port = Port.make(port_type, port_name, _id);
 		
-		return metadata.types.add(_atomic);
+		type.add_message_type(_msg);
+		
+		return type.add_port(new Port(_port));
 	}
 	
 	static add_subcomponent(metadata, coupled, id, type) {
-		var _type = metadata.types.get(type);
-		var _subcomponent = Subcomponent.make(id, _type);
+		var _subcomponent = Subcomponent.make(id, type);
 		
-		coupled.subcomponent.add(_subcomponent);
-		
-		return metadata.models.add(_subcomponent);
+		return metadata.add_subcomponent(coupled, new Subcomponent(_subcomponent));
 	}
 	
-	static add_port(model, port_type, port_name, fields) {
-		var _id = model.message_type.length;
-		var _fields = fields.map(f => Field.make(f));
-		var _msg = MessageType.make(_id, _fields);
-		var _port = Port.make(port_type, port_name, _msg);
+	static add_coupling(coupled, link) {
+		// Three possible cases:
+		// 		- out@receiver1 in2@Network
+		//		- controlIn controlIn@sender1
+		//		- packetSentOut@sender1 packetSentOut		
+		var m_from = link.from.model ? coupled.subcomponent.get(link.from.model) : coupled;
+		var p_from = m_from.port.get(link.from.port);
+
+		if (!p_from) p_from = MaUtil.add_port(m_from.type, "output", link.from.port, [link.from.port]);
 		
-		model.message_type.add(_msg);
+		var m_to = link.to.model ? coupled.subcomponent.get(link.to.model) : coupled;
+		var p_to = m_to.port.get(link.to.port);
 		
-		return model.port.add(_port);
-	}
-	
-	static add_coupling(model, m_from, p_from, m_to, p_to) {
-		var _coupling = Coupling.make(m_from, p_from, m_to, p_to);
+		if (!p_to) p_to = MaUtil.add_port(m_to.type, "input", link.to.port, [link.to.port]);
 		
-		model.coupling.push(_coupling);
+		// TODO: Cheating, this should use the add_coupling function on ModelCoupled but,
+		// it's a mess due to how ma files work.
+		var _coupling = new Coupling(Coupling.make(m_from, p_from, m_to, p_to));
+		
+		coupled.coupling.push(_coupling);
 		
 		return _coupling;
 	}

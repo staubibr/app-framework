@@ -1,20 +1,21 @@
 'use strict';
 
-import JsonObject from '../../base/json-object.js';
+import Configuration from './configuration.js';
 
 /** 
  * A configuration class that holds all basic visualization parameters
  **/
-export default class Configuration extends JsonObject { 
+export default class ConfigurationGis extends Configuration { 
 	
-	get type() { return "gis"; }
-
+	
+	get json() { return this._json; }
+	
 	/** 
 	* Sets the json configuration for the GIS view. 
 	* @type {object} 
 	*/
 	set json(value) { 
-		this.json = value; 
+		this._json = value; 
 		
 		if (this.variables) this.variables.forEach((s, i) => s.index = i); 
 	}
@@ -56,5 +57,7 @@ export default class Configuration extends JsonObject {
      */
 	constructor(json) {
 		super(json);
+		
+		this.type = this.type ?? "gis";
 	}
 }

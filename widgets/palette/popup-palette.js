@@ -10,7 +10,7 @@ export default Core.templatable("Api.Widget.Popup.Palette", class PopupPalette e
 	initialize(simulation, settings) {		
 		this.simulation = simulation;
 		this.settings = settings;
-		this.model = simulation.grid_model_types[0];
+		this.model = simulation.grid_types[0];
 		
 		// TODO: Review event names
 		this.elems.styles.on("style-deleted", ev => this.elems.layers.refresh());

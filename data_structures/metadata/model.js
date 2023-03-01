@@ -2,6 +2,7 @@
 
 import JsonObject from '../../base/json-object.js';
 import List from '../../base/list.js';
+import Port from './port.js';
 import MessageType from './message-type.js';
 
 /**
@@ -41,7 +42,11 @@ export default class Model extends JsonObject {
 	
 	get port() { return this.json["port"]; }
 	
+	set port(value) { this.json["port"] = value; }
+	
 	get message_type() { return this.json["message type"]; }
+	
+	set message_type(value) { this.json["message type"] = value; }
 	
     /**
      * @param {object} json - JSON used to initialize the object.
@@ -49,19 +54,43 @@ export default class Model extends JsonObject {
 	constructor(json) {
 		super(json);
 		
-		if (!this.port) this.json["port"] = [];
-		this.json["port"] = new List(p => p.name, this.ports);
+		var message_types = this.message_type?.map(j => new MessageType(j));
+		this.message_type = new List(m => m.id);
+		message_types?.forEach(m => this.add_message_type(m));
 		
-		if (!this.message_type) this.json["message type"] = [];
-		this.json["message type"] = new List(m => m.id, this.message_type);
+		var ports = this.port?.map(j => new Port(j));
+		this.port = new List(p => p.name);
+		ports?.forEach(p => this.add_port(p));
 	}
 	
+	add_message_type(message_type) {
+		return this.message_type.add(message_type);
+	}
+	
+	add_port(port) {
+		var p = this.port.add(port);
+		
+		p.message_type = this.message_type.get(p.message_type);
+		
+		return p;
+	}
+	
+	/*
 	static make(id, title) {
 		return new Model({
 			"identifier": id,
 			"title": title,
-			"port": null,
-			"message type": null
+			"port": [],
+			"message type": []
 		});
+	}
+	*/
+	static make(id, title) {
+		return {
+			"identifier": id,
+			"title": title,
+			"port": [],
+			"message type": []
+		};
 	}
 }

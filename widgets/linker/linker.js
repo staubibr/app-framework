@@ -44,7 +44,7 @@ export default Core.templatable("Api.Widget.Linker", class Linker extends Widget
 			m.port.forEach(p => ports.push({ model:m, port:p }));
 		});
 		
-		simulation.coupled_model_types.forEach(m => {
+		simulation.coupled_types.forEach(m => {
 			links = links.concat(m.coupling);
 		});
 		

@@ -8,7 +8,7 @@ import JsonObject from '../../base/json-object.js';
  * @extends JsonObject
  */
 export default class CouplingsSet extends JsonObject { 
-	   
+	
 	get from_model() { return this.json["from_model"]; }
 	
 	get from_port() { return this.json["from_port"]; }

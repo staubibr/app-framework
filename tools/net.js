@@ -4,7 +4,7 @@ import Core from './core.js';
  * A utility class that contains a series of basic functions for requests
  **/
 export default class Net {
-	
+	// TODO: USE ASYNC AWAIT
 	/**
 	* builds a url string from a query object and base url
 	* @param {string} base - the base URL

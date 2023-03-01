@@ -2,12 +2,14 @@
 
 import Core from '../tools/core.js';
 import Dom from '../tools/dom.js';
+import Net from '../tools/net.js';
 import Widget from '../base/widget.js';
+import Reader from "../components/chunk-reader.js";
 import BoxInputFiles from '../ui/box-input-files.js';
 import Parser from '../parsers/parser.js';
 import ParserCDpp from '../parsers/parserCDpp.js';
 import ParserCadmium from '../parsers/parserCadmium.js';
-// import ParserOGSE from '../parsers/parserOGSE.js';
+import ParserOGSE from '../parsers/parserOGSE.js';
 import Simulation from '../data_structures/simulation/simulation.js';
 
 export default Core.templatable("Api.Widget.Loader", class Loader extends Widget { 
@@ -27,41 +29,56 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 	restore_ui() {
 		Dom.add_css(this.elems.wait, "hidden");
 		
-		this.elems.parse.style.backgroundImage = null;	
+		this.elems.parse.style.backgroundImage = null;
 	}
 	
+	// Parsing, normal process:
+	// 1. Get visualization json (either from file or service)
+	// 2. Create configuration object from json (configuration-gis.js for example)
+	// 3. Call load_files on configuration object.
+	// 4. Create parser Object
+	// 5. Call parse_metadata function on parser object
+	// 6. Create simulation object from metadata
+	// 7. Call parse_messages function on parser object
+	// 8. call initialize on visualization object
+	// 9. initialize simulation object
 	async load(files) {
-		try {
-			files = Parser.organize_files(files);
+		try {			
+			// returns visualization object and adds files to array
+			var viz = await Parser.parse_visualization(files);
+			
+			if (viz) files = files.concat(await viz.load_files());
 			
 			if (ParserCadmium.detect(files)) var parser = new ParserCadmium(files);
 			
 			else if (ParserCDpp.detect(files)) var parser = new ParserCDpp(files);
 			
-			else var parser = new ParserOGSE(files);
+			else if (ParserOGSE.detect(files)) var parser = new ParserOGSE(files);
 			
-			await this.parse(parser, files);
+			else throw new Error("Unable to detect simulation type (Cadmium, CDpp-Grid or OGSE).")
+			
+			await this.parse(parser, files, viz);
 		}
 		catch (error) {
 			this.on_widget_error(error);
 		}
 	}
 	
-	async parse(parser, files) {
+	async parse(parser, files, viz) {		
 		parser.on("progress", this.on_parser_progress.bind(this));
 		
 		var metadata = await parser.parse_metadata();
-		var configuration = await parser.parse_visualization(metadata);
-		var simulation = new Simulation(metadata, configuration.cache);
+		var simulation = new Simulation(metadata);
 		var messages = await parser.parse_messages(simulation);
 		
-		if (configuration.type == "grid") configuration.initialize(simulation);
+		if (!viz) viz = await parser.default_visualization();
 		
-		simulation.initialize(messages);
+		viz.initialize(parser.files, simulation);
+		simulation.initialize(messages, viz.cache);
 		
 		this.restore_ui();
 
-		this.emit("ready", { files: files, simulation: simulation, configuration: configuration });			
+		this.emit("ready", { files: parser.files, simulation: simulation, viz: viz });			
 	}
 	
 	on_parser_progress(ev) {		

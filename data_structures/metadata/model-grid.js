@@ -4,6 +4,7 @@ import List from '../../base/list.js';
 import Model from './model.js';
 import ModelCoupled from './model-coupled.js';
 import SubcomponentCell from './subcomponent-cell.js';
+import State from './state.js';
 import Dimensions from './dimensions.js';
 
 /**
@@ -15,9 +16,19 @@ export default class ModelGrid extends Model {
 	
 	get subcomponent() { return this.json["subcomponent"]; }
 	
+	set subcomponent(value) { this.json["subcomponent"] = value; }
+	
 	get dimensions() { return this.json["dimensions"]; }
 	
+	set dimensions(value) { this.json["dimensions"] = value; }
+	
 	get state() { return this.json["state"]; }
+	
+	set state(value) { 
+		this.json["state"] = value;
+		
+		this.state.message_type = this.message_type.get(this.state.message_type);
+	}
 	
 	get index() { return this._index; }
 	
@@ -29,8 +40,16 @@ export default class ModelGrid extends Model {
 		
 		this._index = []
 		
-		if (!this.subcomponent) this.json["subcomponent"] = [];
-		this.json["subcomponent"] = new List(s => s.id, this.subcomponents);
+		this.state = new State(json.state);
+		this.dimensions = new Dimensions(json.dimensions);
+		
+		var subcomponents = this.subcomponent.map(j => new Subcomponent(j));
+		this.subcomponent = new List(s => s.id);
+		subcomponents.forEach(s => this.add_subcomponent(s));
+	}
+	
+	add_subcomponent(subcomponent) {
+		return this.subcomponent.add(subcomponent);
 	}
 		
 	build_index(metadata, type) {		
@@ -43,8 +62,9 @@ export default class ModelGrid extends Model {
 				this.index[x][y] = [];
 			
 				for (var z = 0; z < this.dimensions.z; z++) {
-					var cell = SubcomponentCell.make(`c-${id++}`, type, [x,y,z]);
-					this.index[x][y][z] = metadata.models.add(this.subcomponent.add(cell));
+					var json = SubcomponentCell.make(`c-${id++}`, type, [x,y,z]);
+					var cell = this.subcomponent.add(new SubcomponentCell(json));
+					this.index[x][y][z] = metadata.models.add(cell);
 				}
 			}
 		}
@@ -59,13 +79,24 @@ export default class ModelGrid extends Model {
 			"identifier": this.id,
 			"title": this.title,
 			"port": this.ports,
+			"state": this.state,
 			"message type": this.message_type,
-			"model type": this.model_type instanceof Model ? this.model_type.id : this.model_type,
-			"dimensions": this.dimensions,
-			"state": this.state
+			"dimensions": this.dimensions
 		}
 	}
 	
+	static make(id, title, state, message_types, dimensions) {
+		return {
+			"identifier": id,
+			"title": title,
+			"port": [],
+			"message type": message_types,
+			"subcomponent": [],
+			"state": state,
+			"dimensions": dimensions
+		};
+	}
+	/*
 	static make(id, title, state, dimensions) {
 		return new ModelGrid({
 			"identifier": id,
@@ -77,4 +108,5 @@ export default class ModelGrid extends Model {
 			"dimensions": dimensions
 		});
 	}
+	*/
 }

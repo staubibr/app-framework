@@ -24,15 +24,23 @@ export default class Port extends JsonObject {
 		return {
 			"type": this.type,
 			"name": this.name,
-			"message type": this.message_type instanceof MessageType ? this.message_type.id : this.message_type
+			"message type": this.message_type.id
 		}
 	}
-	
+	/*
 	static make(type, name, message_type) {
 		return new Port({
 			"type": type,
 			"name": name,
 			"message type": message_type
 		});
+	}
+	*/
+	static make(type, name, message_type_id) {
+		return {
+			"type": type,
+			"name": name,
+			"message type": message_type_id
+		};
 	}
 }

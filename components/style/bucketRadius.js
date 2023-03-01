@@ -37,8 +37,8 @@ export default class BucketRadius {
 	 * @param {number} value - the value used to determine the style
      * @return {number} the radius for this style
      */
-	symbol(value) {
-		var v = value[this.property];
+	symbol(message) {
+		var v = message.get_value(this.property);
 		
 		if (v == 0 && this.zero) return new ol.style.Fill({ color: this.zero });
 		

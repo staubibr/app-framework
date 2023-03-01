@@ -1,5 +1,6 @@
 'use strict';
 
+import Net from '../../tools/net.js';
 import Evented from '../../base/evented.js';
 
 /** 
@@ -10,6 +11,14 @@ export default class Configuration extends Evented {
 	get json() { return this._json; }
 	
 	set json(value) { this._json = value; }
+	
+	get type() { return this.json.type; }
+	
+	set type(value) { this.json.type = value; }
+	
+	get files() { return this._files; }
+	
+	set files(value) { this._files = value; }
 	
 	/** 
 	* Gets the speed for the playback. In frames per second. 
@@ -60,6 +69,17 @@ export default class Configuration extends Evented {
 		this.speed = this.speed ?? 10;
 		this.loop = this.loop ?? true;
 		this.cache = this.cache ?? 10;
+		this.files = this.json.files ?? [];
+	}
+	
+	initialize(files) {
+		this.files = files;
+	}
+	
+	async load_files() {
+		return await Promise.all(this.files.map(async (f, i) => {			
+			return await Net.file(f.url, f.name, false);
+		}));
 	}
 	
     /**

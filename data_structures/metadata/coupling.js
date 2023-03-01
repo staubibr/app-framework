@@ -29,19 +29,29 @@ export default class Coupling extends JsonObject {
 	
 	toJSON() {
 		return {
-			"from model": this.from_model instanceof Subcomponent ? this.from_model.id : this.from_model,
-			"from port": this.from_port instanceof Port ? this.from_port.name : this.from_port,
-			"to model": this.to_model instanceof Subcomponent ? this.to_model.id : this.to_model,
-			"to port": this.to_port instanceof Port ? this.to_port.name : this.to_port
+			"from model": this.from_model.id,
+			"from port": this.from_port.name,
+			"to model": this.to_model.id,
+			"to port": this.to_port.name
 		}
 	}
 	
-	static make(from_model, from_port, to_model, to_port) {
+	static make(from_model_id, from_port_name, to_model_id, to_port_name) {
+		return {
+			"from model": from_model_id,
+			"from port": from_port_name,
+			"to model": to_model_id,
+			"to port": to_port_name
+		};
+	}
+	/*
+	static make(from_model_id, from_port_name, to_model_id, to_port_name) {
 		return new Coupling({
-			"from model": from_model,
-			"from port": from_port,
-			"to model": to_model,
-			"to port": to_port
+			"from model": from_model_id,
+			"from port": from_port_name,
+			"to model": to_model_id,
+			"to port": to_port_name
 		});
 	}
+	*/
 }

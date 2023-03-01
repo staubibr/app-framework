@@ -21,16 +21,16 @@ export default class SubcomponentCell extends Subcomponent {
 	toJSON() {
 		return {
 			"identifier": this.id,
-			"model type": this.model_type instanceof Model ? this.model_type.id : this.model_type,
+			"model type": this.type.id,
 			"coords": this.coords
 		}
 	}
-	
-	static make(id, model_type, coords) {
-		return new SubcomponentCell({
+
+	static make(id, type_id, coords) {
+		return {
 			"identifier": id,
-			"model type": model_type,
+			"model type": type_id,
 			"coords": coords
-		});
+		};
 	}
 }

@@ -2,6 +2,10 @@
 
 import Core from '../tools/core.js';
 import Evented from '../base/evented.js';
+import Reader from "../components/chunk-reader.js";
+import ConfigurationDiagram from '../data_structures/visualization/configuration-diagram.js';
+import ConfigurationGrid from '../data_structures/visualization/configuration-grid.js';
+import ConfigurationGis from '../data_structures/visualization/configuration-gis.js';
 
 export default class Parser extends Evented { 
 
@@ -17,7 +21,7 @@ export default class Parser extends Evented {
 	constructor(files) {
 		super();
 		
-		this.files = files;
+		this.files = {};
 	}
 	
 	/**                              
@@ -48,8 +52,22 @@ export default class Parser extends Evented {
 	 * Parses the visualization.json file
 	 * @return {Configuration} a visualization configuration file
 	 */		
-	async parse_visualization() {
-		throw new Error("parse_visualization must be implemented by parser.");
+	static async parse_visualization(files) {		
+		var file = files.find(f => f.name.toLowerCase() == 'visualization.json');
+	
+		if (!file) return null;
+	
+		var j_viz = await Reader.read_as_json(file);
+		
+		if (j_viz.type == "diagram") var viz = new ConfigurationDiagram(j_viz);
+		
+		else if (j_viz.type == "grid") var viz = new ConfigurationGrid(j_viz);
+		
+		else if (j_viz.type == "gis") var viz = new ConfigurationGis(j_viz);
+		
+		else throw new Error("Unable to detect visualization type.");
+		
+		return viz;
 	}
 	
 	/**                              
@@ -58,23 +76,5 @@ export default class Parser extends Evented {
 	 */		
 	async parse_messages() {
 		throw new Error("parse_messages must be implemented by parser.");
-	}
-	
-	static organize_files(files) {
-		return {
-			cadmium_state: files.find(f => f.name.toLowerCase().endsWith('_output_state.txt')),
-			cadmium_output: files.find(f => f.name.toLowerCase().endsWith('_output_messages.txt')),
-			cd_ma: files.find(f => f.name.toLowerCase().endsWith('.ma')),
-			cd_log: files.find(f => f.name.toLowerCase().includes('.log')),
-			cd_pal: files.find(f => f.name.toLowerCase().endsWith('.pal')),
-			cd_val: files.find(f => f.name.toLowerCase().endsWith('.val')),
-			cd_map: files.find(f => f.name.toLowerCase().endsWith('.map')),
-			structure: files.find(f => f.name == 'structure.json'),
-			messages: files.find(f => f.name == 'messages.log'),
-			diagram: files.find(f => f.name == 'diagram.svg'),
-			visualization: files.find(f => f.name == 'visualization.json'),
-			style: files.find(f => f.name == 'style.json'),
-			geojson: files.filter(f => f.name.endsWith('.geojson'))
-		}
 	}
 };

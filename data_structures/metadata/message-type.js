@@ -15,6 +15,10 @@ export default class MessageType extends JsonObject {
 	
 	get field() { return this.json["field"]; }
 	
+	set field(value) { this.json["field"] = value; }
+	
+	set field(value) { this.json["field"] = value; }
+	
 	get index() { return this._index; }
 	
     /**
@@ -23,12 +27,20 @@ export default class MessageType extends JsonObject {
 	constructor(json) {
 		super(json);
 		
-		if (!this.field) this.json["field"] = [];
-		this.json["field"] = new List(f => f.name, this.field);
-		
 		this._index = {};
 		
-		for (var i = 0; i < this.field.length; i++) this._index[this.field[i].name] = i;
+		var fields = this.field.map(j => new Field(j));
+		this.field = new List(f => f.name);
+		fields.forEach(f => this.add_field(f));
+	}
+	
+	add_field(field) {
+		var f = this.field.add(field);
+		
+		// TODO: Make this part of the field object ?
+		this._index[f.name] = this.field.get_index(f.name);
+		
+		return f;
 	}
 	
 	pair(values, fn) {
@@ -46,11 +58,18 @@ export default class MessageType extends JsonObject {
 		
 		return t;
 	}
-	
+	/*
 	static make(id, fields) {
 		return new MessageType({
 			"identifier": id,
 			"field": fields
 		});
+	}
+	*/
+	static make(id, fields) {
+		return {
+			"identifier": id,
+			"field": fields
+		};
 	}
 }

@@ -33,8 +33,8 @@ export default class BucketFill {
 	 * @param {number} value - the value used to determine the style
      * @return {ol.style.Fill} an OL style for polygons
      */
-	symbol(value) {
-		var v = value[this.property];
+	symbol(message) {
+		var v = message.get_value(this.property);
 		
 		if (v == 0 && this.zero) return new ol.style.Fill({ color: this.zero });
 		

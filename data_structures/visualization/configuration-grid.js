@@ -1,14 +1,43 @@
 'use strict';
 
+import JsonObject from '../../base/json-object.js';
 import Configuration from './configuration.js';
 import ModelGrid from '../metadata/model-grid.js';
+
+class GridLayer extends JsonObject {
+	
+	get z() { return this.json.z; }
+	
+	get fields() { return this.json.fields; }
+	
+	get style() { return this.json.style; }
+	
+	get position() { return this.json.position; }
+	
+	get geom() { return this.json.geom; }
+	
+	set geom(value) { this.json.geom = value; }
+	
+	constructor(json) {
+		super(json); 
+	}
+	
+	toJSON() {
+		return { 
+			z:this.z, 
+			fields:this.fields, 
+			style:this.style, 
+			position:this.position
+		}
+	}
+}
+
+
 
 /** 
  * A configuration class that holds grid visualization parameters
  **/
 export default class ConfigurationGrid extends Configuration { 
-	
-	get type() { return "grid"; }
 	
 	/** 
 	* Gets the number of columns for the grid. 
@@ -122,36 +151,41 @@ export default class ConfigurationGrid extends Configuration {
 		this.spacing = this.spacing ?? 10;
 		this.showGrid = this.showGrid ?? false;
 		this.aspect = this.aspect ?? true;
-		this.layers = this.layers ?? [];
 		this.styles = this.styles ?? [];
+		this.type = this.type ?? "grid";
+		
+		this.layers = this.layers?.map(l => new GridLayer(l)) ?? [];
 	}
 	
-	initialize(simulation) {
+	initialize(files, simulation) {
+		super.initialize(files);
+		
 		if (this.layers.length > 0) return;
 
-		var grid = simulation.model_types[1];
-		var model = simulation.model_types[2];
-		var layers = [];
+		var grid = simulation.types[1];
+		var model = simulation.types[2];
 		
 		for (var i = 0; i < grid.dimensions.z; i++) {
-			model.state.fields.forEach(f => {				
-				layers.push({ z:i, fields:[f.name], style:0, position:layers.length });
-			});
+			model.state.fields.forEach(f => this.add_layer(i, [f.name], 0));
 		}
 
-		this.layers = layers;
 		this.columns = this.layers.length > 3 ? 3 : this.layers.length;
 	}
 		
     /**
      * Adds a layer to the grid configuration. A layer configuration determines how the layer will be drawn.
      * @param {number} z - The z value for the layer to draw.
-     * @param {string[]} ports - An array of port names that will be drawn on the layer
+     * @param {string[]} fields - An array of field names that will be drawn on the layer
      * @param {number} style - The index of the style used to draw the layer.
 	 * @return {object} the layer configuration added
 	 */
-	add_layer(z, ports, style) {
-		var layer = { z:z, ports:ports, style:style, position:this.layers.length }
+	add_layer(z, fields, style) {				
+		var layer = new GridLayer({ 
+			z:z, 
+			fields:fields, 
+			style:style, 
+			position:this.layers.length 
+		});
 		
 		this.layers.push(layer);
 		
@@ -176,9 +210,7 @@ export default class ConfigurationGrid extends Configuration {
      * @return {object} the style object 
 	 * @todo style object should be made into a class
 	 */
-	add_style(buckets) {
-		var style = { buckets:buckets };
-		
+	add_style(style) {		
 		this.styles.push(style);
 		
 		return style;

@@ -11,10 +11,10 @@ export default Core.templatable("Api.Widget.GIS.PopupContent", class PopupConten
 	constructor(node, options) {
 		super(node);
 		
-		this.get_content = options.get_content;
-		this.get_title = options.get_title;
+		this.get_content = options?.get_content ?? null;
+		this.get_title = options?.get_title ?? null;
 		
-		this.fill(options.features || [])
+		this.fill(options?.features || [])
 		
 		this.elems.prev.addEventListener("click", this.prev_page.bind(this));
 		this.elems.next.addEventListener("click", this.next_page.bind(this));

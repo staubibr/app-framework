@@ -128,7 +128,7 @@ export default class Diagram extends Evented {
 	load_links(simulation) {
 		var links = {}
 		
-		simulation.coupled_model_types.forEach(m => {			
+		simulation.coupled_types.forEach(m => {			
 			m.coupling.forEach(c => {
 				if (!links[c.from_model.id]) links[c.from_model.id] = {};
 				

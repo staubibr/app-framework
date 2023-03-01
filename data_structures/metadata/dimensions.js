@@ -15,7 +15,12 @@ export default class Dimensions extends JsonObject {
 	
 	get z() { return this.json[2]; }
 	
+	/*
 	static make(dimensions) {
 		return new Dimensions(dimensions);
+	}
+	*/
+	static make(dimensions) {
+		return dimensions;
 	}
 }

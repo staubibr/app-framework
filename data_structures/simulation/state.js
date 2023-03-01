@@ -50,7 +50,7 @@ export default class State {
 		
 		return clone;
 	}
-		
+	
     /**
      * Returns the state value of a model for the current state.
      * @param {Model} model - a model instance for which to retrieve the state value.

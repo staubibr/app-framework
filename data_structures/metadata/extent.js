@@ -18,7 +18,7 @@ export default class Extent extends JsonObject {
 	get x_max() { return this.json["x max"]; }
 	
 	get y_max() { return this.json["y max"]; }
-	
+	/*
 	static make(reference, x_min, y_min, x_max, y_max) {
 		return new Extent({
 			"reference": reference,
@@ -27,5 +27,15 @@ export default class Extent extends JsonObject {
 			"x max": x_max,
 			"y max": y_max
 		});
+	}
+	*/
+	static make(reference, x_min, y_min, x_max, y_max) {
+		return {
+			"reference": reference,
+			"x min": x_min,
+			"y min": y_min,
+			"x max": x_max,
+			"y max": y_max
+		};
 	}
 }
