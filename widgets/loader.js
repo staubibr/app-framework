@@ -10,6 +10,7 @@ import Parser from '../parsers/parser.js';
 import ParserCDpp from '../parsers/parserCDpp.js';
 import ParserCadmium from '../parsers/parserCadmium.js';
 import ParserOGSE from '../parsers/parserOGSE.js';
+import ParserAidan from '../parsers/parserAidan.js';
 import Simulation from '../data_structures/simulation/simulation.js';
 
 export default Core.templatable("Api.Widget.Loader", class Loader extends Widget { 
@@ -55,6 +56,8 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 			
 			else if (ParserOGSE.detect(files)) var parser = new ParserOGSE(files);
 			
+			else if (ParserAidan.detect(files)) var parser = new ParserAidan(files);
+			
 			else throw new Error("Unable to detect simulation type (Cadmium, CDpp-Grid or OGSE).")
 			
 			await this.parse(parser, files, viz);
@@ -78,7 +81,7 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 		
 		this.restore_ui();
 
-		this.emit("ready", { files: parser.files, simulation: simulation, viz: viz });			
+		this.emit("ready", { files: parser.files, simulation: simulation, viz: viz });		
 	}
 	
 	on_parser_progress(ev) {		

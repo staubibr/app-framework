@@ -143,7 +143,7 @@ export default Core.templatable("Api.Widget.GIS", class wGIS extends Widget {
 	on_variable_select_change(ev){		
 		this.gis.draw(this.current, this.simulation.state.messages);
 
-		this.gis.add_legend();
+		this.gis.add_legend(this.current);
 	}
 	
 	on_simulation_jump(ev) {

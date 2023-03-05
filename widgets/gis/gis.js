@@ -26,7 +26,7 @@ export default class GIS extends Evented {
 		
 		this.map = new Map(container, [basemap1, basemap2]);
 		
-		this.map.on("render-complete", this.on_map_render_complete.bind(this));
+		Promise.all([this.map.ready(), this.get_layer_json()]).then(this.on_map_ready.bind(this));
 		
 		if (options.view) this.map.set_view(options.view.center, options.view.zoom);
 
@@ -45,17 +45,14 @@ export default class GIS extends Evented {
 		this.map.popup.setPosition(coordinates);
 	}
 	
-	async on_map_render_complete(d, ev) {
-		// Show geo layers and draw simulation state
-		// for (var id in this.map.layers)this.map.layers[id].set('visible', true);
-	
+	async on_map_ready(d, ev) {	
 		// Load all geojson data layers contained in visualization.json
-		await Promise.all(this.options.layers.map(async l => {
-			if (l.file) return this.load_layer_from_file(l);
+		this.options.layers.forEach(l => {			
+			if (l.json) return this.load_layer_from_file(l);
 			
 			if (l.url) return this.load_layer_from_service(l);
-		}));
-		
+		});
+
 		// Prepare simulation styles, set first one as currently selected, 
 		// update the variable selector to reflect the current property being coloured
 		this.prepare_simulation_visualization();
@@ -65,20 +62,26 @@ export default class GIS extends Evented {
 		this.emit("ready");
 	}
 	
-	async load_layer_from_file(layer) {
-		var f = this.options.files.geojson.find(f => f.name == layer.file);
+	async get_layer_json() {
+		return Promise.all(this.options.layers.map(async l => {
+			if (!l.file) return;
+			
+			var f = this.options.files.geojson.find(f => f.name == l.file);
+			
+			if (!f) throw new Error(`File ${l.file} not provided in the visualization file.`);
+			
+			l.json = await Reader.read_as_json(f);
+		}));
+	}
 		
-		if (!f) throw new Error(`File ${l.file} not provided in the visualization file.`);
-		
-		var j_data = await Reader.read_as_json(f);
+	async load_layer_from_file(layer, position) {
 		var j_style = this.options.styles.find(s => s.id == layer.style);
 		var style = Style.from_json(layer.type, j_style);
 		
-		j_data.name = layer.id;
+		layer.json.name = layer.id;
 		
-		var l = this.map.add_geojson_layer(layer.id, j_data);
+		var l = this.map.add_geojson_layer(layer.id, layer.json, position);
 		
-		// l.set('visible', false);
 		l.setStyle(style.symbol());
 	}
 	

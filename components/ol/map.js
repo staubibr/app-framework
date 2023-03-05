@@ -50,15 +50,17 @@ export default class Map extends Evented {
 			this.emit("click", { "features" : features, "coordinates" : ev.coordinate });
 		})
 		
-		this._ol.once("rendercomplete", (ev) => {
-			this.emit("render-complete", null);
-		});
-		
 		this.projection = basemaps[0].getSource().getProjection();
 		
 		this.popup = new ol.Overlay.Popup({ closeBox:true });
    
 		this.OL.addOverlay(this.popup);
+	}
+	
+	ready() {
+		return new Promise(resolve => {
+			this._ol.once("rendercomplete", resolve);
+		});
 	}
 	
     /**
