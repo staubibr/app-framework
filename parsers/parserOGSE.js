@@ -100,7 +100,7 @@ export default class ParserOGSE extends Parser {
 			
 			// If line has only one item, then it's a timestep. Otherwise, it's a simulation message, 
 			// the format then depends on the whether it's a DEVS, Cell-DEVS or Irregular model
-			var lines = chunk.split("\r\n");
+			var lines = chunk.split("\n");
 		
 			for (var i = 0; i < lines.length; i++) {
 				var data = lines[i].split(";");
