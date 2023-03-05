@@ -27,8 +27,6 @@ export default class ParserAidan extends Parser {
 		
 		if (!files.find(f => f.name.toLowerCase().endsWith('_state.txt'))) return false;
 		
-		if (!files.find(f => f.name.toLowerCase().endsWith('_messages.txt'))) return false;
-		
 		if (!files.find(f => f.name.toLowerCase() == "metadata.json")) return false;
 		
 		return true;
