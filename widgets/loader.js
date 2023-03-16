@@ -43,10 +43,12 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 	// 7. Call parse_messages function on parser object
 	// 8. call initialize on visualization object
 	// 9. initialize simulation object
-	async load(files) {
+	async load(files, ogse) {
 		try {			
 			// returns visualization object and adds files to array
 			var viz = await Parser.parse_visualization(files);
+			
+			if (viz && ogse) viz.link_ogse(ogse);
 			
 			if (viz) files = files.concat(await viz.load_files());
 			

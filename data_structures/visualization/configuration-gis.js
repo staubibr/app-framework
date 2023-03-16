@@ -60,4 +60,11 @@ export default class ConfigurationGis extends Configuration {
 		
 		this.type = this.type ?? "gis";
 	}
+	
+	link_ogse(workspace) {
+		debugger;
+		
+		// TODO: URL SHOULDNT BE HARDCODED
+		this.files.forEach(f => f.url = "http://localhost/ogse-files/workspaces/" + workspace + "/" + f.url);
+	}
 }
