@@ -6,6 +6,7 @@ import Reader from "../components/chunk-reader.js";
 import ConfigurationDiagram from '../data_structures/visualization/configuration-diagram.js';
 import ConfigurationGrid from '../data_structures/visualization/configuration-grid.js';
 import ConfigurationGis from '../data_structures/visualization/configuration-gis.js';
+import Frame from '../data_structures/simulation/frame.js';
 
 export default class Parser extends Evented { 
 
@@ -76,5 +77,37 @@ export default class Parser extends Evented {
 	 */		
 	async parse_messages() {
 		throw new Error("parse_messages must be implemented by parser.");
+	}
+	
+	parse_line() {
+		throw new Error("parse_line must be implemented by parser using CSV log files.");
+	}
+	
+	async parse_csv(simulation, get_time, parse_line) {
+		var f = null;
+		
+		return Reader.read_by_chunk(this.files.log, "\n", (parsed, chunk, progress) => {
+			if (parsed == null) parsed = [];
+			
+			// If line has only one item, then it's a timestep. Otherwise, it's a simulation message, 
+			// the format then depends on the whether it's a DEVS, Cell-DEVS or Irregular model
+			var lines = chunk.split("\n");
+			var start = f == null ? 1 : 0;
+			
+			for (var i = start; i < lines.length; i++) {
+				var d = lines[i].split(";");
+				
+				if (f?.time == d[0]) parse_line(f, simulation, d);
+				
+				else {
+					f = new Frame(get_time(d));
+					parsed.push(f);
+				}			
+			}
+			
+			this.emit("progress", { progress: progress });
+			
+			return parsed;
+		}, true);
 	}
 };

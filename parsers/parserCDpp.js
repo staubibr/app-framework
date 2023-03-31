@@ -12,7 +12,7 @@ import ModelCoupled from '../data_structures/metadata/model-coupled.js'
 import ModelGrid from '../data_structures/metadata/model-grid.js'
 import ConfigurationGrid from '../data_structures/visualization/configuration-grid.js';
 import Parser from './parser.js';
-import MaUtil from './ma-util.js'
+import MaUtil from './ma-util.js';
 
 /**
  * A parser component to process the raw Cell-DEVS results from CDpp or Lopez
@@ -45,10 +45,19 @@ export default class ParserCDpp extends Parser {
 	 * Parses the visualization.json file
 	 * @return {Configuration} a visualization configuration file
 	 */		
-	async default_visualization() {
+	async default_visualization(simulation) {
 		var viz = new ConfigurationGrid();
 
 		if (this.files.pal) viz.styles = await this.parse_style();
+		
+		var grid = simulation.types[1];
+		var model = simulation.types[2];
+		
+		for (var i = 0; i < grid.dimensions.z; i++) {
+			model.state.fields.forEach(f => viz.add_layer(i, [f.name], 0));
+		}
+
+		viz.columns = viz.layers.length > 3 ? 3 : viz.layers.length;
 		
 		return viz;
 	}
@@ -62,7 +71,7 @@ export default class ParserCDpp extends Parser {
 		var title = this.files.ma.name.slice(0,-3);
 		var tokens = await MaUtil.tokenize(this.files.ma);
 		var t = tokens.find(t => !!t.dim);
-		var metadata = new Metadata(title, "top");
+		var metadata = new Metadata("top", "top");
 		
 		// In CDpp and Lopez, cells only log output messages. For visualization, we consider 
 		// output messages as state messages. Lopez outputs through ports while CDpp outputs 

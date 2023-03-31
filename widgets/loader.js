@@ -9,6 +9,7 @@ import BoxInputFiles from '../ui/box-input-files.js';
 import Parser from '../parsers/parser.js';
 import ParserCDpp from '../parsers/parserCDpp.js';
 import ParserCadmium from '../parsers/parserCadmium.js';
+import ParserCadmiumV2 from '../parsers/parserCadmiumV2.js';
 import ParserOGSE from '../parsers/parserOGSE.js';
 import ParserAidan from '../parsers/parserAidan.js';
 import Simulation from '../data_structures/simulation/simulation.js';
@@ -54,6 +55,8 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 			
 			if (ParserCadmium.detect(files)) var parser = new ParserCadmium(files);
 			
+			else if (ParserCadmiumV2.detect(files)) var parser = new ParserCadmiumV2(files);
+			
 			else if (ParserCDpp.detect(files)) var parser = new ParserCDpp(files);
 			
 			else if (ParserOGSE.detect(files)) var parser = new ParserOGSE(files);
@@ -76,9 +79,10 @@ export default Core.templatable("Api.Widget.Loader", class Loader extends Widget
 		var simulation = new Simulation(metadata);
 		var messages = await parser.parse_messages(simulation);
 		
-		if (!viz) viz = await parser.default_visualization();
+		if (!viz) viz = await parser.default_visualization(simulation);
 		
-		viz.initialize(parser.files, simulation);
+		viz.files = parser.files;
+		
 		simulation.initialize(messages, viz.cache);
 		
 		this.restore_ui();
