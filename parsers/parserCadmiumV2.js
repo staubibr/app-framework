@@ -46,7 +46,7 @@ export default class ParserOGSE extends Parser {
 		var viz = new ConfigurationGrid();
 		var j_config = await Reader.read_as_json(this.files.config);
 		
-		j_config.scenario.state.forEach((s, i) => {			
+		j_config.viewer.forEach((s, i) => {			
 			viz.styles.push(s.colors.map((c, j) => {
 				return { start:s.breaks[j], end:s.breaks[j + 1], color:c };
 			}));
@@ -68,7 +68,7 @@ export default class ParserOGSE extends Parser {
 		
 		var id = j_config.cells.default.cell_type;
 		var metadata = new Metadata("top", "top");		
-		var fields = j_config.scenario.state.map(s => s.field);
+		var fields = j_config.viewer.map(s => s.field);
 		var dim = j_config.scenario.shape;
 		
 		if (dim.length == 2) dim[2] = 1;
