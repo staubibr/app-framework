@@ -6,21 +6,7 @@ import Message from './message.js';
  * The message output class contains the data that a model outputs through a port.
  **/
 export default class MessageOutput extends Message { 
-	
-	/** 
-	* Gets the message port type
-	* @type {TypePort} 
-	*/
-	get port() { return this._port; }
-	
-	/** 
-	* Sets the message port type
-	* @type {TypePort} 
-	*/
-	set port(value) { this._port = value; }
-	
-	get templated() { return this.port.message_type.template(this.value); }
-	
+		
 	get templated_string() { return JSON.stringify(this.templated); }
 	
     /**
@@ -32,6 +18,8 @@ export default class MessageOutput extends Message {
 		super(model, value);
 		
 		this.port = port;
+		
+		this.templated = this.port.message_type.template(this.value);
 	}
 	
 	pair(fn) {

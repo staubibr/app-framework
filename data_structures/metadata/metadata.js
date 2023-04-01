@@ -31,7 +31,7 @@ export default class Metadata {
 	 * The metadata for the simulation (list of model types)
      */
 	constructor(top_type_id, top_id) {				
-		this._models = new List(m => m.id);
+		this._models = [];
 		this._types = new List(t => t.id);	
 
 		if (!top_type_id || !top_id) return;
@@ -40,7 +40,19 @@ export default class Metadata {
 		var sub = new Subcomponent(Subcomponent.make(top_id, top));
 		
 		this.types.add(top);
-		this.models.add(sub);
+		this.add_model(sub);
+	}
+	
+	add_model(subcomponent) {
+		subcomponent.position = this.models.length;
+		
+		this.models.push(subcomponent);
+		
+		return subcomponent;
+	}
+	
+	get_model(id) {
+		return this.models.find(m => m.id == id);
 	}
 	
 	add_type(type) {
@@ -52,14 +64,14 @@ export default class Metadata {
 		//THROW ERROR IF NOT MODEL TYPE
 		coupled?.add_subcomponent(subcomponent);
 		
-		return this.models.add(subcomponent);
+		return this.add_model(subcomponent);
 	}
 	
-	add_coupling(coupled, c) {	// subcomponent, coupling
-		c.from_model = c.from_model ? this.models.get(c.from_model) : coupled;
+	add_coupling(coupled, c) {	// subcomponent, coupling	
+		c.from_model = c.from_model ? this.get_model(c.from_model) : coupled;
 		c.from_port = c.from_model.port.get(c.from_port);
 		
-		c.to_model = c.to_model ? this.models.get(c.to_model) : coupled;
+		c.to_model = c.to_model ? this.get_model(c.to_model) : coupled;
 		c.to_port = c.to_model.port.get(c.to_port);
 		
 		return coupled.add_coupling(c);

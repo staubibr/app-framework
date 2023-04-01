@@ -59,6 +59,21 @@ export default class GIS extends Evented {
 		
 		this.map.on("click", this.on_map_click.bind(this));
 		
+		// array index to search for features corresponding to messages faster.
+		this.features = [];
+		
+		this.options.layers.forEach(l => {
+			if (!l.join) return;
+			
+			this.map.layer_features(l.id).forEach(f => {
+				var id = f.getProperties()[l.join];
+				var model = this.simulation.models.find(m => m.id == id);
+				
+				this.features[model.position] = { feature:f, layer:l.id };				
+			});
+			
+		})
+		
 		this.emit("ready");
 	}
 	
@@ -117,20 +132,21 @@ export default class GIS extends Evented {
 		this.map.add_control(ls);
 	}
 	
-	draw(variable, data) {		
+	draw(variable, messages) {		
 		if (!this.map) return;
 		
-		for (var id in variable) {
-			var features = this.map.layer_features(id);
-			var v = variable[id];
+		var filt = messages.filter(m => !!m);
+		
+		for (var i = 0; i < filt.length; i++) {
+			var m = filt[i];
+			var f = this.features[m.model.position];
 			
-			features.forEach(f => {
-				var id = f.getProperties()[v.layer.join];
-				var m = data[id];
-				
-				if (m != null) f.setStyle(v.style.symbol(m));
-			});
-		}
+			if (!f) continue;
+			
+			var s = variable[f.layer].style;
+			
+			if (s) f.feature.setStyle(s.symbol(m));
+		};
 	}
 	
 	on_map_click(ev) {

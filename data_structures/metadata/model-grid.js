@@ -64,7 +64,7 @@ export default class ModelGrid extends Model {
 				for (var z = 0; z < this.dimensions.z; z++) {
 					var json = SubcomponentCell.make(`c-${id++}`, type, [x,y,z]);
 					var cell = this.subcomponent.add(new SubcomponentCell(json));
-					this.index[x][y][z] = metadata.models.add(cell);
+					this.index[x][y][z] = metadata.add_model(cell);
 				}
 			}
 		}

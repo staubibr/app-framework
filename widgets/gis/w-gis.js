@@ -52,7 +52,7 @@ export default Core.templatable("Api.Widget.GIS", class wGIS extends Widget {
 			if (!variable) return;
 			
 			var id = s.feature.getProperties()[variable.layer.join];
-			var model = this.simulation.models.get(id);
+			var model = this.simulation.get_model(id);
 			var data = this.simulation.state.get_message(model);
 			var style = variable.style.symbol(data);
 			
@@ -68,7 +68,7 @@ export default Core.templatable("Api.Widget.GIS", class wGIS extends Widget {
 		// state messages
 		var props = s.feature.getProperties();
 		var id = props[variable.layer.join];
-		var model = this.simulation.models.get(id);
+		var model = this.simulation.get_model(id);
 		var data = this.simulation.state.get_message(model).templated;
 		
 		var root = Dom.create("div");
@@ -150,12 +150,8 @@ export default Core.templatable("Api.Widget.GIS", class wGIS extends Widget {
 		this.gis.draw(this.current, this.simulation.state.messages);
 	}
 	
-	on_simulation_move(ev) {
-		var data = {};
-		
-		ev.frame.state_messages.forEach(t => data[t.model.id] = t);
-		
-		this.gis.draw(this.current, data);
+	on_simulation_move(ev) {				
+		this.gis.draw(this.current, ev.frame.state_messages);
 	}
 	
 	html() {

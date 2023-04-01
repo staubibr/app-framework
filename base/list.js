@@ -134,7 +134,6 @@ export default class List extends Array {
 	 * @returns {boolean} true if the item is found, false otherwise
 	 */
 	reindex(fn_key) {
-		debugger;
 		this.index = {};
 		this.fn_key = fn_key;
 		

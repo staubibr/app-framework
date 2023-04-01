@@ -5,32 +5,16 @@
  **/
 export default class State { 
 	
-	/** 
-	* Gets the models for the state object.
-	* @type {object} 
-	*/
-	get models() { return this._models; }
-	
-	/** 
-	* Gets the state messages for the state object.
-	* @type {object} 
-	*/
-	get messages() { return this._messages; }
-	
-	set position(value) { this._position = value; }
-	
-	get position() { return this._position; }
-		
     /**
 	 * The state class holds the last state messages for all models in the simulation.
      * @param {Model[]} models - An array of all the models in the simulation.
      */
 	constructor(models) {
-		this._position = -1;
-		this._models = models;
-		this._messages = {};
+		this.position = -1;
+		this.models = models;
+		this.messages = [];
 		
-		for (var i = 0; i < models.length; i++) this.messages[models[i].id] = null;
+		// for (var i = 0; i < models.length; i++) this.messages[models[i].id] = null;
 	}
 	
     /**
@@ -43,7 +27,7 @@ export default class State {
 		for (var i = 0; i < this.models.length; i++) {
 			var m = this.models[i];
 			
-			clone.messages[m.id] = this.messages[m.id];
+			clone.messages[m.position] = this.messages[m.position];
 		}
 		
 		clone.position = this.position;
@@ -57,7 +41,7 @@ export default class State {
 	 * @return {object} a state value (usually JSON).
      */
 	get_message(model) {
-		return this.messages[model.id] || null;
+		return this.messages[model.position] || null;
 	}
 	
     /**
@@ -69,7 +53,7 @@ export default class State {
 		
 		for (var i = 0; i < frame.state_messages.length; i++) {
 			var message = frame.state_messages[i];
-			this.messages[message.model.id] = message;
+			this.messages[message.model.position] = message;
 		}
 	}
 	
@@ -78,7 +62,7 @@ export default class State {
 
 		for (var i = 0; i < frame.state_messages.length; i++) {
 			var message = frame.state_messages[i];
-			this.messages[message.model.id] = message.prev;
+			this.messages[message.model.position] = message.prev;
 		}
 	}
 }

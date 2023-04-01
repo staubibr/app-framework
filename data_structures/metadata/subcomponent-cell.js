@@ -10,19 +10,19 @@ import Model from './model.js';
  */
 export default class SubcomponentCell extends Subcomponent { 
 	
-	get coords() { return this.json["coords"]; }
-	
-	get x() { return this.coords[0]; }
-	
-	get y() { return this.coords[1]; }
-	
-	get z() { return this.coords[2]; }
+	constructor(json) {
+		super(json);
+		
+		this.x = json.coords[0];
+		this.y = json.coords[1];
+		this.z = json.coords[2];
+	}
 	
 	toJSON() {
 		return {
 			"identifier": this.id,
 			"model type": this.type.id,
-			"coords": this.coords
+			"coords": [this.x, this.y, this.z]
 		}
 	}
 

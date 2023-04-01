@@ -117,7 +117,7 @@ export default class Simulation extends Evented {
 		this._state = null;
 	}
 	
-	initialize(frames, n_cache) {
+	initialize(frames, n_cache) {		
 		this._cache = new Cache(n_cache, this.models);	
 		
 		for (var i = 0; i < frames.length; i++) {
@@ -132,6 +132,10 @@ export default class Simulation extends Evented {
 		}
 		
 		this.state = this.cache.first().clone();
+	}
+	
+	get_model(id) {
+		return this.models.find(m => m.id == id);
 	}
 	
     /**

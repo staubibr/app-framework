@@ -13,10 +13,8 @@ export default Core.templatable("Api.Widget.Grid", class Grid extends Evented {
 	set canvas(value) { this._canvas = value; }
 	get canvas() { return this._canvas; }
 	
-	get context() { return this.canvas.getContext("2d"); }
-	
-	set model(value) { this._model = value; }
-	get model() { return this._model; }
+	// set model(value) { this._model = value; }
+	// get model() { return this._model; }
 	
 	get styler() { return this._styler; }
 	set styler(value) { this._styler = value; }
@@ -47,6 +45,7 @@ export default Core.templatable("Api.Widget.Grid", class Grid extends Evented {
 		this.options = options;
 		this.model = simulation.grid_types[0];
 		this.canvas = Dom.create("canvas", null, container);
+		this.context = this.canvas.getContext("2d");
 
 		this.canvas.addEventListener("mousemove", this.on_canvas_mousemove.bind(this));
 		this.canvas.addEventListener("mouseout", this.on_canvas_mouseout.bind(this));
@@ -126,9 +125,13 @@ export default Core.templatable("Api.Widget.Grid", class Grid extends Evented {
 			for (var x = 0; x < this.dimensions.x; x++) {
 				for (var y = 0; y < this.dimensions.y; y++) {
 					for (var p = 0; p < l.fields.length; p++) {
-						var c = this.model.get_cell(x, y, l.z);
-						var m = state.get_message(c);
-						var v = m.get_value(l.fields[p]);
+		
+						var c = this.model.index[x][y][l.z];
+						var m = state.messages[c.position];
+						var v = m.templated[l.fields[p]];
+						// var c = this.model.get_cell(x, y, l.z);
+						// var m = state.get_message(c);
+						// var v = m.get_value(l.fields[p]);
 						
 						this.draw_cell(x, y, i, this.get_color(l.style, v));
 					}
@@ -142,7 +145,7 @@ export default Core.templatable("Api.Widget.Grid", class Grid extends Evented {
 			var m = messages[i];
 			var c = m.model;
 			
-			for (var j = 0; j < m.value.length; j++) {			
+			for (var j = 0; j < m.value.length; j++) {		
 				var layers = this.index[c.z]?.[c.state.fields[j].name] ?? [];
 				
 				for (var k = 0; k < layers.length; k++) {

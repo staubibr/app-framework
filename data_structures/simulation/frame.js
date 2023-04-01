@@ -7,55 +7,16 @@
  **/
 export default class Frame { 
 
-	/** 
-	* Gets all messages for the frame.
-	* @type {Message[]} 
-	*/
-	get messages() { return this._messages; }
-
-	/** 
-	* Gets output messages for the frame.
-	* @type {Message[]} 
-	*/
-	get output_messages() { return this.messages.output; }
-
-	/** 
-	* Gets state messages for the frame.
-	* @type {Message[]} 
-	*/
-	get state_messages() { return this.messages.state; }
-	
-	get previous_messages() { return this.messages.previous; }
-	
-	/** 
-	* Gets the time representation for the frame.
-	* @type {string} 
-	*/
-	get time() { return this._time; }
-	
     /**
      * @param {string} time - The time representation for the frame.
      */
 	constructor(time) {
-		this._time = time;
+		this.time = time;
 		
-		this._messages = {
-			output : [],
-			state : [],
-			previous : []		// previous state messages for this frame
-		}
-	}
-	
-    /**
-     * Add a message of the specified type to the frame .
-	 * @param {Message} message - message to add.
-	 * @param {string} type - the type of message to add (output or state).
-     * @return {Message} the added message.
-     */
-	add_message(message, type) {
-		this.messages[type].push(message);
-		
-		return message;
+		this.messages = [];
+		this.output_messages = [];
+		this.state_messages = [];
+		this.previous_messages = [];
 	}
 	
     /**
@@ -63,8 +24,10 @@ export default class Frame {
 	 * @param {Message} message - message to add.
      * @return {Message} the added message.
      */
-	add_output_message(message) {
-		return this.add_message(message, "output");
+	add_output_message(message) {		
+		this.output_messages.push(message);
+		
+		return message;
 	}
 	
     /**
@@ -73,11 +36,15 @@ export default class Frame {
      * @return {Message} the added message.
      */
 	add_state_message(message) {
-		return this.add_message(message, "state");
+		this.state_messages.push(message);
+		
+		return message;
 	}
 	
 	add_previous_message(message) {
-		return this.add_message(message, "previous");
+		this.previous_messages.push(message);
+		
+		return message;
 	}
 	
 	link_previous(state) {

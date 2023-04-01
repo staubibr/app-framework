@@ -14,30 +14,6 @@ export default class Cache {
 	* @type {number} 
 	*/
 	get length() { return this.states.length; }
-
-	/** 
-	* Gets interval between cached states.
-	* @type {number} 
-	*/
-	get interval() { return this._interval; }
-
-	/** 
-	* Sets interval between cached states.
-	* @type {number} 
-	*/
-	set interval(value) { this._interval = value; }
-	
-	/** 
-	* Gets an array of states containing the cached states.
-	* @type {State[]} 
-	*/
-	get states() { return this._states; }
-	
-	/** 
-	* Gets an array of states containing the cached states.
-	* @type {State[]} 
-	*/
-	set states(value) { this._states = value; }
 	
     /**
      * @param {number} interval - The interval between cached states (1 cached state out of interval value).

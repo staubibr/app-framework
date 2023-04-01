@@ -143,7 +143,7 @@ export default class MaUtil {
 		var _msg = MessageType.make(_id, _fields);
 		var _port = Port.make(port_type, port_name, _id);
 		
-		type.add_message_type(_msg);
+		type.add_message_type(new MessageType(_msg));
 		
 		return type.add_port(new Port(_port));
 	}

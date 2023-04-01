@@ -240,7 +240,6 @@ export default Core.templatable("Api.Widget.Linker", class Linker extends Widget
 	}
 	
 	on_linker_clear(ev) {
-		debugger;
 		// TODO: There are a few bugs here. The attributes get cleared correctly but the element on the right hand side
 		// stays highlighted. Afterwards, when animating the diagram, the couplings still get highlighted.
 		this.options.pages.forEach(p => {

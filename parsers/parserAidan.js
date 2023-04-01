@@ -98,7 +98,7 @@ export default class ParserAidan extends Parser {
 				}
 				
 				else {
-					var model = simulation.models.get(line[3].slice(1));		
+					var model = simulation.get_model(line[3].slice(1));		
 					var values = line[5].split(",").map(v => +v);
 
 					this.frame.add_state_message(new MessageState(model, values));	
