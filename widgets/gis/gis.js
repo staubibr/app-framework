@@ -69,6 +69,8 @@ export default class GIS extends Evented {
 				var id = f.getProperties()[l.join];
 				var model = this.simulation.models.find(m => m.id == id);
 				
+				if (!model) return;
+				
 				this.features[model.position] = { feature:f, layer:l.id };				
 			});
 			
